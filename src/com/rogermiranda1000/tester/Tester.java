@@ -13,7 +13,7 @@ public class Tester {
 
     public static void main(String[] args) {
         try {
-            Socket serversManagerSocket = new Socket("172.31.103.244", 8000);
+            Socket serversManagerSocket = new Socket("127.0.0.1", 8000);
             Tester tester = new Tester(new TesterConnector(serversManagerSocket));
             tester.connector.startServer(null, null, new Map[]{}, new Plugin[]{}, ServerType.Spigot, "1.17.1", new ConfigFile[]{});
         } catch (Exception e) {
