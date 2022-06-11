@@ -31,8 +31,6 @@ public class TesterConnector implements ServerManagerPetition {
     public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, Map[] maps, Plugin[] plugins, ServerType mcType, String version, ConfigFile[] configFiles) throws IOException {
         ArrayList<Byte> message = new ArrayList<>();
         message.add((byte) 0b000_0_000000000001); // start server header
-
-        message.add((byte)0x0A); // '\n'
         OutputStream out = this.serversManagerSocket.getOutputStream();
         DataOutputStream dos = new DataOutputStream(out);
         dos.write(TesterConnector.toByteArray(message), 0, message.size());
