@@ -1,4 +1,4 @@
-package com.rogermiranda1000.entities;
+package com.rogermiranda1000.watchwolf.entities;
 
 import java.io.File;
 import java.io.FileInputStream;

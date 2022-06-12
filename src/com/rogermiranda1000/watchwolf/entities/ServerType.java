@@ -1,4 +1,4 @@
-package com.rogermiranda1000.entities;
+package com.rogermiranda1000.watchwolf.entities;
 
 public enum ServerType {
     Spigot,

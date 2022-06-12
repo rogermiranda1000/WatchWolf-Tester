@@ -1,4 +1,4 @@
-package com.rogermiranda1000.entities;
+package com.rogermiranda1000.watchwolf.entities;
 
 public class UsualPlugin extends Plugin {
     private final String name;

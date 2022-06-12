@@ -1,28 +1,35 @@
-package com.rogermiranda1000.tester;
+package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.entities.*;
-import com.rogermiranda1000.serversmanager.ServerErrorNotifier;
-import com.rogermiranda1000.serversmanager.ServerManagerPetition;
-import com.rogermiranda1000.serversmanager.ServerStartNotifier;
+import com.rogermiranda1000.watchwolf.entities.*;
+import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
+import com.rogermiranda1000.watchwolf.serversmanager.ServerManagerPetition;
+import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 public class TesterConnector implements ServerManagerPetition {
     public interface ArrayAdder { public void addToArray(ArrayList<Byte> out, Object []file); }
 
     private final Socket serversManagerSocket;
+    private Socket serverManagerSocket;
 
     public TesterConnector(Socket serversManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
+    }
+
+    public void setServerManagerSocket(Socket s) {
+        this.serverManagerSocket = s;
+    }
+
+    public void close() {
+        try {
+            this.serversManagerSocket.close();
+            if (this.serverManagerSocket != null) this.serverManagerSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /* HELPER FUNCTIONS */
@@ -53,6 +60,18 @@ public class TesterConnector implements ServerManagerPetition {
         TesterConnector.addArray(out, arr, TesterConnector::addRaw);
     }
 
+    private static String readString(DataInputStream dis) throws IOException {
+        // TODO check if EOF
+        // size
+        short size = (short) dis.read(); // LSB
+        size |= ((short)dis.read()) << 8; // MSB
+
+        // characters
+        StringBuilder sb = new StringBuilder();
+        for (int n = 0; n < size; n++) sb.append((char)dis.read());
+        return sb.toString();
+    }
+
     /* INTERFACES */
     @Override
     public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, Map[] maps, Plugin[] plugins, ServerType mcType, String version, ConfigFile[] configFiles) throws IOException {
@@ -68,11 +87,14 @@ public class TesterConnector implements ServerManagerPetition {
         TesterConnector.addString(message, version);
         TesterConnector.addArray(message, configFiles, TesterConnector::addRaw); // TODO
 
-        OutputStream out = this.serversManagerSocket.getOutputStream();
-        DataOutputStream dos = new DataOutputStream(out);
+        DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
         dos.write(TesterConnector.toByteArray(message), 0, message.size());
-        dos.close();
 
-        return null;
+        // read response
+        // TODO queue
+        DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+        short r = dis.readShort();
+        if (r != 4097) return null; // response from ServersManager's start server request
+        return TesterConnector.readString(dis);
     }
 }
