@@ -1,15 +1,15 @@
 package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.entities.*;
-import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
-import com.rogermiranda1000.watchwolf.serversmanager.ServerManagerPetition;
-import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
+import com.rogermiranda1000.watchwolf.server.ServerPetition;
+import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
+import com.rogermiranda1000.watchwolf.serversmanager.*;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class TesterConnector implements ServerManagerPetition {
+public class TesterConnector implements ServerManagerPetition, ServerPetition {
     public interface ArrayAdder { public void addToArray(ArrayList<Byte> out, Object []file); }
 
     private final Socket serversManagerSocket;
@@ -48,8 +48,8 @@ public class TesterConnector implements ServerManagerPetition {
 
     private static void addArray(ArrayList<Byte> out, Object[] array, ArrayAdder arrayAdder) {
         int size = array.length;
-        out.add((byte)(size&0xFF));
-        out.add((byte)((size>>8)&0xFF));
+        out.add((byte)((size>>8)&0xFF)); // MSB
+        out.add((byte)(size&0xFF));      // LSB
 
         if (size > 0) arrayAdder.addToArray(out, array);
     }
@@ -63,8 +63,8 @@ public class TesterConnector implements ServerManagerPetition {
     private static String readString(DataInputStream dis) throws IOException {
         // TODO check if EOF
         // size
-        short size = (short) dis.read(); // LSB
-        size |= ((short)dis.read()) << 8; // MSB
+        short size = (short) (dis.read() << 8); // MSB
+        size |= (short) dis.read(); // LSB
 
         // characters
         StringBuilder sb = new StringBuilder();
@@ -96,5 +96,42 @@ public class TesterConnector implements ServerManagerPetition {
         short r = dis.readShort();
         if (r != 4097) return null; // response from ServersManager's start server request
         return TesterConnector.readString(dis);
+    }
+
+    @Override
+    public void opPlayer(String nick) throws IOException {
+        ArrayList<Byte> message = new ArrayList<>();
+
+        // op player header
+        message.add((byte) 0b001_0_0000);
+        message.add((byte) 0b00000001);
+        message.add((byte) 0x00);
+        message.add((byte) 0x04);
+
+        TesterConnector.addString(message, nick);
+
+        DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
+        dos.write(TesterConnector.toByteArray(message), 0, message.size());
+    }
+
+    @Override
+    public void whitelistPlayer(String nick) throws IOException {
+        // TODO
+    }
+
+    @Override
+    public void stopServer(ServerStopNotifier onServerStop) throws IOException {
+        ArrayList<Byte> message = new ArrayList<>();
+
+        // stop server header
+        message.add((byte) 0b001_0_0000);
+        message.add((byte) 0b00000001);
+        message.add((byte) 0x00);
+        message.add((byte) 0x01);
+
+        DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
+        dos.write(TesterConnector.toByteArray(message), 0, message.size());
+
+        // TODO onServerStop?
     }
 }

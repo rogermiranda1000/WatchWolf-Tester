@@ -5,6 +5,7 @@ import com.rogermiranda1000.watchwolf.entities.*;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Tester implements Runnable {
     private TesterConnector connector;
@@ -39,9 +40,16 @@ public class Tester implements Runnable {
 
     public static void main(String[] args) {
         try {
-            Socket serversManagerSocket = new Socket("127.0.0.1", 8000);
+            Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager
             Tester tester = new Tester(new TesterConnector(serversManagerSocket));
             tester.run();
+
+            tester.connector.whitelistPlayer("rogermiranda1000");
+            tester.connector.opPlayer("rogermiranda1000");
+
+            new Scanner(System.in).nextLine(); // wait till enter
+            tester.connector.stopServer(null);
+
             tester.close();
         } catch (IOException e) {
             e.printStackTrace();
