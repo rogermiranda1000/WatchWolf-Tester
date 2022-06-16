@@ -9,10 +9,11 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
     public interface ArrayAdder { public void addToArray(ArrayList<Byte> out, Object []file); }
 
     private final Socket serversManagerSocket;
+    private ServerStartNotifier onServerStart;
     private Socket serverManagerSocket;
 
     public TesterConnector(Socket serversManagerSocket) {
@@ -29,6 +30,36 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition {
             if (this.serverManagerSocket != null) this.serverManagerSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Read async responses
+     */
+    @Override
+    public void run() {
+        while(!this.serversManagerSocket.isClosed()) {
+            synchronized (this) {
+                try {
+                    DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+                    this.processAsyncReturn(dis.readShort());
+                } catch (EOFException ignore) {
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void processAsyncReturn(short header) throws IOException {
+        switch (header) {
+            case 0b000_1_000000000010: // server started
+                if (this.onServerStart != null) this.onServerStart.onServerStart();
+                else System.out.println("Server started, but notifier not setted");
+                break;
+
+            default:
+                System.out.println("Uknown request: " + header);
         }
     }
 
@@ -75,6 +106,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition {
     /* INTERFACES */
     @Override
     public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, Map[] maps, Plugin[] plugins, ServerType mcType, String version, ConfigFile[] configFiles) throws IOException {
+        this.onServerStart = onServerStart;
+
         ArrayList<Byte> message = new ArrayList<>();
 
         // start server header
@@ -88,14 +121,18 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition {
         TesterConnector.addArray(message, configFiles, TesterConnector::addRaw); // TODO
 
         DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
-        dos.write(TesterConnector.toByteArray(message), 0, message.size());
+        synchronized (this) { // response with return -> reserve the socket before the thread does
+            dos.write(TesterConnector.toByteArray(message), 0, message.size());
 
-        // read response
-        // TODO queue
-        DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
-        short r = dis.readShort();
-        if (r != 4097) return null; // response from ServersManager's start server request
-        return TesterConnector.readString(dis);
+            // read response
+            DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+            short r = dis.readShort();
+            while (r != 4097) {
+                this.processAsyncReturn(r); // expected return, found async return from another request
+                r = dis.readShort();
+            }
+            return TesterConnector.readString(dis);
+        }
     }
 
     @Override
