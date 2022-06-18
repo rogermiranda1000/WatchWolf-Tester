@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.entities.*;
+import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
@@ -13,18 +14,38 @@ public class Tester implements Runnable, ServerStartNotifier {
     private String serverIp;
     private int serverSocketPort;
 
-    public Tester(Socket serverManagerSocket) {
+    private ServerStartNotifier onServerStart;
+    private ServerErrorNotifier onError;
+    private final ServerType mcType;
+    private final String version;
+    private final Plugin[] plugins;
+    private final Map[] maps;
+    private final ConfigFile[] configFiles;
+
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles) {
         this.connector = new TesterConnector(serverManagerSocket);
+
+        this.mcType = mcType;
+        this.version = version;
+        this.plugins = plugins;
+        this.maps = maps;
+        this.configFiles = configFiles;
+    }
+
+    public Tester setOnServerStart(ServerStartNotifier onServerStart) {
+        this.onServerStart = onServerStart;
+        return this;
+    }
+
+    public Tester setOnServerError(ServerErrorNotifier onError) {
+        this.onError = onError;
+        return this;
     }
 
     @Override
     public void run() {
         try {
-            String []ip = this.connector.startServer(this, null, ServerType.Spigot, "1.17.1", new Plugin[]{
-                    new UsualPlugin("WorldGuard"),
-                    new UsualPlugin("WorldEdit"),
-                    new UsualPlugin("MineIt")
-            }, new Map[]{}, new ConfigFile[]{}).split(":");
+            String []ip = this.connector.startServer(this.onServerStart, this.onError, this.mcType, this.version, this.plugins, this.maps, this.configFiles).split(":");
             new Thread(this.connector).start();
 
             this.serverIp = ip[0];
@@ -38,19 +59,16 @@ public class Tester implements Runnable, ServerStartNotifier {
 
     @Override
     public void onServerStart() {
+        // connect to the server socket
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + "...");
             this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort));
-
-            // start the test
-            this.connector.whitelistPlayer("rogermiranda1000");
-            this.connector.opPlayer("rogermiranda1000");
-
-            new Scanner(System.in).nextLine(); // wait till enter
-            this.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        // start the test
+        if (this.onServerStart != null) this.onServerStart.onServerStart();
     }
 
     public void close() {
@@ -64,11 +82,36 @@ public class Tester implements Runnable, ServerStartNotifier {
         this.connector = null;
     }
 
+    public TesterConnector getConnector() {
+        return this.connector;
+    }
+
     public static void main(String[] args) {
         try {
-            Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager
-            Tester tester = new Tester(serversManagerSocket);
-            tester.run();
+            Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager socket
+
+            Tester tester = new Tester(serversManagerSocket, ServerType.Spigot, "1.17.1", new Plugin[]{
+                    new UsualPlugin("WorldGuard"),
+                    new UsualPlugin("WorldEdit"),
+                    new UsualPlugin("MineIt")
+            }, new Map[]{}, new ConfigFile[]{});
+
+            tester.setOnServerStart(() -> {
+                try {
+                    TesterConnector connector = tester.getConnector();
+                    connector.whitelistPlayer("rogermiranda1000");
+                    connector.opPlayer("rogermiranda1000");
+
+                    new Scanner(System.in).nextLine(); // wait till enter
+                    tester.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            tester.setOnServerError((msg) -> System.err.println("-- Server error --\n" + msg));
+
+            tester.run(); // all prepared, start the server
         } catch (IOException e) {
             e.printStackTrace();
         }
