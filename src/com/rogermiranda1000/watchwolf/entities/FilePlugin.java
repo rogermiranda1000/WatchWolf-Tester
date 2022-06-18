@@ -3,6 +3,7 @@ package com.rogermiranda1000.watchwolf.entities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class FilePlugin extends Plugin {
     private final byte []data;
@@ -18,5 +19,10 @@ public class FilePlugin extends Plugin {
 
     public FilePlugin(byte []data) {
         this.data = data;
+    }
+
+    @Override
+    public void sendSocketData(ArrayList<Byte> out) {
+        // TODO
     }
 }

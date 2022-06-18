@@ -20,7 +20,11 @@ public class Tester implements Runnable, ServerStartNotifier {
     @Override
     public void run() {
         try {
-            String []ip = this.connector.startServer(this, null, new Map[]{}, new Plugin[]{}, ServerType.Spigot, "1.17.1", new ConfigFile[]{}).split(":");
+            String []ip = this.connector.startServer(this, null, ServerType.Spigot, "1.17.1", new Plugin[]{
+                    new UsualPlugin("WorldGuard"),
+                    new UsualPlugin("WorldEdit"),
+                    new UsualPlugin("MineIt")
+            }, new Map[]{}, new ConfigFile[]{}).split(":");
             new Thread(this.connector).start();
 
             this.serverIp = ip[0];
@@ -37,15 +41,26 @@ public class Tester implements Runnable, ServerStartNotifier {
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + "...");
             this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort));
-            // TODO start the test
+
+            // start the test
+            this.connector.whitelistPlayer("rogermiranda1000");
+            this.connector.opPlayer("rogermiranda1000");
+
+            new Scanner(System.in).nextLine(); // wait till enter
+            this.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public void close() {
-        this.connector.close();
+        // try to close the server
+        try {
+            this.connector.stopServer(null);
+        } catch (IOException ignore) {}
 
+        // close the connections
+        this.connector.close();
         this.connector = null;
     }
 
@@ -54,14 +69,6 @@ public class Tester implements Runnable, ServerStartNotifier {
             Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager
             Tester tester = new Tester(serversManagerSocket);
             tester.run();
-
-            tester.connector.whitelistPlayer("rogermiranda1000");
-            tester.connector.opPlayer("rogermiranda1000");
-
-            new Scanner(System.in).nextLine(); // wait till enter
-            tester.connector.stopServer(null);
-
-            tester.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

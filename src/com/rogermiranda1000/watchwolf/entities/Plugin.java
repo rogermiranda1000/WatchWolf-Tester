@@ -1,4 +1,4 @@
 package com.rogermiranda1000.watchwolf.entities;
 
-public class Plugin {
+public abstract class Plugin implements SocketData {
 }

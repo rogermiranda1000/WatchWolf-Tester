@@ -8,5 +8,5 @@ import com.rogermiranda1000.watchwolf.entities.ServerType;
 import java.io.IOException;
 
 public interface ServerManagerPetition {
-    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, Map []maps, Plugin []plugins, ServerType mcType, String version, ConfigFile []configFiles) throws IOException;
+    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin []plugins, Map []maps, ConfigFile []configFiles) throws IOException;
 }
