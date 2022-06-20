@@ -33,14 +33,15 @@ public class SocketHelper {
     }
 
     public static short readShort(DataInputStream dis) throws IOException {
-        short msb = (short)((short)dis.readByte() << 8);
-        return (short)(msb | dis.readByte()); // LSB
+        int msb = dis.readUnsignedByte();
+        short lsb = (short)dis.readUnsignedByte();
+        return (short)(msb << 8 | lsb);
     }
 
     public static String readString(DataInputStream dis) throws IOException {
         // TODO check if EOF
         // size
-        short size = SocketHelper.readShort(dis);
+        int size = Short.toUnsignedInt(SocketHelper.readShort(dis));
 
         // characters
         StringBuilder sb = new StringBuilder();

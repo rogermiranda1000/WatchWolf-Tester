@@ -5,11 +5,12 @@ import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Tester implements Runnable, ServerStartNotifier {
+    public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
+
     private TesterConnector connector;
     private String serverIp;
     private int serverSocketPort;
@@ -90,11 +91,13 @@ public class Tester implements Runnable, ServerStartNotifier {
         try {
             Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager socket
 
-            Tester tester = new Tester(serversManagerSocket, ServerType.Spigot, "1.17.1", new Plugin[]{
+            Tester tester = new Tester(serversManagerSocket, ServerType.Spigot, "1.8", new Plugin[]{
                     new UsualPlugin("WorldGuard"),
                     new UsualPlugin("WorldEdit"),
-                    new UsualPlugin("MineIt")
-            }, new Map[]{}, new ConfigFile[]{});
+                    new UsualPlugin("MineIt"),
+                    new UsualPlugin("PortalGun")
+            }, new Map[]{}, new ConfigFile[]{})
+                    .setOnServerError(Tester.DEFAULT_ERROR_PRINT);
 
             tester.setOnServerStart(() -> {
                 try {
@@ -108,8 +111,6 @@ public class Tester implements Runnable, ServerStartNotifier {
                     ex.printStackTrace();
                 }
             });
-
-            tester.setOnServerError((msg) -> System.err.println("-- Server error --\n" + msg));
 
             tester.run(); // all prepared, start the server
         } catch (IOException e) {

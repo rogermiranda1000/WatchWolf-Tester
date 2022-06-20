@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
     private final Socket serversManagerSocket;
     private ServerStartNotifier onServerStart;
+    private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
 
     public TesterConnector(Socket serversManagerSocket) {
@@ -40,7 +41,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             synchronized (this.serversManagerSocket) {
                 try {
                     DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
-                    this.processAsyncReturn(dis.readShort());
+                    this.processAsyncReturn(dis.readShort(), dis);
                 } catch (EOFException ignore) {
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -49,11 +50,16 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         }
     }
 
-    private void processAsyncReturn(short header) throws IOException {
+    private void processAsyncReturn(short header, DataInputStream dis) throws IOException {
         switch (header) {
             case 0b000_1_000000000010: // server started
                 if (this.onServerStart != null) this.onServerStart.onServerStart();
                 else System.out.println("Server started, but notifier not setted");
+                break;
+
+            case 0b000_1_000000000011: // error
+                String error = SocketHelper.readString(dis); // even if no error notifier, we need to remove the string from the socket
+                if (this.onServerError != null) this.onServerError.onError(error);
                 break;
 
             default:
@@ -65,6 +71,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles) throws IOException {
         this.onServerStart = onServerStart;
+        this.onServerError = onError;
 
         ArrayList<Byte> message = new ArrayList<>();
 
@@ -93,7 +100,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
             short r = SocketHelper.readShort(dis);
             while (r != 4097) {
-                this.processAsyncReturn(r); // expected return, found async return from another request
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
                 r = SocketHelper.readShort(dis);
             }
             return SocketHelper.readString(dis);
