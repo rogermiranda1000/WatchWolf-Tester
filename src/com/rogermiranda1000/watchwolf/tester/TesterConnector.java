@@ -127,7 +127,18 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public void whitelistPlayer(String nick) throws IOException {
         if (this.serverManagerSocket == null) return;
-        // TODO
+        ArrayList<Byte> message = new ArrayList<>();
+
+        // op player header
+        message.add((byte) 0b001_0_0000);
+        message.add((byte) 0b00000001);
+        message.add((byte) 0x00);
+        message.add((byte) 0x03);
+
+        SocketHelper.addString(message, nick);
+
+        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
+        dos.write(SocketHelper.toByteArray(message), 0, message.size());
     }
 
     @Override
