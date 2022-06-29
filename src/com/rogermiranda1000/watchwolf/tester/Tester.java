@@ -46,7 +46,7 @@ public class Tester implements Runnable, ServerStartNotifier {
     @Override
     public void run() {
         try {
-            String []ip = this.connector.startServer(this.onServerStart, this.onError, this.mcType, this.version, this.plugins, this.maps, this.configFiles).split(":");
+            String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, this.plugins, this.maps, this.configFiles).split(":");
             new Thread(this.connector).start();
 
             this.serverIp = ip[0];
@@ -95,7 +95,8 @@ public class Tester implements Runnable, ServerStartNotifier {
                     new UsualPlugin("WorldGuard"),
                     new UsualPlugin("WorldEdit"),
                     new UsualPlugin("MineIt"),
-                    new UsualPlugin("PortalGun")
+                    //new UsualPlugin("PortalGun"),
+                    new UsualPlugin("Gson")
             }, new Map[]{}, new ConfigFile[]{})
                     .setOnServerError(Tester.DEFAULT_ERROR_PRINT);
 
