@@ -7,6 +7,7 @@ import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class Tester implements Runnable, ServerStartNotifier {
     public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
@@ -15,7 +16,7 @@ public class Tester implements Runnable, ServerStartNotifier {
     private String serverIp;
     private int serverSocketPort;
 
-    private ServerStartNotifier onServerStart;
+    private Runnable onServerStart;
     private ServerErrorNotifier onError;
     private final ServerType mcType;
     private final String version;
@@ -34,7 +35,12 @@ public class Tester implements Runnable, ServerStartNotifier {
     }
 
     public Tester setOnServerStart(ServerStartNotifier onServerStart) {
-        this.onServerStart = onServerStart;
+        this.onServerStart = onServerStart::onServerStart;
+        return this;
+    }
+
+    public Tester setOnServerStart(Consumer<TesterConnector> onServerStart) {
+        this.onServerStart = ()->onServerStart.accept(this.getConnector());
         return this;
     }
 
@@ -69,7 +75,7 @@ public class Tester implements Runnable, ServerStartNotifier {
         }
 
         // start the test
-        if (this.onServerStart != null) this.onServerStart.onServerStart();
+        if (this.onServerStart != null) this.onServerStart.run();
     }
 
     public void close() {
