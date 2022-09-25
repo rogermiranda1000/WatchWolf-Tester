@@ -7,6 +7,7 @@ import com.rogermiranda1000.watchwolf.serversmanager.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
@@ -42,7 +43,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
                 try {
                     DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
                     this.processAsyncReturn(dis.readShort(), dis);
-                } catch (EOFException ignore) {
+                } catch (EOFException | SocketException ignore) {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
