@@ -10,6 +10,12 @@ public abstract class SocketData {
         public SocketData read(DataInputStream dis) throws IOException;
     }
 
+    public SocketData() {}
+
+    public SocketData(Reader reader) {
+        this.setReaderFunction(reader);
+    }
+
     private static final HashMap<Class<? extends SocketData>, Reader> readers = new HashMap<>();
 
     public void setReaderFunction(Reader reader) {

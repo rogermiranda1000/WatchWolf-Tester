@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.entities.*;
+import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
 import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.*;
@@ -159,5 +160,49 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         this.serverManagerSocket.close();
         this.serverManagerSocket = null;
         // TODO onServerStop?
+    }
+
+    @Override
+    public void setBlock(Position position, Block block) throws IOException {
+        if (this.serverManagerSocket == null) return;
+        ArrayList<Byte> message = new ArrayList<>();
+
+        // set block header
+        message.add((byte) 0b001_0_0000);
+        message.add((byte) 0b00000001);
+        message.add((byte) 0x00);
+        message.add((byte) 0x05);
+
+        position.sendSocketData(message);
+        block.sendSocketData(message);
+
+        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
+        dos.write(SocketHelper.toByteArray(message), 0, message.size());
+    }
+
+    @Override
+    public Block getBlock(Position position) throws IOException {
+        ArrayList<Byte> message = new ArrayList<>();
+
+        // get block header
+        message.add((byte) 0b001_0_0000);
+        message.add((byte) 0b00000001);
+        message.add((byte) 0x00);
+        message.add((byte) 0x06);
+
+        DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
+        synchronized (this.serversManagerSocket) { // response with return -> reserve the socket before the thread does
+            dos.write(SocketHelper.toByteArray(message), 0, message.size());
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+            short r = SocketHelper.readShort(dis);
+            while (r != 0b001_1_000000000001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0006) throw new IOException("Expected response from 0x0006 operation.");
+            return (Block) SocketData.readSocketData(dis, Block.class);
+        }
     }
 }

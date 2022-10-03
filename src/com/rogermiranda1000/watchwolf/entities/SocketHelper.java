@@ -32,6 +32,14 @@ public class SocketHelper {
         SocketHelper.addArray(out, arr, SocketHelper::addRaw);
     }
 
+    /**
+     * @author https://stackoverflow.com/a/13072387/9178470
+     */
+    public static void addDouble(ArrayList<Byte> out, double d) {
+        long lng = Double.doubleToLongBits(d);
+        for(int i = 0; i < 8; i++) out.add((byte)((lng >> ((7 - i) * 8)) & 0xff));
+    }
+
     public static void addShort(ArrayList<Byte> out, short s) {
         out.add((byte)(s >> 8));
         out.add((byte)(s & 0xFF));
@@ -49,6 +57,10 @@ public class SocketHelper {
         int msb = dis.readUnsignedByte();
         short lsb = (short)dis.readUnsignedByte();
         return (short)(msb << 8 | lsb);
+    }
+
+    public static double readDouble(DataInputStream dis) throws IOException {
+        return dis.readDouble();
     }
 
     public static String readString(DataInputStream dis) throws IOException {
