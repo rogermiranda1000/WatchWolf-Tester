@@ -3,6 +3,7 @@ package com.rogermiranda1000.watchwolf.entities;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public abstract class SocketData {
@@ -34,4 +35,16 @@ public abstract class SocketData {
     }
 
     public abstract void sendSocketData(ArrayList<Byte> out);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof SocketData)) return false;
+
+        ArrayList<Byte> thisData = new ArrayList<>(),
+                        thatData = new ArrayList<>();
+        this.sendSocketData(thisData);
+        ((SocketData)obj).sendSocketData(thatData);
+        return thisData.equals(thatData);
+    }
 }
