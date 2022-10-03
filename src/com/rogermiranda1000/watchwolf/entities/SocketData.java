@@ -1,26 +1,30 @@
 package com.rogermiranda1000.watchwolf.entities;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Function;
 
 public abstract class SocketData {
-    private static final HashMap<Class<? extends SocketData>, Function<DataInputStream,SocketData>> readers = new HashMap<>();
+    public static interface Reader {
+        public SocketData read(DataInputStream dis) throws IOException;
+    }
 
-    public void setReaderFunction(Function<DataInputStream,SocketData> reader) {
+    private static final HashMap<Class<? extends SocketData>, Reader> readers = new HashMap<>();
+
+    public void setReaderFunction(Reader reader) {
         SocketData.readers.put(this.getClass(), reader);
     }
 
-    public static void setReaderFunction(Class<? extends SocketData> targetClass, Function<DataInputStream,SocketData> reader) {
+    public static void setReaderFunction(Class<? extends SocketData> targetClass, Reader reader) {
         SocketData.readers.put(targetClass, reader);
     }
 
 
-    public static SocketData readSocketData(DataInputStream dis, Class<? extends SocketData> typeClass) throws UnknownReaderClassException {
-        Function<DataInputStream,SocketData> reader = SocketData.readers.get(typeClass);
+    public static SocketData readSocketData(DataInputStream dis, Class<? extends SocketData> typeClass) throws UnknownReaderClassException, IOException {
+        Reader reader = SocketData.readers.get(typeClass);
         if (reader == null) throw new UnknownReaderClassException("The class " + typeClass.getName() + " doesn't contain a SocketReader.");
-        return reader.apply(dis);
+        return reader.read(dis);
     }
 
     public abstract void sendSocketData(ArrayList<Byte> out);

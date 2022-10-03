@@ -41,6 +41,10 @@ public class SocketHelper {
         for (int n = 0; n < bytes; n++) out.add((byte)0);
     }
 
+    public static void discard(DataInputStream dis, int bytes) throws IOException {
+        for (int n = 0; n < bytes; n++) dis.readUnsignedByte();
+    }
+
     public static short readShort(DataInputStream dis) throws IOException {
         int msb = dis.readUnsignedByte();
         short lsb = (short)dis.readUnsignedByte();

@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.entities.blocks.special;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.*;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import java.util.*;
 
 public class PolishedGraniteSlab extends Block implements Orientable {
@@ -31,11 +32,25 @@ public class PolishedGraniteSlab extends Block implements Orientable {
 		return orientation.keySet();
 	}
 
+	/*   --- SOCKET DATA OVERRIDE ---   */
+	@Override
+	public void sendSocketData(ArrayList<Byte> out) {
+		SocketHelper.addShort(out, this.id);
+		out.add((byte)0);
+		out.add((byte)(((this.orientation.get(Orientable.Orientation.U) == true) ? 0b100000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.D) == true) ? 0b010000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.N) == true) ? 0b001000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.S) == true) ? 0b000100_00 : 0x00) |((this.orientation.get(Orientable.Orientation.E) == true) ? 0b000010_00 : 0x00) |((this.orientation.get(Orientable.Orientation.W) == true) ? 0b000001_00 : 0x00)));
+		out.add((byte)0);
+		SocketHelper.fill(out, 51);
+	}
+
 	/*   --- CONSTRUCTORS ---   */
-	public PolishedGraniteSlab(int id) {
-		super(id, "PolishedGraniteSlab");
-		this.orientation.put(Orientable.Orientation.U, false);
+	public PolishedGraniteSlab(short id) {
+		super(id, "POLISHED_GRANITE_SLAB");
 		this.orientation.put(Orientable.Orientation.D, false);
+		this.orientation.put(Orientable.Orientation.U, false);
+	}
+
+	public PolishedGraniteSlab(int id) {
+		this((short) id);
 	}
 
 	private PolishedGraniteSlab(PolishedGraniteSlab old) {

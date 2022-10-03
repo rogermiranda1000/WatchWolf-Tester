@@ -1,13 +1,18 @@
 package com.rogermiranda1000.watchwolf.entities.blocks.special;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.*;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import java.util.*;
 
 public class NoteBlock extends Block {
 
 	/*   --- CONSTRUCTORS ---   */
+	public NoteBlock(short id) {
+		super(id, "NOTE_BLOCK");
+	}
+
 	public NoteBlock(int id) {
-		super(id, "NoteBlock");
+		this((short) id);
 	}
 
 	private NoteBlock(NoteBlock old) {

@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.entities.blocks.special;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.*;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import java.util.*;
 
 public class BlackStainedGlassPane extends Block implements Orientable {
@@ -31,13 +32,27 @@ public class BlackStainedGlassPane extends Block implements Orientable {
 		return orientation.keySet();
 	}
 
+	/*   --- SOCKET DATA OVERRIDE ---   */
+	@Override
+	public void sendSocketData(ArrayList<Byte> out) {
+		SocketHelper.addShort(out, this.id);
+		out.add((byte)0);
+		out.add((byte)(((this.orientation.get(Orientable.Orientation.U) == true) ? 0b100000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.D) == true) ? 0b010000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.N) == true) ? 0b001000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.S) == true) ? 0b000100_00 : 0x00) |((this.orientation.get(Orientable.Orientation.E) == true) ? 0b000010_00 : 0x00) |((this.orientation.get(Orientable.Orientation.W) == true) ? 0b000001_00 : 0x00)));
+		out.add((byte)0);
+		SocketHelper.fill(out, 51);
+	}
+
 	/*   --- CONSTRUCTORS ---   */
-	public BlackStainedGlassPane(int id) {
-		super(id, "BlackStainedGlassPane");
-		this.orientation.put(Orientable.Orientation.N, false);
-		this.orientation.put(Orientable.Orientation.S, false);
+	public BlackStainedGlassPane(short id) {
+		super(id, "BLACK_STAINED_GLASS_PANE");
 		this.orientation.put(Orientable.Orientation.E, false);
+		this.orientation.put(Orientable.Orientation.S, false);
+		this.orientation.put(Orientable.Orientation.N, false);
 		this.orientation.put(Orientable.Orientation.W, false);
+	}
+
+	public BlackStainedGlassPane(int id) {
+		this((short) id);
 	}
 
 	private BlackStainedGlassPane(BlackStainedGlassPane old) {
