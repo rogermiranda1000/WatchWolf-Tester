@@ -947,4 +947,15 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 
 		return null;
 	}
+
+	public static Block getBlock(String name) {
+		for (Field f : Blocks.class.getDeclaredFields()) {
+			try {
+				Block b = (Block)f.get(null);
+				if (b.name.equals(name)) return b;
+			} catch (IllegalAccessException ignore) { }
+		}
+
+		return null;
+	}
 }
