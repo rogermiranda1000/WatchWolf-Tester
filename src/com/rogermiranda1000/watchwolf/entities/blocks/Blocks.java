@@ -2,6 +2,8 @@ package com.rogermiranda1000.watchwolf.entities.blocks;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.special.*;
 
+import java.lang.reflect.Field;
+
 public class Blocks {
 	public static final Block AIR=new Block(0,"AIR"),
 STONE=new Block(1,"STONE"),
@@ -934,4 +936,15 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 	public static final CaveVines CAVE_VINES=new CaveVines(926);
 	public static final CaveVinesPlant CAVE_VINES_PLANT=new CaveVinesPlant(927);
 	public static final BigDripleafStem BIG_DRIPLEAF_STEM=new BigDripleafStem(928);
+
+	public static Block getBlockById(int id) {
+		for (Field f : Blocks.class.getDeclaredFields()) {
+			try {
+				Block b = (Block)f.get(null);
+				if (b.id == id) return b;
+			} catch (IllegalAccessException ignore) { }
+		}
+
+		return null;
+	}
 }

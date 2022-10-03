@@ -32,6 +32,15 @@ public class SocketHelper {
         SocketHelper.addArray(out, arr, SocketHelper::addRaw);
     }
 
+    public static void addShort(ArrayList<Byte> out, short s) {
+        out.add((byte)(s >> 8));
+        out.add((byte)(s & 0xFF));
+    }
+
+    public static void fill(ArrayList<Byte> out, int bytes) {
+        for (int n = 0; n < bytes; n++) out.add((byte)0);
+    }
+
     public static short readShort(DataInputStream dis) throws IOException {
         int msb = dis.readUnsignedByte();
         short lsb = (short)dis.readUnsignedByte();
