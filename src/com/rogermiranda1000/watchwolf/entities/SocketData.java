@@ -3,7 +3,6 @@ package com.rogermiranda1000.watchwolf.entities;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 public abstract class SocketData {
@@ -24,13 +23,22 @@ public abstract class SocketData {
     }
 
     public static void setReaderFunction(Class<? extends SocketData> targetClass, Reader reader) {
+        System.out.println(targetClass.getName());
         SocketData.readers.put(targetClass, reader);
     }
 
 
     public static SocketData readSocketData(DataInputStream dis, Class<? extends SocketData> typeClass) throws UnknownReaderClassException, IOException {
         Reader reader = SocketData.readers.get(typeClass);
-        if (reader == null) throw new UnknownReaderClassException("The class " + typeClass.getName() + " doesn't contain a SocketReader.");
+        if (reader == null) {
+            // maybe it's not loaded yet
+            try {
+                ClassLoader.getSystemClassLoader().loadClass(typeClass.getName());
+            } catch (ClassNotFoundException ignore) { }
+
+            reader = SocketData.readers.get(typeClass);
+            if (reader == null) throw new UnknownReaderClassException("The class " + typeClass.getName() + " doesn't contain a SocketReader.");
+        }
         return reader.read(dis);
     }
 
