@@ -23,7 +23,6 @@ public abstract class SocketData {
     }
 
     public static void setReaderFunction(Class<? extends SocketData> targetClass, Reader reader) {
-        System.out.println(targetClass.getName());
         SocketData.readers.put(targetClass, reader);
     }
 
@@ -33,7 +32,7 @@ public abstract class SocketData {
         if (reader == null) {
             // maybe it's not loaded yet
             try {
-                ClassLoader.getSystemClassLoader().loadClass(typeClass.getName());
+                Class.forName(typeClass.getName());
             } catch (ClassNotFoundException ignore) { }
 
             reader = SocketData.readers.get(typeClass);
