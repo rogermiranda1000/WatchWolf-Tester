@@ -26,14 +26,17 @@ public abstract class SocketData {
         SocketData.readers.put(targetClass, reader);
     }
 
+    public static void loadStaticBlock(Class<?> loaderClass) {
+        try {
+            Class.forName(loaderClass.getName());
+        } catch (ClassNotFoundException ignore) { }
+    }
 
     public static SocketData readSocketData(DataInputStream dis, Class<? extends SocketData> typeClass) throws UnknownReaderClassException, IOException {
         Reader reader = SocketData.readers.get(typeClass);
         if (reader == null) {
             // maybe it's not loaded yet
-            try {
-                Class.forName(typeClass.getName());
-            } catch (ClassNotFoundException ignore) { }
+            SocketData.loadStaticBlock(typeClass);
 
             reader = SocketData.readers.get(typeClass);
             if (reader == null) throw new UnknownReaderClassException("The class " + typeClass.getName() + " doesn't contain a SocketReader.");

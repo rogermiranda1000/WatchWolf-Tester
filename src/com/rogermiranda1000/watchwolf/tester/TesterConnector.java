@@ -19,6 +19,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
 
     public TesterConnector(Socket serversManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
+
+        SocketData.loadStaticBlock(BlockReader.class);
     }
 
     public void setServerManagerSocket(Socket s) {
