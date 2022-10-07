@@ -59,4 +59,9 @@ public class Position extends SocketData {
         SocketHelper.addDouble(out, this.y);
         SocketHelper.addDouble(out, this.z);
     }
+
+    @Override
+    public String toString() {
+        return this.x + ", " + this.y + ", " + this.z + " (" + this.world + ")";
+    }
 }
