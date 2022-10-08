@@ -37,7 +37,12 @@ public class DeepslateBrickSlab extends Block implements Orientable {
 	public void sendSocketData(ArrayList<Byte> out) {
 		SocketHelper.addShort(out, this.id);
 		out.add((byte)0);
-		out.add((byte)(((this.orientation.get(Orientable.Orientation.U) == true) ? 0b100000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.D) == true) ? 0b010000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.N) == true) ? 0b001000_00 : 0x00) |((this.orientation.get(Orientable.Orientation.S) == true) ? 0b000100_00 : 0x00) |((this.orientation.get(Orientable.Orientation.E) == true) ? 0b000010_00 : 0x00) |((this.orientation.get(Orientable.Orientation.W) == true) ? 0b000001_00 : 0x00)));
+		out.add((byte)((Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.U)) ? 0b100000_00 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.D)) ? 0b010000_00 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.N)) ? 0b001000_00 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.S)) ? 0b000100_00 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.E)) ? 0b000010_00 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.W)) ? 0b000001_00 : 0x00)));
 		out.add((byte)0);
 		SocketHelper.fill(out, 51);
 	}
@@ -45,8 +50,8 @@ public class DeepslateBrickSlab extends Block implements Orientable {
 	/*   --- CONSTRUCTORS ---   */
 	public DeepslateBrickSlab(short id) {
 		super(id, "DEEPSLATE_BRICK_SLAB");
-		this.orientation.put(Orientable.Orientation.D, false);
 		this.orientation.put(Orientable.Orientation.U, false);
+		this.orientation.put(Orientable.Orientation.D, false);
 	}
 
 	public DeepslateBrickSlab(int id) {

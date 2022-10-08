@@ -64,4 +64,13 @@ public class Position extends SocketData {
     public String toString() {
         return this.x + ", " + this.y + ", " + this.z + " (" + this.world + ")";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Position)) return false;
+
+        Position that = (Position)obj;
+        return this.world.equals(that.world) && this.x == that.x && this.y == that.y && this.z == that.z;
+    }
 }
