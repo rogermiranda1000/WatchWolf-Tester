@@ -184,7 +184,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public void setBlock(Position position, Block block) throws IOException {
         if (this.serverManagerSocket == null) return;
-        Message message = new Message(this.serversManagerSocket);
+        Message message = new Message(this.serverManagerSocket);
 
         // set block header
         message.add((byte) 0b001_0_0000);
@@ -201,7 +201,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public Block getBlock(Position position) throws IOException {
         if (this.serverManagerSocket == null) return null;
-        Message message = new Message(this.serversManagerSocket);
+        Message message = new Message(this.serverManagerSocket);
 
         // get block header
         message.add((byte) 0b001_0_0000);
@@ -215,7 +215,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             message.send();
 
             // read response
-            DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
             short r = SocketHelper.readShort(dis);
             while (r != 0b001_1_000000000001) {
                 this.processAsyncReturn(r, dis); // expected return, found async return from another request
