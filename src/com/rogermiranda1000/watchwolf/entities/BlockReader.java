@@ -8,7 +8,10 @@ public class BlockReader {
     static {
         SocketData.setReaderFunction(Block.class, (dis) -> {
             Block r = Blocks.getBlockById(SocketHelper.readShort(dis));
-            if (r == null) return null;
+            if (r == null) {
+                SocketHelper.discard(dis, 54);
+                return null;
+            }
 
             dis.readUnsignedByte(); // TODO age
             int tmp = dis.readUnsignedByte(); // direction & axis
