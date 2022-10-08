@@ -15,7 +15,7 @@ public class BlockReader {
 
             dis.readUnsignedByte(); // TODO age
             int tmp = dis.readUnsignedByte(); // direction & axis
-            if (r.getClass().isAssignableFrom(Orientable.class)) {
+            if (r instanceof Orientable) {
                 Orientable orientable = (Orientable) r;
                 try {
                     if ((tmp & 0b00_000001) > 0) orientable = orientable.set(Orientable.Orientation.U);
