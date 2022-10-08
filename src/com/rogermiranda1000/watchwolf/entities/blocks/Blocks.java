@@ -948,6 +948,10 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 		return Blocks.getBlocks().filter(b -> b.name.equals(name)).findFirst().orElse(null);
 	}
 
+	public static Block getDefault(Block b) {
+		return Blocks.getBlockById(b.id);
+	}
+
 	public static Stream<Block> getBlocks() {
 		return Arrays.stream(Blocks.class.getDeclaredFields()).filter(f -> Block.class.isAssignableFrom(f.getType())).map(f -> {
 			try {
