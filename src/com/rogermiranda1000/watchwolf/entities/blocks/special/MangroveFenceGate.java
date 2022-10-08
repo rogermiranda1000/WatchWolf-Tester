@@ -35,12 +35,12 @@ public class MangroveFenceGate extends Block implements Orientable {
 	public void sendSocketData(ArrayList<Byte> out) {
 		SocketHelper.addShort(out, this.id);
 		out.add((byte)0);
-		out.add((byte)((Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.U)) ? 0b100000_00 : 0x00) |
-				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.D)) ? 0b010000_00 : 0x00) |
-				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.N)) ? 0b001000_00 : 0x00) |
-				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.S)) ? 0b000100_00 : 0x00) |
-				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.E)) ? 0b000010_00 : 0x00) |
-				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.W)) ? 0b000001_00 : 0x00)));
+		out.add((byte)((Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.U)) ? 0b00_000001 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.D)) ? 0b00_000010 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.N)) ? 0b00_000100 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.S)) ? 0b00_001000 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.E)) ? 0b00_010000 : 0x00) |
+				(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.W)) ? 0b00_100000 : 0x00)));
 		out.add((byte)0);
 		SocketHelper.fill(out, 51);
 	}
@@ -48,12 +48,12 @@ public class MangroveFenceGate extends Block implements Orientable {
 	/*   --- CONSTRUCTORS ---   */
 	public MangroveFenceGate(short id) {
 		super(id, "MANGROVE_FENCE_GATE");
-		this.orientation.put(Orientable.Orientation.W, false);
-		this.orientation.put(Orientable.Orientation.S, false);
-		this.orientation.put(Orientable.Orientation.U, false);
 		this.orientation.put(Orientable.Orientation.E, false);
-		this.orientation.put(Orientable.Orientation.D, false);
 		this.orientation.put(Orientable.Orientation.N, false);
+		this.orientation.put(Orientable.Orientation.S, false);
+		this.orientation.put(Orientable.Orientation.W, false);
+		this.orientation.put(Orientable.Orientation.U, false);
+		this.orientation.put(Orientable.Orientation.D, false);
 	}
 
 	public MangroveFenceGate(int id) {
