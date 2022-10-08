@@ -18,15 +18,15 @@ public class BlocksTester extends AbstractTest {
     @Test
     public void setBlock() throws Exception {
         Position p = new Position("world", 0,0,0);
-        TesterTester.connector.setBlock(p, Blocks.SAND);
-        assertEquals(TesterTester.connector.getBlock(p), Blocks.SAND);
+        TesterTester.connector.setBlock(p, Blocks.IRON_BLOCK);
+        assertEquals(TesterTester.connector.getBlock(p), Blocks.IRON_BLOCK);
     }
 
     @Test
     public void setComplexBlock() throws Exception {
         Position p = new Position("world", 0,0,0);
-        TesterTester.connector.setBlock(p, Blocks.ACACIA_SLAB);
-        assertEquals(TesterTester.connector.getBlock(p), Blocks.ACACIA_SLAB);
+        TesterTester.connector.setBlock(p, Blocks.OAK_SLAB);
+        assertEquals(TesterTester.connector.getBlock(p), Blocks.OAK_SLAB);
     }
 
     @Test

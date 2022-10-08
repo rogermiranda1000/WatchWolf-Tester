@@ -9,6 +9,7 @@ import com.rogermiranda1000.watchwolf.serversmanager.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
@@ -43,14 +44,30 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     public void run() {
         while(!this.serversManagerSocket.isClosed()) {
             synchronized (this.serversManagerSocket) {
+                int timeout = 1800000; // default Java socket timeout value
                 try {
+                    timeout = this.serversManagerSocket.getSoTimeout();
+                } catch (SocketException ignore) {}
+
+                try {
+                    this.serversManagerSocket.setSoTimeout(1000); // don't stay longer than 1s
                     DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
                     this.processAsyncReturn(dis.readShort(), dis);
-                } catch (EOFException | SocketException ignore) {
+                } catch (EOFException | SocketException | SocketTimeoutException ignore) {
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                } finally {
+                    try {
+                        this.serversManagerSocket.setSoTimeout(timeout);
+                    } catch (SocketException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
+
+            try {
+                Thread.sleep(1000); // give some margin for the rest of the requests
+            } catch (InterruptedException ignore) {}
         }
     }
 
@@ -67,7 +84,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
                 break;
 
             default:
-                System.out.println("Uknown request: " + header);
+                System.out.println("Unknown request: " + header);
         }
     }
 
@@ -167,7 +184,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public void setBlock(Position position, Block block) throws IOException {
         if (this.serverManagerSocket == null) return;
-        ArrayList<Byte> message = new ArrayList<>();
+        Message message = new Message(this.serversManagerSocket);
 
         // set block header
         message.add((byte) 0b001_0_0000);
@@ -175,16 +192,16 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         message.add((byte) 0x00);
         message.add((byte) 0x05);
 
-        position.sendSocketData(message);
-        block.sendSocketData(message);
+        message.add(position);
+        message.add(block);
 
-        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
-        dos.write(SocketHelper.toByteArray(message), 0, message.size());
+        message.send();
     }
 
     @Override
     public Block getBlock(Position position) throws IOException {
-        ArrayList<Byte> message = new ArrayList<>();
+        if (this.serverManagerSocket == null) return null;
+        Message message = new Message(this.serversManagerSocket);
 
         // get block header
         message.add((byte) 0b001_0_0000);
@@ -192,9 +209,10 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         message.add((byte) 0x00);
         message.add((byte) 0x06);
 
-        DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
+        message.add(position);
+
         synchronized (this.serversManagerSocket) { // response with return -> reserve the socket before the thread does
-            dos.write(SocketHelper.toByteArray(message), 0, message.size());
+            message.send();
 
             // read response
             DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());

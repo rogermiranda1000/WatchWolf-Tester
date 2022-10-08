@@ -19,11 +19,8 @@ public class SocketHelper {
     }
 
     public static void addArray(ArrayList<Byte> out, Object[] array, ArrayAdder arrayAdder) {
-        int size = array.length;
-        out.add((byte)((size>>8)&0xFF)); // MSB
-        out.add((byte)(size&0xFF));      // LSB
-
-        if (size > 0) arrayAdder.addToArray(out, array);
+        SocketHelper.addShort(out, (short)array.length);
+        if (array.length > 0) arrayAdder.addToArray(out, array);
     }
 
     public static void addString(ArrayList<Byte> out, String str) {
@@ -60,7 +57,9 @@ public class SocketHelper {
     }
 
     public static double readDouble(DataInputStream dis) throws IOException {
-        return dis.readDouble();
+        long lng = 0;
+        for (int i = 0; i < 8; i++) lng = (lng << 8) | dis.readUnsignedByte();
+        return Double.longBitsToDouble(lng);
     }
 
     public static String readString(DataInputStream dis) throws IOException {
