@@ -6,6 +6,7 @@ import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,6 +35,12 @@ public class BlocksTester extends AbstractTest {
         Position p = new Position("world", 0,0,0);
         Block slab = (Block) Blocks.ACACIA_SLAB.set(Orientable.Orientation.U, true);
         TesterTester.connector.setBlock(p, slab);
-        assertEquals(TesterTester.connector.getBlock(p), slab);
+        Block get = TesterTester.connector.getBlock(p);
+
+        ArrayList<Byte> originalData = new ArrayList<>(),
+                gettedData = new ArrayList<>();
+        slab.sendSocketData(originalData);
+        get.sendSocketData(gettedData);
+        assertEquals(originalData, gettedData);
     }
 }
