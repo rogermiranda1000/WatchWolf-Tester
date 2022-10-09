@@ -19,11 +19,8 @@ public class SocketHelper {
     }
 
     public static void addArray(ArrayList<Byte> out, Object[] array, ArrayAdder arrayAdder) {
-        int size = array.length;
-        out.add((byte)((size>>8)&0xFF)); // MSB
-        out.add((byte)(size&0xFF));      // LSB
-
-        if (size > 0) arrayAdder.addToArray(out, array);
+        SocketHelper.addShort(out, (short)array.length);
+        if (array.length > 0) arrayAdder.addToArray(out, array);
     }
 
     public static void addString(ArrayList<Byte> out, String str) {
@@ -32,10 +29,37 @@ public class SocketHelper {
         SocketHelper.addArray(out, arr, SocketHelper::addRaw);
     }
 
+    /**
+     * @author https://stackoverflow.com/a/13072387/9178470
+     */
+    public static void addDouble(ArrayList<Byte> out, double d) {
+        long lng = Double.doubleToLongBits(d);
+        for(int i = 0; i < 8; i++) out.add((byte)((lng >> ((7 - i) * 8)) & 0xff));
+    }
+
+    public static void addShort(ArrayList<Byte> out, short s) {
+        out.add((byte)(s >> 8));
+        out.add((byte)(s & 0xFF));
+    }
+
+    public static void fill(ArrayList<Byte> out, int bytes) {
+        for (int n = 0; n < bytes; n++) out.add((byte)0);
+    }
+
+    public static void discard(DataInputStream dis, int bytes) throws IOException {
+        for (int n = 0; n < bytes; n++) dis.readUnsignedByte();
+    }
+
     public static short readShort(DataInputStream dis) throws IOException {
         int msb = dis.readUnsignedByte();
         short lsb = (short)dis.readUnsignedByte();
         return (short)(msb << 8 | lsb);
+    }
+
+    public static double readDouble(DataInputStream dis) throws IOException {
+        long lng = 0;
+        for (int i = 0; i < 8; i++) lng = (lng << 8) | dis.readUnsignedByte();
+        return Double.longBitsToDouble(lng);
     }
 
     public static String readString(DataInputStream dis) throws IOException {
