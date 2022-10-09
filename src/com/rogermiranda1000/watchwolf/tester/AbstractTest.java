@@ -20,7 +20,7 @@ abstract public class AbstractTest {
     // TODO move to file
     public static final String []serversManagerIP = "127.0.0.1:8000".split(":");
     private static final ServerType serverType = ServerType.Spigot;
-    private static final String serverVersion = "1.19";
+    private static final String serverVersion = "1.18.2";
 
     @BeforeAll
     public static void setup() throws IOException, InterruptedException {

@@ -3,6 +3,9 @@ package com.rogermiranda1000.watchwolf.entities.blocks;
 import com.rogermiranda1000.watchwolf.entities.blocks.special.*;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class Blocks {
 	public static final Block AIR=new Block(0,"AIR"),
@@ -938,13 +941,24 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 	public static final BigDripleafStem BIG_DRIPLEAF_STEM=new BigDripleafStem(928);
 
 	public static Block getBlockById(int id) {
-		for (Field f : Blocks.class.getDeclaredFields()) {
-			try {
-				Block b = (Block)f.get(null);
-				if (b.id == id) return b;
-			} catch (IllegalAccessException ignore) { }
-		}
+		return Blocks.getBlocks().filter(b -> b.id == id).findFirst().orElse(null);
+	}
 
-		return null;
+	public static Block getBlock(String name) {
+		return Blocks.getBlocks().filter(b -> b.name.equals(name)).findFirst().orElse(null);
+	}
+
+	public static Block getDefault(Block b) {
+		return Blocks.getBlockById(b.id);
+	}
+
+	public static Stream<Block> getBlocks() {
+		return Arrays.stream(Blocks.class.getDeclaredFields()).filter(f -> Block.class.isAssignableFrom(f.getType())).map(f -> {
+			try {
+				return (Block)f.get(null);
+			} catch (IllegalAccessException ignore) {
+				return null;
+			}
+		});
 	}
 }

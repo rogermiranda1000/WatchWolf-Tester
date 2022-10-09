@@ -7,9 +7,9 @@ public interface Orientable {
         U, D, N, S, E, W
     }
 
-    public boolean isSet(Orientation o) throws IllegalArgumentException;
-    public Orientable set(Orientation o, boolean value) throws IllegalArgumentException;
-    public Orientable set(Orientation o) throws IllegalArgumentException;
-    public Orientable unset(Orientation o) throws IllegalArgumentException;
+    public boolean isOrientationSet(Orientation o) throws IllegalArgumentException;
+    public Orientable setOrientation(Orientation o, boolean value) throws IllegalArgumentException;
+    public Orientable setOrientation(Orientation o) throws IllegalArgumentException;
+    public Orientable unsetOrientation(Orientation o) throws IllegalArgumentException;
     public Set<Orientation> getValidOrientations();
 }
