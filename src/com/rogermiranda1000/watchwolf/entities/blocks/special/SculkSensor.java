@@ -6,6 +6,16 @@ import java.util.*;
 
 public class SculkSensor extends Block {
 
+	/*   --- SOCKET DATA OVERRIDE ---   */
+	@Override
+	public void sendSocketData(ArrayList<Byte> out) {
+		SocketHelper.addShort(out, this.id);
+		out.add((byte)0);
+		out.add((byte)0);
+		out.add((byte)0);
+		SocketHelper.fill(out, 51);
+	}
+
 	/*   --- CONSTRUCTORS ---   */
 	public SculkSensor(short id) {
 		super(id, "SCULK_SENSOR");

@@ -7,6 +7,7 @@ import java.util.Set;
  */
 public interface Directionable {
     public static enum Direction {
+        NONE(0),
         X(1), Y(2), Z(3),
         DOUBLE_WALL(2), SINGLE_WALL(1);
 
@@ -20,9 +21,7 @@ public interface Directionable {
         }
     }
 
-    public boolean isSet(Directionable.Direction d) throws IllegalArgumentException;
-    public Orientable set(Directionable.Direction d, boolean value) throws IllegalArgumentException;
-    public Orientable set(Directionable.Direction d) throws IllegalArgumentException;
-    public Orientable unset(Directionable.Direction d) throws IllegalArgumentException;
+    public Directionable.Direction getFacingDirection();
+    public Directionable setDirection(Directionable.Direction d) throws IllegalArgumentException;
     public Set<Directionable.Direction> getValidDirections();
 }

@@ -7,23 +7,23 @@ import java.util.*;
 public class GrayShulkerBox extends Block implements Orientable {
 	/*   --- ORIENTABLE INTERFACE ---   */
 	private final Map<Orientable.Orientation,Boolean> orientation = new HashMap<>();
-	public boolean isSet(Orientable.Orientation o) throws IllegalArgumentException {
+	public boolean isOrientationSet(Orientable.Orientation o) throws IllegalArgumentException {
 		Boolean result = this.orientation.get(o);
 		return result;
 	}
 
-	public Orientable set(Orientable.Orientation o, boolean value) throws IllegalArgumentException {
+	public Orientable setOrientation(Orientable.Orientation o, boolean value) throws IllegalArgumentException {
 		GrayShulkerBox current = new GrayShulkerBox(this);
 		current.orientation.put(o, value);
 		return current;
 	}
 
-	public Orientable set(Orientable.Orientation o) throws IllegalArgumentException {
-		return this.set(o, true);
+	public Orientable setOrientation(Orientable.Orientation o) throws IllegalArgumentException {
+		return this.setOrientation(o, true);
 	}
 
-	public Orientable unset(Orientable.Orientation o) throws IllegalArgumentException {
-		return this.set(o, false);
+	public Orientable unsetOrientation(Orientable.Orientation o) throws IllegalArgumentException {
+		return this.setOrientation(o, false);
 	}
 
 	public Set<Orientable.Orientation> getValidOrientations() {
@@ -48,12 +48,12 @@ public class GrayShulkerBox extends Block implements Orientable {
 	/*   --- CONSTRUCTORS ---   */
 	public GrayShulkerBox(short id) {
 		super(id, "GRAY_SHULKER_BOX");
-		this.orientation.put(Orientable.Orientation.E, false);
-		this.orientation.put(Orientable.Orientation.N, false);
-		this.orientation.put(Orientable.Orientation.S, false);
-		this.orientation.put(Orientable.Orientation.W, false);
 		this.orientation.put(Orientable.Orientation.U, false);
+		this.orientation.put(Orientable.Orientation.E, false);
+		this.orientation.put(Orientable.Orientation.W, false);
+		this.orientation.put(Orientable.Orientation.S, false);
 		this.orientation.put(Orientable.Orientation.D, false);
+		this.orientation.put(Orientable.Orientation.N, false);
 	}
 
 	public GrayShulkerBox(int id) {

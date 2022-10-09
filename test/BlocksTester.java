@@ -1,7 +1,9 @@
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
+import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
+import com.rogermiranda1000.watchwolf.entities.blocks.special.Bell;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import org.junit.jupiter.api.Test;
 
@@ -31,15 +33,30 @@ public class BlocksTester extends AbstractTest {
     }
 
     @Test
-    public void setChangedComplexBlock() throws Exception {
+    public void setChangedOrientableBlock() throws Exception {
         Position p = new Position("world", 0,0,0);
-        Block slab = (Block) Blocks.ACACIA_SLAB.set(Orientable.Orientation.U, true);
+        Block slab = (Block) Blocks.ACACIA_SLAB.setOrientation(Orientable.Orientation.U, true);
         TesterTester.connector.setBlock(p, slab);
         Block get = TesterTester.connector.getBlock(p);
 
         ArrayList<Byte> originalData = new ArrayList<>(),
                 gettedData = new ArrayList<>();
         slab.sendSocketData(originalData);
+        get.sendSocketData(gettedData);
+        assertEquals(originalData, gettedData);
+    }
+
+    @Test
+    public void setChangedOrientableDirectionableBlock() throws Exception {
+        Position p = new Position("world", 0,0,0);
+        Bell bell = (Bell) Blocks.BELL.setOrientation(Orientable.Orientation.W, true);
+        bell = (Bell) bell.setDirection(Directionable.Direction.SINGLE_WALL);
+        TesterTester.connector.setBlock(p, bell);
+        Block get = TesterTester.connector.getBlock(p);
+
+        ArrayList<Byte> originalData = new ArrayList<>(),
+                gettedData = new ArrayList<>();
+        bell.sendSocketData(originalData);
         get.sendSocketData(gettedData);
         assertEquals(originalData, gettedData);
     }
