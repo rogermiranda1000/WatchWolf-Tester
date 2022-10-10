@@ -2,6 +2,7 @@ package com.rogermiranda1000.watchwolf.entities;
 
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
+import com.rogermiranda1000.watchwolf.entities.blocks.Directionable;
 import com.rogermiranda1000.watchwolf.entities.blocks.Orientable;
 
 public class BlockReader {
@@ -14,6 +15,7 @@ public class BlockReader {
             }
 
             dis.readUnsignedByte(); // TODO age
+
             int tmp = dis.readUnsignedByte(); // direction & axis
             if (r instanceof Orientable) {
                 Orientable orientable = (Orientable) r;
@@ -29,7 +31,38 @@ public class BlockReader {
                     r = (Block) orientable;
                 }
             }
-            // TODO axis
+            if (r instanceof Directionable) {
+                Directionable directionable = (Directionable) r;
+                tmp >>= 6;
+                try {
+                    switch (tmp) {
+                        case 1:
+                            directionable = directionable.setDirection(Directionable.Direction.X);
+                            break;
+                        case 2:
+                            directionable = directionable.setDirection(Directionable.Direction.Y);
+                            break;
+                        case 3:
+                            directionable = directionable.setDirection(Directionable.Direction.Z);
+                            break;
+                    }
+                } catch (IllegalArgumentException ignore) {}
+                try {
+                    switch (tmp) {
+                        case 0:
+                            directionable = directionable.setDirection(Directionable.Direction.NONE);
+                            break;
+                        case 1:
+                            directionable = directionable.setDirection(Directionable.Direction.SINGLE_WALL);
+                            break;
+                        case 2:
+                            directionable = directionable.setDirection(Directionable.Direction.DOUBLE_WALL);
+                            break;
+                    }
+                } catch (IllegalArgumentException ignore) {}
+                r = (Block) directionable;
+            }
+
             SocketHelper.discard(dis, 1); // reserved
             SocketHelper.discard(dis, 51); // TODO
             return r;
