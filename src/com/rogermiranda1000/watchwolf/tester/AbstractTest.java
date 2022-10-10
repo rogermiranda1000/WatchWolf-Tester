@@ -4,50 +4,76 @@ import com.rogermiranda1000.watchwolf.entities.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.Map;
 import com.rogermiranda1000.watchwolf.entities.Plugin;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
-abstract public class AbstractTest {
-    private static Tester tester;
-    public static TesterConnector connector;
-
-    public abstract File getConfigFile(); // TODO how static abstract
+public class AbstractTest implements TestWatcher, // send feedback
+        BeforeAllCallback, AfterAllCallback, // open/close server
+        ParameterResolver { // send arguments
+    private Tester tester;
+    private TesterConnector connector;
 
     // TODO move to file
-    public static final String []serversManagerIP = "127.0.0.1:8000".split(":");
-    private static final ServerType serverType = ServerType.Spigot;
-    private static final String serverVersion = "1.18.2";
+    public final String []serversManagerIP = "127.0.0.1:8000".split(":");
+    private final ServerType serverType = ServerType.Spigot;
+    private final String serverVersion = "1.18.2";
 
-    @BeforeAll
-    public static void setup() throws IOException, InterruptedException {
+    @Override
+    public void beforeAll(ExtensionContext extensionContext) throws IOException, InterruptedException {
+        this.getConfigFile(); // TODO
         Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
 
-        System.out.println("Starting test for " + serverType.name() + " " + AbstractTest.serverVersion);
-        AbstractTest.tester = new Tester(serversManagerSocket, AbstractTest.serverType, AbstractTest.serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
+        System.out.println("Starting test for " + serverType.name() + " " + this.serverVersion);
+        this.tester = new Tester(serversManagerSocket, this.serverType, this.serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
                 .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
         final Object waitForStartup = new Object();
-        AbstractTest.tester.setOnServerStart((connector) -> {
+        this.tester.setOnServerStart((connector) -> {
             synchronized (waitForStartup) {
-                AbstractTest.connector = connector;
+                this.connector = connector;
                 waitForStartup.notify();
             }
         });
 
         synchronized (waitForStartup) {
-            AbstractTest.tester.run();
+            this.tester.run();
 
             waitForStartup.wait();
             // at this point the connector is ready; end the setup and start the tests
         }
     }
 
-    @AfterAll
-    public static void stop() {
-        AbstractTest.tester.close();
+    @Override
+    public void afterAll(ExtensionContext extensionContext) throws Exception {
+        this.tester.close();
+    }
+
+    @Override
+    public void testSuccessful(ExtensionContext context) {
+        System.err.println("Test " + context.getDisplayName() + " succeed");
+    }
+
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        System.err.println("Test " + context.getDisplayName() + " failed: " + cause.getMessage());
+    }
+
+    /**
+     * Method to override
+     * @return WatchWolf config file
+     */
+    public File getConfigFile() { throw new UnspecifiedConfigFileException(); }
+
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        return parameterContext.getParameter().getType() == TesterConnector.class;
+    }
+
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        return this.connector;
     }
 }
