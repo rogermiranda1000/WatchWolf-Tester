@@ -69,7 +69,7 @@ public class Tester implements Runnable, ServerStartNotifier {
         // connect to the server socket
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + "...");
-            this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort));
+            this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort), this.mcType, this.version);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

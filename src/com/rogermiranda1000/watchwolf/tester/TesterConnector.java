@@ -18,14 +18,20 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
 
+    private ServerType mcType;
+    private String version;
+
     public TesterConnector(Socket serversManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
 
         SocketData.loadStaticBlock(BlockReader.class);
     }
 
-    public void setServerManagerSocket(Socket s) {
+    public void setServerManagerSocket(Socket s, ServerType mcType, String version) {
         this.serverManagerSocket = s;
+
+        this.mcType = mcType;
+        this.version = version;
     }
 
     public void close() {
@@ -86,6 +92,15 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             default:
                 System.out.println("Unknown request: " + header);
         }
+    }
+
+    /* EXTRA INTERFACES */
+    public ServerType getServerType() {
+        return this.mcType;
+    }
+
+    public String getServerVersion() {
+        return this.version;
     }
 
     /* INTERFACES */
