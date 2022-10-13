@@ -58,7 +58,7 @@ public class Tester implements Runnable, ServerStartNotifier {
             this.serverIp = ip[0];
             this.serverSocketPort = Integer.parseInt(ip[1]) + 1; // the server socket port it's the next of the server port
 
-            System.out.println("Server started, waiting for the 'server up' message");
+            System.out.println("Server started (" + ip[0] + ":" + ip[1] + "), waiting for the 'server up' message");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
