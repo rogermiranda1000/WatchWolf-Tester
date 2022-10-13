@@ -27,18 +27,17 @@ public class AbstractTest implements TestWatcher, // send feedback
     // TODO move to file
     public final String []serversManagerIP = "127.0.0.1:8000".split(":");
     private final ServerType serverType = ServerType.Spigot;
-    private final String []serverVersions = {"1.18.2", "1.17"};
+    private final String []serverVersions = {"1.18.2", "1.14"};
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
         this.servers = new ArrayList<>();
-
-        Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
         this.testID = UUID.randomUUID();
 
-        Thread []startQueue = new Thread[this.serverVersions.length];
-        for (int n = 0; n < this.serverVersions.length; n++) {
-            String serverVersion = this.serverVersions[n];
+        final Object waitForStartup = new Object();
+        for (String serverVersion : this.serverVersions) {
+            Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
+
             final ServerInstance server = new ServerInstance();
             this.servers.add(server);
 
@@ -46,33 +45,22 @@ public class AbstractTest implements TestWatcher, // send feedback
             server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
                     .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
-            final Object waitForStartup = new Object();
             server.tester.setOnServerStart((connector) -> {
                 synchronized (waitForStartup) {
                     server.connector = connector;
                     waitForStartup.notify();
                 }
             });
-
-            startQueue[n] = new Thread(() -> {
-                synchronized (waitForStartup) {
-                    server.tester.run();
-
-                    try {
-                        waitForStartup.wait();
-                        // at this point this connector is ready
-                    } catch (InterruptedException ignore) {}
-                }
-            });
-            startQueue[n].start();
         }
 
-        for (Thread t : startQueue) {
+        synchronized (waitForStartup) {
+            for (ServerInstance server : this.servers) server.tester.run();
+
             try {
-                t.join();
+                for (int n = 0; n < this.servers.size(); n++) waitForStartup.wait(); // wait n times
+                // at this point the connectors are ready; end the setup and start the tests
             } catch (InterruptedException ignore) {}
         }
-        // at this point the connectors are ready; end the setup and start the tests
     }
 
     @Override
