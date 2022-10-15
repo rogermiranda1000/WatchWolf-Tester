@@ -5,23 +5,30 @@ import com.rogermiranda1000.watchwolf.entities.Map;
 import com.rogermiranda1000.watchwolf.entities.Plugin;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class AbstractTest implements TestWatcher, // send feedback
         BeforeAllCallback, AfterAllCallback, // open/close server
-        ParameterResolver { // send arguments
+        ArgumentsProvider { // send arguments
     private static class ServerInstance {
         public Tester tester;
         public TesterConnector connector;
     }
 
-    private ArrayList<ServerInstance> servers;
+    private static HashMap<Class<? extends AbstractTest>, AbstractTest> instances = new HashMap<>();
 
+    private ArrayList<ServerInstance> servers;
     private UUID testID;
 
     // TODO move to file
@@ -31,6 +38,8 @@ public class AbstractTest implements TestWatcher, // send feedback
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
+        AbstractTest.instances.put((Class<? extends AbstractTest>) extensionContext.getTestClass().orElseThrow((Supplier<? extends RuntimeException>) () -> {throw new IllegalArgumentException("Extension context not extends of AbstractTest");}), this);
+
         this.servers = new ArrayList<>();
         this.testID = UUID.randomUUID();
 
@@ -64,7 +73,7 @@ public class AbstractTest implements TestWatcher, // send feedback
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) throws Exception {
+    public void afterAll(ExtensionContext extensionContext) {
         for (ServerInstance server : this.servers) server.tester.close();
 
         // TODO send 'done' to website
@@ -83,14 +92,18 @@ public class AbstractTest implements TestWatcher, // send feedback
     }
 
     @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType() == TesterConnector.class;
+    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+        Class<?> cls = extensionContext.getTestClass().orElse(null);
+        AbstractTest instance = AbstractTest.instances.get(cls);
+        if (instance == null) throw new IllegalArgumentException("Instance of " + cls + " not instantiated.");
+
+        return instance.servers.stream().map(e -> Arguments.of(e.connector));
     }
 
-    @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return this.servers.get(0).connector;
-    }
+    /*@Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        return parameterContext.getParameter().getType() == TesterConnector.class;
+    }*/
 
     /**
      * Method to override
