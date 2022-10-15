@@ -1,14 +1,16 @@
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import com.rogermiranda1000.watchwolf.tester.TesterConnector;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Alright... We're doing a Tester to test plugins, but who tests the tester to test plugins?
  * That's right! We need a Tester for the Tester.
  */
+@ExtendWith(TesterTester.class) // run the tests with the AbstractTest overridden methods
 public class TesterTester extends AbstractTest {
     private static final String USER1 = "rogermiranda1000";
 
@@ -17,15 +19,17 @@ public class TesterTester extends AbstractTest {
         return null; // TODO
     }
 
-    @Test
-    public void opPlayer() throws Exception {
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
+    public void opPlayer(TesterConnector connector) throws Exception {
         // TODO we need Player interface to test it
-        TesterTester.connector.opPlayer(TesterTester.USER1);
+        connector.opPlayer(TesterTester.USER1);
     }
 
-    @Test
-    public void whitelistPlayer() throws Exception {
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
+    public void whitelistPlayer(TesterConnector connector) throws Exception {
         // TODO we need Player interface to test it
-        TesterTester.connector.whitelistPlayer(TesterTester.USER1);
+        connector.whitelistPlayer(TesterTester.USER1);
     }
 }

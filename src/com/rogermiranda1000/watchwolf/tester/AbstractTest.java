@@ -4,50 +4,110 @@ import com.rogermiranda1000.watchwolf.entities.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.Map;
 import com.rogermiranda1000.watchwolf.entities.Plugin;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-abstract public class AbstractTest {
-    private static Tester tester;
-    public static TesterConnector connector;
+public class AbstractTest implements TestWatcher, // send feedback
+        BeforeAllCallback, AfterAllCallback, // open/close server
+        ArgumentsProvider { // send arguments
+    private static class ServerInstance {
+        public Tester tester;
+        public TesterConnector connector;
+    }
 
-    public abstract File getConfigFile(); // TODO how static abstract
+    private static HashMap<Class<? extends AbstractTest>, AbstractTest> instances = new HashMap<>();
+
+    private ArrayList<ServerInstance> servers;
+    private UUID testID;
 
     // TODO move to file
-    public static final String []serversManagerIP = "127.0.0.1:8000".split(":");
-    private static final ServerType serverType = ServerType.Spigot;
-    private static final String serverVersion = "1.18.2";
+    public final String []serversManagerIP = "127.0.0.1:8000".split(":");
+    private final ServerType serverType = ServerType.Spigot;
+    private final String []serverVersions = {"1.18.2", "1.14"};
 
-    @BeforeAll
-    public static void setup() throws IOException, InterruptedException {
-        Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
+    @Override
+    public void beforeAll(ExtensionContext extensionContext) throws IOException {
+        AbstractTest.instances.put((Class<? extends AbstractTest>) extensionContext.getTestClass().orElseThrow((Supplier<? extends RuntimeException>) () -> {throw new IllegalArgumentException("Extension context not extends of AbstractTest");}), this);
 
-        System.out.println("Starting test for " + serverType.name() + " " + AbstractTest.serverVersion);
-        AbstractTest.tester = new Tester(serversManagerSocket, AbstractTest.serverType, AbstractTest.serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
-                .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
+        this.servers = new ArrayList<>();
+        this.testID = UUID.randomUUID();
 
         final Object waitForStartup = new Object();
-        AbstractTest.tester.setOnServerStart((connector) -> {
-            synchronized (waitForStartup) {
-                AbstractTest.connector = connector;
-                waitForStartup.notify();
-            }
-        });
+        for (String serverVersion : this.serverVersions) {
+            Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
+
+            final ServerInstance server = new ServerInstance();
+            this.servers.add(server);
+
+            System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
+            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
+                    .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
+
+            server.tester.setOnServerStart((connector) -> {
+                synchronized (waitForStartup) {
+                    server.connector = connector;
+                    waitForStartup.notify();
+                }
+            });
+        }
 
         synchronized (waitForStartup) {
-            AbstractTest.tester.run();
+            for (ServerInstance server : this.servers) server.tester.run();
 
-            waitForStartup.wait();
-            // at this point the connector is ready; end the setup and start the tests
+            try {
+                for (int n = 0; n < this.servers.size(); n++) waitForStartup.wait(); // wait n times
+                // at this point the connectors are ready; end the setup and start the tests
+            } catch (InterruptedException ignore) {}
         }
     }
 
-    @AfterAll
-    public static void stop() {
-        AbstractTest.tester.close();
+    @Override
+    public void afterAll(ExtensionContext extensionContext) {
+        for (ServerInstance server : this.servers) server.tester.close();
+
+        // TODO send 'done' to website
     }
+
+    @Override
+    public void testSuccessful(ExtensionContext context) {
+        // TODO send 'ok' to website
+        System.err.println("Test " + context.getDisplayName() + " succeed");
+    }
+
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        // TODO send 'fail' to website
+        System.err.println("Test " + context.getDisplayName() + " failed: " + cause.getMessage());
+    }
+
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+        Class<?> cls = extensionContext.getTestClass().orElse(null);
+        AbstractTest instance = AbstractTest.instances.get(cls);
+        if (instance == null) throw new IllegalArgumentException("Instance of " + cls + " not instantiated.");
+
+        return instance.servers.stream().map(e -> Arguments.of(e.connector));
+    }
+
+    /*@Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        return parameterContext.getParameter().getType() == TesterConnector.class;
+    }*/
+
+    /**
+     * Method to override
+     * @return WatchWolf config file
+     */
+    public File getConfigFile() { throw new UnspecifiedConfigFileException(); }
 }
