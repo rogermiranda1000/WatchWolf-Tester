@@ -1,7 +1,8 @@
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
 
@@ -18,14 +19,15 @@ public class TesterTester extends AbstractTest {
         return null; // TODO
     }
 
-    @Test
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
     public void opPlayer(TesterConnector connector) throws Exception {
         // TODO we need Player interface to test it
         connector.opPlayer(TesterTester.USER1);
-        System.out.println(connector.getServerVersion());
     }
 
-    @Test
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
     public void whitelistPlayer(TesterConnector connector) throws Exception {
         // TODO we need Player interface to test it
         connector.whitelistPlayer(TesterTester.USER1);
