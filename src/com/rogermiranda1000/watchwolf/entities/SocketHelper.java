@@ -38,8 +38,8 @@ public class SocketHelper {
     }
 
     public static void addShort(ArrayList<Byte> out, short s) {
-        out.add((byte)(s >> 8));
         out.add((byte)(s & 0xFF));
+        out.add((byte)(s >> 8));
     }
 
     public static void fill(ArrayList<Byte> out, int bytes) {
@@ -51,8 +51,8 @@ public class SocketHelper {
     }
 
     public static short readShort(DataInputStream dis) throws IOException {
-        int msb = dis.readUnsignedByte();
-        short lsb = (short)dis.readUnsignedByte();
+        int lsb = dis.readUnsignedByte();
+        short msb = (short)dis.readUnsignedByte();
         return (short)(msb << 8 | lsb);
     }
 

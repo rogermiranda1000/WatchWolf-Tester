@@ -79,12 +79,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
 
     private void processAsyncReturn(short header, DataInputStream dis) throws IOException {
         switch (header) {
-            case 0b000_1_000000000010: // server started
+            case 0b000000000010_1_000: // server started
                 if (this.onServerStart != null) this.onServerStart.onServerStart();
                 else System.out.println("Server started, but notifier not setted");
                 break;
 
-            case 0b000_1_000000000011: // error
+            case 0b000000000011_1_000: // error
                 String error = SocketHelper.readString(dis); // even if no error notifier, we need to remove the string from the socket
                 if (this.onServerError != null) this.onServerError.onError(error);
                 break;
@@ -112,8 +112,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         ArrayList<Byte> message = new ArrayList<>();
 
         // start server header
-        message.add((byte) 0b000_0_0000);
-        message.add((byte) 0b00000001);
+        message.add((byte) 0b0000_0_100);
+        message.add((byte) 0b00000000);
 
         SocketHelper.addString(message, mcType.name());
         SocketHelper.addString(message, version);
@@ -146,50 +146,44 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     @Override
     public void opPlayer(String nick) throws IOException {
         if (this.serverManagerSocket == null) return;
-        ArrayList<Byte> message = new ArrayList<>();
+        Message message = new Message(this.serverManagerSocket);
 
         // op player header
-        message.add((byte) 0b001_0_0000);
-        message.add((byte) 0b00000001);
-        message.add((byte) 0x00);
-        message.add((byte) 0x04);
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0004);
 
-        SocketHelper.addString(message, nick);
+        message.add(nick);
 
-        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
-        dos.write(SocketHelper.toByteArray(message), 0, message.size());
+        message.send();
     }
 
     @Override
     public void whitelistPlayer(String nick) throws IOException {
         if (this.serverManagerSocket == null) return;
-        ArrayList<Byte> message = new ArrayList<>();
+        Message message = new Message(this.serverManagerSocket);
 
         // op player header
-        message.add((byte) 0b001_0_0000);
-        message.add((byte) 0b00000001);
-        message.add((byte) 0x00);
-        message.add((byte) 0x03);
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0003);
 
-        SocketHelper.addString(message, nick);
+        message.add(nick);
 
-        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
-        dos.write(SocketHelper.toByteArray(message), 0, message.size());
+        message.send();
     }
 
     @Override
     public void stopServer(ServerStopNotifier onServerStop) throws IOException {
         if (this.serverManagerSocket == null) return;
-        ArrayList<Byte> message = new ArrayList<>();
+        Message message = new Message(this.serverManagerSocket);
 
         // stop server header
-        message.add((byte) 0b001_0_0000);
-        message.add((byte) 0b00000001);
-        message.add((byte) 0x00);
-        message.add((byte) 0x01);
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0001);
 
-        DataOutputStream dos = new DataOutputStream(this.serverManagerSocket.getOutputStream());
-        dos.write(SocketHelper.toByteArray(message), 0, message.size());
+        message.send();
 
         this.serverManagerSocket.close();
         this.serverManagerSocket = null;
@@ -202,10 +196,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         Message message = new Message(this.serverManagerSocket);
 
         // set block header
-        message.add((byte) 0b001_0_0000);
-        message.add((byte) 0b00000001);
-        message.add((byte) 0x00);
-        message.add((byte) 0x05);
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0005);
 
         message.add(position);
         message.add(block);
@@ -219,10 +212,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         Message message = new Message(this.serverManagerSocket);
 
         // get block header
-        message.add((byte) 0b001_0_0000);
-        message.add((byte) 0b00000001);
-        message.add((byte) 0x00);
-        message.add((byte) 0x06);
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0006);
 
         message.add(position);
 
@@ -232,7 +224,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             // read response
             DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
             short r = SocketHelper.readShort(dis);
-            while (r != 0b001_1_000000000001) {
+            while (r != 0b000000000001_1_001) {
                 this.processAsyncReturn(r, dis); // expected return, found async return from another request
                 r = SocketHelper.readShort(dis);
             }
