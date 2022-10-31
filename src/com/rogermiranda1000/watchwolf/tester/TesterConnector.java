@@ -58,7 +58,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
                 try {
                     this.serversManagerSocket.setSoTimeout(1000); // don't stay longer than 1s
                     DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
-                    this.processAsyncReturn(dis.readShort(), dis);
+                    this.processAsyncReturn(SocketHelper.readShort(dis), dis);
                 } catch (EOFException | SocketException | SocketTimeoutException ignore) {
                 } catch (IOException ex) {
                     ex.printStackTrace();
