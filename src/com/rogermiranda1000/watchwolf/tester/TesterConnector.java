@@ -77,7 +77,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         }
     }
 
-    private void processAsyncReturn(short header, DataInputStream dis) throws IOException {
+    private void processAsyncReturn(int header, DataInputStream dis) throws IOException {
         switch (header) {
             case 0b000000000010_1_000: // server started
                 if (this.onServerStart != null) this.onServerStart.onServerStart();
@@ -134,7 +134,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
 
             // read response
             DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
-            short r = SocketHelper.readShort(dis);
+            int r = SocketHelper.readShort(dis);
             while (r != 0b000000000001_1_000) { // server started response
                 this.processAsyncReturn(r, dis); // expected return, found async return from another request
                 r = SocketHelper.readShort(dis);
@@ -223,7 +223,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
 
             // read response
             DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
-            short r = SocketHelper.readShort(dis);
+            int r = SocketHelper.readShort(dis);
             while (r != 0b000000000001_1_001) {
                 this.processAsyncReturn(r, dis); // expected return, found async return from another request
                 r = SocketHelper.readShort(dis);

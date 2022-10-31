@@ -37,9 +37,9 @@ public class SocketHelper {
         for(int i = 0; i < 8; i++) out.add((byte)((lng >> ((7 - i) * 8)) & 0xff));
     }
 
-    public static void addShort(ArrayList<Byte> out, short s) {
+    public static void addShort(ArrayList<Byte> out, int s) {
         out.add((byte)(s & 0xFF));
-        out.add((byte)(s >> 8));
+        out.add((byte)((s >> 8)&0xFF));
     }
 
     public static void fill(ArrayList<Byte> out, int bytes) {
@@ -50,10 +50,10 @@ public class SocketHelper {
         for (int n = 0; n < bytes; n++) dis.readUnsignedByte();
     }
 
-    public static short readShort(DataInputStream dis) throws IOException {
+    public static int readShort(DataInputStream dis) throws IOException {
         int lsb = dis.readUnsignedByte();
         short msb = (short)dis.readUnsignedByte();
-        return (short)(msb << 8 | lsb);
+        return (msb << 8 | lsb);
     }
 
     public static double readDouble(DataInputStream dis) throws IOException {
@@ -65,7 +65,7 @@ public class SocketHelper {
     public static String readString(DataInputStream dis) throws IOException {
         // TODO check if EOF
         // size
-        int size = Short.toUnsignedInt(SocketHelper.readShort(dis));
+        int size = SocketHelper.readShort(dis);
 
         // characters
         StringBuilder sb = new StringBuilder();
