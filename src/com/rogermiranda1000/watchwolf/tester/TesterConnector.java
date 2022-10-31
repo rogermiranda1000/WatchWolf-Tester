@@ -112,7 +112,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         ArrayList<Byte> message = new ArrayList<>();
 
         // start server header
-        message.add((byte) 0b0000_0_100);
+        message.add((byte) 0b0001_0_000);
         message.add((byte) 0b00000000);
 
         SocketHelper.addString(message, mcType.name());
@@ -135,11 +135,11 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             // read response
             DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
             short r = SocketHelper.readShort(dis);
-            while (r != 4097) {
+            while (r != 0b000000000001_1_000) { // server started response
                 this.processAsyncReturn(r, dis); // expected return, found async return from another request
                 r = SocketHelper.readShort(dis);
             }
-            return SocketHelper.readString(dis);
+            return SocketHelper.readString(dis); // TODO if string is "" -> error
         }
     }
 
