@@ -92,36 +92,4 @@ public class Tester implements Runnable, ServerStartNotifier {
     public TesterConnector getConnector() {
         return this.connector;
     }
-
-    public static void main(String[] args) {
-        try {
-            Socket serversManagerSocket = new Socket("127.0.0.1", 8000); // ServersManager socket
-
-            Tester tester = new Tester(serversManagerSocket, ServerType.Spigot, "1.8", new Plugin[]{
-                    new UsualPlugin("WorldGuard"),
-                    new UsualPlugin("WorldEdit"),
-                    new UsualPlugin("MineIt"),
-                    //new UsualPlugin("PortalGun"),
-                    new UsualPlugin("Gson")
-            }, new Map[]{}, new ConfigFile[]{})
-                    .setOnServerError(Tester.DEFAULT_ERROR_PRINT);
-
-            tester.setOnServerStart(() -> {
-                try {
-                    TesterConnector connector = tester.getConnector();
-                    connector.whitelistPlayer("rogermiranda1000");
-                    connector.opPlayer("rogermiranda1000");
-
-                    new Scanner(System.in).nextLine(); // wait till enter
-                    tester.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            });
-
-            tester.run(); // all prepared, start the server
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
