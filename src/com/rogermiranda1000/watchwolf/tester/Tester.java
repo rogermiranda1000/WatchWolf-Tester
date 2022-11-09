@@ -1,15 +1,15 @@
 package com.rogermiranda1000.watchwolf.tester;
 
+import com.rogermiranda1000.watchwolf.clientsmanager.ClientStartNotifier;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.function.Consumer;
 
-public class Tester implements Runnable, ServerStartNotifier {
+public class Tester implements Runnable, ServerStartNotifier, ClientStartNotifier {
     public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
 
     private TesterConnector connector;
@@ -23,15 +23,17 @@ public class Tester implements Runnable, ServerStartNotifier {
     private final Plugin[] plugins;
     private final Map[] maps;
     private final ConfigFile[] configFiles;
+    private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles) {
-        this.connector = new TesterConnector(serverManagerSocket);
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames) {
+        this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket);
 
         this.mcType = mcType;
         this.version = version;
         this.plugins = plugins;
         this.maps = maps;
         this.configFiles = configFiles;
+        this.clientNames = clientNames;
     }
 
     public Tester setOnServerStart(ServerStartNotifier onServerStart) {
@@ -68,14 +70,21 @@ public class Tester implements Runnable, ServerStartNotifier {
     public void onServerStart() {
         // connect to the server socket
         try {
-            System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + "...");
+            System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
             this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort), this.mcType, this.version);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        // start the test
+        // start the clients
         if (this.onServerStart != null) this.onServerStart.run();
+    }
+
+    @Override
+    public void onClientStart() {
+        // connect to the client socket
+
+        // start the test
     }
 
     public void close() {

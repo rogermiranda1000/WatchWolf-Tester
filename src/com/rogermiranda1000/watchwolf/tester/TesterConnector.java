@@ -11,19 +11,23 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
-    private final Socket serversManagerSocket;
+    private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
+    private HashMap<String,Socket> clientSockets;
 
     private ServerType mcType;
     private String version;
 
-    public TesterConnector(Socket serversManagerSocket) {
+    public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
+        this.clientsManagerSocket = clientsManagerSocket;
 
+        this.clientSockets = new HashMap<>();
         SocketData.loadStaticBlock(BlockReader.class);
     }
 
@@ -32,6 +36,10 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
 
         this.mcType = mcType;
         this.version = version;
+    }
+
+    public void setClientSocket(Socket s, String username) {
+        this.clientSockets.put(username, s);
     }
 
     public void close() {
