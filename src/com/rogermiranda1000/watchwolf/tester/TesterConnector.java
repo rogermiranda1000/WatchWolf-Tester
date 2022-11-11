@@ -1,5 +1,6 @@
 package com.rogermiranda1000.watchwolf.tester;
 
+import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
@@ -13,12 +14,13 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition, Runnable {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable {
     private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
-    private HashMap<String,Socket> clientSockets;
+
+    private ArrayList<Client> clients;
 
     private ServerType mcType;
     private String version;
@@ -27,7 +29,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
 
-        this.clientSockets = new HashMap<>();
+        this.clients = new ArrayList<>();
         SocketData.loadStaticBlock(BlockReader.class);
     }
 
@@ -39,7 +41,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
     }
 
     public void setClientSocket(Socket s, String username) {
-        this.clientSockets.put(username, s);
+        this.clients.add(new Client(username, s));
     }
 
     public void close() {
@@ -238,6 +240,30 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, R
             }
             if (SocketHelper.readShort(dis) != 0x0006) throw new IOException("Expected response from 0x0006 operation.");
             return (Block) SocketData.readSocketData(dis, Block.class);
+        }
+    }
+
+    @Override
+    public String startClient(String username, String serverIp) throws IOException {
+        Message message = new Message(this.clientsManagerSocket);
+
+        // start client header
+        message.add((short) 0b000000000001_0_010);
+
+        message.add(username);
+        message.add(serverIp);
+
+        synchronized (this.clientsManagerSocket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.clientsManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_010) { // server started response
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis); // TODO if string is "" -> error
         }
     }
 }

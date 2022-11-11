@@ -56,7 +56,7 @@ public class AbstractTest implements TestWatcher, // send feedback
             server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}, clientsManagerSocket, new String[]{"MinecraftGamer_Z"}) // TODO rest of variables
                     .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
-            server.tester.setOnServerStart((connector) -> {
+            server.tester.setOnServerReady((connector) -> {
                 synchronized (waitForStartup) {
                     server.connector = connector;
                     waitForStartup.notify();

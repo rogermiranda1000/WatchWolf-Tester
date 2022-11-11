@@ -1,6 +1,5 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.clientsmanager.ClientStartNotifier;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
@@ -9,14 +8,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.function.Consumer;
 
-public class Tester implements Runnable, ServerStartNotifier, ClientStartNotifier {
+public class Tester implements Runnable, ServerStartNotifier {
     public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
 
     private TesterConnector connector;
     private String serverIp;
     private int serverSocketPort;
 
-    private Runnable onServerStart;
+    private Runnable onServerReady;
     private ServerErrorNotifier onError;
     private final ServerType mcType;
     private final String version;
@@ -36,13 +35,13 @@ public class Tester implements Runnable, ServerStartNotifier, ClientStartNotifie
         this.clientNames = clientNames;
     }
 
-    public Tester setOnServerStart(ServerStartNotifier onServerStart) {
-        this.onServerStart = onServerStart::onServerStart;
+    public Tester setOnServerReady(ServerStartNotifier onServerReady) {
+        this.onServerReady = onServerReady::onServerStart;
         return this;
     }
 
-    public Tester setOnServerStart(Consumer<TesterConnector> onServerStart) {
-        this.onServerStart = ()->onServerStart.accept(this.getConnector());
+    public Tester setOnServerReady(Consumer<TesterConnector> onServerReady) {
+        this.onServerReady = ()->onServerReady.accept(this.getConnector());
         return this;
     }
 
@@ -69,22 +68,22 @@ public class Tester implements Runnable, ServerStartNotifier, ClientStartNotifie
     @Override
     public void onServerStart() {
         // connect to the server socket
+        String serverIp = this.serverIp + ":" + this.serverSocketPort;
         try {
-            System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
+            System.out.println("Connecting to " + serverIp + " (server)...");
             this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort), this.mcType, this.version);
+
+            // start the clients
+            for (String client : this.clientNames) {
+                String []clientIp = this.connector.startClient(client, serverIp).split(":");
+                this.connector.setClientSocket(new Socket(clientIp[0], Integer.parseInt(clientIp[1])), client);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        // start the clients
-        if (this.onServerStart != null) this.onServerStart.run();
-    }
-
-    @Override
-    public void onClientStart() {
-        // connect to the client socket
-
         // start the test
+        if (this.onServerReady != null) this.onServerReady.run();
     }
 
     public void close() {
