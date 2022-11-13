@@ -71,7 +71,7 @@ public class Tester implements Runnable, ServerStartNotifier {
         // connect to the server socket
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
-            this.connector.setServerManagerSocket(new Socket(this.serverIp, this.serverSocketPort), this.mcType, this.version);
+            this.connector.setServerManagerSocket(new Socket(/*this.serverIp*/"127.0.0.1", this.serverSocketPort), this.mcType, this.version); // TODO inside docker use the ip; outside 127.0.0.1
 
             // whitelist the players
             for (String client : this.clientNames) this.connector.whitelistPlayer(client);
