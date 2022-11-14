@@ -71,7 +71,15 @@ public class Tester implements Runnable, ServerStartNotifier {
         // connect to the server socket
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
-            this.connector.setServerManagerSocket(new Socket(/*this.serverIp*/"127.0.0.1", this.serverSocketPort), this.mcType, this.version); // TODO inside docker use the ip; outside 127.0.0.1
+            this.connector.setServerManagerSocket(new Socket("127.0.0.1" /* inside docker use this.serverIp; outside use loopback ip (127.0.0.1) */, this.serverSocketPort), this.mcType, this.version);
+
+            // Start the clients to query them:
+            // Spigot with disabled online mode needs to cache the UUID of the player
+            // to add him to the whitelist (otherwise it will query the online player UUID).
+            for (String client : this.clientNames) {
+                this.connector.startClient(client, this.serverIp + ":" + this.serverPort);
+                // no need to stop the bot; it will be kicked
+            }
 
             // whitelist the players
             for (String client : this.clientNames) this.connector.whitelistPlayer(client);
@@ -79,7 +87,9 @@ public class Tester implements Runnable, ServerStartNotifier {
 
             // start the clients
             for (String client : this.clientNames) {
-                String []clientIp = this.connector.startClient(client, this.serverIp + ":" + this.serverPort).split(":");
+                String ip = this.connector.startClient(client, this.serverIp + ":" + this.serverPort);
+                if (ip.length() == 0) throw new IOException("Cannot start client");
+                String []clientIp = ip.split(":");
                 this.connector.setClientSocket(new Socket(clientIp[0], Integer.parseInt(clientIp[1])), client);
             }
         } catch (IOException ex) {
