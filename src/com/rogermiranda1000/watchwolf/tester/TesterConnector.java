@@ -25,6 +25,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     private ServerType mcType;
     private String version;
 
+    public final ServerPetition server = this;
+    // TODO client
+
     public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
