@@ -73,14 +73,6 @@ public class Tester implements Runnable, ServerStartNotifier {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
             this.connector.setServerManagerSocket(new Socket("127.0.0.1" /* inside docker use this.serverIp; outside use loopback ip (127.0.0.1) */, this.serverSocketPort), this.mcType, this.version);
 
-            // Start the clients to query them:
-            // Spigot with disabled online mode needs to cache the UUID of the player
-            // to add him to the whitelist (otherwise it will query the online player UUID).
-            for (String client : this.clientNames) {
-                this.connector.startClient(client, this.serverIp + ":" + this.serverPort);
-                // no need to stop the bot; it will be kicked
-            }
-
             // whitelist the players
             for (String client : this.clientNames) this.connector.whitelistPlayer(client);
             try { Thread.sleep(2000); } catch (Exception ignore){} // TODO synchronize with the server (don't connect before the dispatcher whitelist the player!)
