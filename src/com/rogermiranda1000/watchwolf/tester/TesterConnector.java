@@ -1,5 +1,6 @@
 package com.rogermiranda1000.watchwolf.tester;
 
+import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
@@ -20,19 +21,19 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
 
-    private ArrayList<Client> clients;
+    private final HashMap<String,ClientSocket> clients;
 
     private ServerType mcType;
     private String version;
 
     public final ServerPetition server = this;
-    // TODO client
+    // TODO client petition with variable
 
     public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket) {
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
 
-        this.clients = new ArrayList<>();
+        this.clients = new HashMap<>();
         SocketData.loadStaticBlock(BlockReader.class);
     }
 
@@ -44,7 +45,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     public void setClientSocket(Socket s, String username) {
-        this.clients.add(new Client(username, s));
+        this.clients.put(username, new ClientSocket(username, s));
     }
 
     public void close() {
@@ -54,6 +55,22 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ServerPetition getServerPetition() {
+        return this.server;
+    }
+
+    public ClientPetition getClientPetition(String username) throws ClientNotFoundException {
+        ClientSocket client = this.clients.get(username);
+        if (client == null) throw new ClientNotFoundException(username + " not in users pool");
+        return client;
+    }
+
+    public ClientPetition getClientPetition(int index) throws ClientNotFoundException {
+        Object []clients = this.clients.values().toArray(); // TODO cache the array
+        if (index < 0 || clients.length <= index) throw new ClientNotFoundException("There's only " + clients.length + " users in the pool; asked for number " + index);
+        return (ClientPetition) clients[index];
     }
 
     /**
