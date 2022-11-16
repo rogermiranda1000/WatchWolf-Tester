@@ -36,11 +36,6 @@ public class Tester implements Runnable, ServerStartNotifier {
         this.clientNames = clientNames;
     }
 
-    public Tester setOnMessage(MessageNotifier onMessage) {
-        this.connector.setOnMessage(onMessage);
-        return this;
-    }
-
     public Tester setOnServerReady(ServerStartNotifier onServerReady) {
         this.onServerReady = onServerReady::onServerStart;
         return this;

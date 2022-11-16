@@ -32,7 +32,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
      * Ne need to wait n messages of the same type (one for each connected client)
      */
     private final ArrayList<String> messageQueue;
-    private MessageNotifier messageNotifier;
+    private final ArrayList<MessageNotifier> messageNotifier;
 
     public final ServerPetition server = this;
     // TODO client petition with variable
@@ -43,12 +43,16 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
         this.clients = new HashMap<>();
         this.messageQueue = new ArrayList<>();
+        this.messageNotifier = new ArrayList<>();
         SocketData.loadStaticBlock(BlockReader.class);
     }
 
-    public TesterConnector setOnMessage(MessageNotifier onMessage) {
-        this.messageNotifier = onMessage;
-        return this;
+    public void addOnMessage(MessageNotifier onMessage) {
+        this.messageNotifier.add(onMessage);
+    }
+
+    public void removeOnMessage(MessageNotifier onMessage) {
+        this.messageNotifier.remove(onMessage);
     }
 
     public void setServerManagerSocket(Socket s, ServerType mcType, String version) {
@@ -99,14 +103,14 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     private void clientMessage(String username, String msg) {
-        if (this.messageNotifier == null) return; // nothing to call; don't bother to log the messages
+        if (this.messageNotifier.size() == 0) return; // nothing to call; don't bother to log the messages
 
         String hash = username + ": " + msg;
         int matchesNeeded = this.clients.size()-1;
         if (Collections.frequency(this.messageQueue, hash) >= matchesNeeded) {
             // all the clients got the message
             for (int i = 0; i < matchesNeeded; i++) this.messageQueue.remove(hash);
-            this.messageNotifier.onMessage(username, msg);
+            for (MessageNotifier notifier : this.messageNotifier) notifier.onMessage(username, msg);
         }
         else {
             // not ready; append to queue

@@ -1,3 +1,4 @@
+import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +19,23 @@ public class UserTester extends AbstractTest {
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)
     public void sendMsg(TesterConnector connector) throws Exception {
-        connector.getClientPetition(UserTester.USER1).sendMessage("Hello World!");
-        Thread.sleep(8000); // TODO read from message pool
+        String user = UserTester.USER1,
+                message = "Hello World!";
+
+        final Object got = new Object();
+        MessageNotifier notifier = (author,msg) -> {
+            if (author.equals(user) && msg.equals(message)) {
+                // notify
+                synchronized (got) {
+                    got.notify();
+                }
+            }
+        };
+        connector.addOnMessage(notifier);
+        synchronized (got) {
+            connector.getClientPetition(user).sendMessage(message);
+            got.wait(4000); // wait 4s
+        }
+        connector.removeOnMessage(notifier);
     }
 }

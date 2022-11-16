@@ -62,8 +62,6 @@ public class AbstractTest implements TestWatcher, // send feedback
                     waitForStartup.notify();
                 }
             });
-
-            server.tester.setOnMessage((author,msg) -> System.out.println(author + ": " + msg)); // TODO
         }
 
         synchronized (waitForStartup) {
