@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.client.ClientPetition;
+import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
@@ -13,6 +14,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable {
@@ -26,6 +28,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     private ServerType mcType;
     private String version;
 
+    /**
+     * Ne need to wait n messages of the same type (one for each connected client)
+     */
+    private final ArrayList<String> messageQueue;
+    private MessageNotifier messageNotifier;
+
     public final ServerPetition server = this;
     // TODO client petition with variable
 
@@ -34,7 +42,13 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         this.clientsManagerSocket = clientsManagerSocket;
 
         this.clients = new HashMap<>();
+        this.messageQueue = new ArrayList<>();
         SocketData.loadStaticBlock(BlockReader.class);
+    }
+
+    public TesterConnector setOnMessage(MessageNotifier onMessage) {
+        this.messageNotifier = onMessage;
+        return this;
     }
 
     public void setServerManagerSocket(Socket s, ServerType mcType, String version) {
@@ -73,28 +87,73 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         return (ClientPetition) clients[index];
     }
 
+    private Socket getAsyncSocket(int index) throws IndexOutOfBoundsException {
+        if (index == 0) return this.serversManagerSocket;
+        else {
+            try {
+                return ((ClientSocket)this.getClientPetition(index - 1)).getSocket();
+            } catch (ClientNotFoundException ignore) {
+                throw new IndexOutOfBoundsException();
+            }
+        }
+    }
+
+    private void clientMessage(String username, String msg) {
+        if (this.messageNotifier == null) return; // nothing to call; don't bother to log the messages
+
+        String hash = username + ": " + msg;
+        int matchesNeeded = this.clients.size()-1;
+        if (Collections.frequency(this.messageQueue, hash) >= matchesNeeded) {
+            // all the clients got the message
+            for (int i = 0; i < matchesNeeded; i++) this.messageQueue.remove(hash);
+            this.messageNotifier.onMessage(username, msg);
+        }
+        else {
+            // not ready; append to queue
+            this.messageQueue.add(hash);
+        }
+    }
+
     /**
      * Read async responses
      */
     @Override
     public void run() {
-        while(!this.serversManagerSocket.isClosed()) {
-            synchronized (this.serversManagerSocket) {
+        boolean allClosed = true; // if all the sockets (when IndexOutOfBoundsException is thrown) all are dead
+        int index = 0;
+
+        while(true) {
+            Socket checkingSocket = null;
+            try {
+                checkingSocket = this.getAsyncSocket(index++);
+            } catch (IndexOutOfBoundsException ignore) {
+                if (allClosed) break; // kill the thread
+
+                // reset and start again
+                allClosed = true;
+                index = 0;
+                continue;
+            }
+
+            if (checkingSocket.isClosed()) continue;
+            allClosed = false;
+
+            synchronized (checkingSocket) {
                 int timeout = 1800000; // default Java socket timeout value
                 try {
-                    timeout = this.serversManagerSocket.getSoTimeout();
+                    timeout = checkingSocket.getSoTimeout();
                 } catch (SocketException ignore) {}
 
                 try {
-                    this.serversManagerSocket.setSoTimeout(1000); // don't stay longer than 1s
-                    DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+                    checkingSocket.setSoTimeout(1000); // don't stay longer than 1s
+                    DataInputStream dis = new DataInputStream(checkingSocket.getInputStream());
                     this.processAsyncReturn(SocketHelper.readShort(dis), dis);
                 } catch (EOFException | SocketException | SocketTimeoutException ignore) {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 } finally {
                     try {
-                        this.serversManagerSocket.setSoTimeout(timeout);
+                        checkingSocket.setSoTimeout(timeout);
                     } catch (SocketException ex) {
                         ex.printStackTrace();
                     }
@@ -108,15 +167,24 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     private void processAsyncReturn(int header, DataInputStream dis) throws IOException {
+        String error, username, message;
         switch (header) {
+            /* -- SERVERS MANAGER ASYNC RETURN -- */
             case 0b000000000010_1_000: // server started
                 if (this.onServerStart != null) this.onServerStart.onServerStart();
                 else System.out.println("Server started, but notifier not setted");
                 break;
 
             case 0b000000000011_1_000: // error
-                String error = SocketHelper.readString(dis); // even if no error notifier, we need to remove the string from the socket
+                error = SocketHelper.readString(dis); // even if no error notifier, we need to remove the string from the socket
                 if (this.onServerError != null) this.onServerError.onError(error);
+                break;
+
+            /* -- CLIENT ASYNC RETURN -- */
+            case 0b000000000011_1_011: // message
+                username = SocketHelper.readString(dis);
+                message = SocketHelper.readString(dis);
+                this.clientMessage(username, message);
                 break;
 
             default:

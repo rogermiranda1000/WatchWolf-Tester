@@ -1,5 +1,6 @@
 package com.rogermiranda1000.watchwolf.tester;
 
+import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
@@ -33,6 +34,11 @@ public class Tester implements Runnable, ServerStartNotifier {
         this.maps = maps;
         this.configFiles = configFiles;
         this.clientNames = clientNames;
+    }
+
+    public Tester setOnMessage(MessageNotifier onMessage) {
+        this.connector.setOnMessage(onMessage);
+        return this;
     }
 
     public Tester setOnServerReady(ServerStartNotifier onServerReady) {
@@ -81,6 +87,7 @@ public class Tester implements Runnable, ServerStartNotifier {
             for (String client : this.clientNames) {
                 String ip = this.connector.startClient(client, this.serverIp + ":" + this.serverPort);
                 if (ip.length() == 0) throw new IOException("Cannot start client");
+                System.out.println("Connecting to " + ip + " (client " + client + ")...");
                 String []clientIp = ip.split(":");
                 this.connector.setClientSocket(new Socket(clientIp[0], Integer.parseInt(clientIp[1])), client);
             }

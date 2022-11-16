@@ -19,6 +19,10 @@ public class ClientSocket implements ClientPetition {
         return this.username;
     }
 
+    protected Socket getSocket() {
+        return this.socket;
+    }
+
     @Override
     public void sendMessage(String msg) throws IOException {
         Message message = new Message(this.socket);
