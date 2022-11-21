@@ -19,17 +19,34 @@ public class Item extends SocketData {
     private byte amount;
     // TODO other attributes
 
-    public Item(ItemType type, byte amount) {
+    public Item(ItemType type, byte amount) throws IllegalArgumentException {
         this.type = type;
+        this.setAmount(amount);
+    }
+
+    public Item(ItemType type) {
+        this(type, (byte) 1);
+    }
+
+    public void setAmount(byte amount) throws IllegalArgumentException {
+        if (amount < 1) throw new IllegalArgumentException("Quantity must be at least 1");
         this.amount = amount;
     }
 
-    public void setAmount(byte amount) {
-        this.amount = amount;
-    }
-
-    public void setAmount(int amount) {
+    public void setAmount(int amount) throws IllegalArgumentException {
         this.setAmount((byte) amount);
+    }
+
+    public void unique() {
+        this.setAmount(1);
+    }
+
+    public ItemType getType() {
+        return this.type;
+    }
+
+    public byte getAmount() {
+        return this.amount;
     }
 
     @Override

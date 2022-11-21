@@ -79,6 +79,10 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         return this.server;
     }
 
+    public String []getClients() {
+        return this.clients.keySet().toArray(new String[0]);
+    }
+
     public ClientPetition getClientPetition(String username) throws ClientNotFoundException {
         ClientSocket client = this.clients.get(username);
         if (client == null) throw new ClientNotFoundException(username + " not in users pool");

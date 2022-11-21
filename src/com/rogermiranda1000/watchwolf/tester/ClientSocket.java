@@ -2,6 +2,8 @@ package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.entities.Message;
+import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -27,7 +29,7 @@ public class ClientSocket implements ClientPetition {
     public void sendMessage(String msg) throws IOException {
         Message message = new Message(this.socket);
 
-        // start client header
+        // send message header
         message.add((short) 0b000000000011_0_011);
 
         message.add(msg);
@@ -39,10 +41,34 @@ public class ClientSocket implements ClientPetition {
     public void runCommand(String cmd) throws IOException {
         Message message = new Message(this.socket);
 
-        // start client header
+        // send command header
         message.add((short) 0b000000000100_0_011);
 
         message.add(cmd);
+
+        message.send();
+    }
+
+    @Override
+    public void breakBlock(Position block) throws IOException {
+        Message message = new Message(this.socket);
+
+        // break block header
+        message.add((short) 0b000000000101_0_011);
+
+        message.add(block);
+
+        message.send();
+    }
+
+    @Override
+    public void equipItemInHand(Item item) throws IOException {
+        Message message = new Message(this.socket);
+
+        // equip in hand header
+        message.add((short) 0b000000000110_0_011);
+
+        message.add(item);
 
         message.send();
     }
