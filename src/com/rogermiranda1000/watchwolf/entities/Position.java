@@ -52,6 +52,15 @@ public class Position extends SocketData {
         return (int)this.z;
     }
 
+    public Position add(Position pos) throws IllegalArgumentException {
+        if (!this.world.equals(pos.world)) throw new IllegalArgumentException("You can only add positions in the same world");
+        return this.add(pos.x, pos.y, pos.z);
+    }
+
+    public Position add(double x, double y, double z) {
+        return new Position(this.world, this.x + x, this.y + y, this.z + z);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addString(out, this.world);

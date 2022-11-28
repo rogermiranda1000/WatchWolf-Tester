@@ -1,4 +1,6 @@
+import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.client.MessageNotifier;
+import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,5 +39,19 @@ public class UserTester extends AbstractTest {
             got.wait(4000); // wait 4s
         }
         connector.removeOnMessage(notifier);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserTester.class)
+    public void breakBlock(TesterConnector connector) throws Exception {
+        String user = UserTester.USER1;
+        ClientPetition userPetition = connector.getClientPetition(user);
+
+        Position pos = connector.server.getPlayerPosition(user).add(0, -1, 0);
+        System.out.println(connector.server.getBlock(pos));
+        userPetition.breakBlock(pos);
+
+        Thread.sleep(5_000);
+        System.out.println(connector.server.getBlock(pos));
     }
 }

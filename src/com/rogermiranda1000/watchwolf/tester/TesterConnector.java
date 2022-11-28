@@ -280,6 +280,33 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public Position getPlayerPosition(String nick) throws IOException {
+        if (this.serverManagerSocket == null) return null;
+        Message message = new Message(this.serverManagerSocket);
+
+        // get block header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0007);
+
+        message.add(nick);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0007) throw new IOException("Expected response from 0x0007 operation.");
+            return (Position) SocketData.readSocketData(dis, Position.class);
+        }
+    }
+
+    @Override
     public void stopServer(ServerStopNotifier onServerStop) throws IOException {
         if (this.serverManagerSocket == null) return;
         Message message = new Message(this.serverManagerSocket);
@@ -324,7 +351,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
         message.add(position);
 
-        synchronized (this.serversManagerSocket) { // response with return -> reserve the socket before the thread does
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
             message.send();
 
             // read response

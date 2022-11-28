@@ -8,6 +8,7 @@ import java.io.IOException;
 public interface ServerPetition {
     void opPlayer(String nick) throws IOException;
     void whitelistPlayer(String nick) throws IOException;
+    Position getPlayerPosition(String nick) throws IOException;
     void stopServer(ServerStopNotifier onServerStop) throws IOException;
     void setBlock(Position position, Block block) throws IOException;
     Block getBlock(Position position) throws IOException;
