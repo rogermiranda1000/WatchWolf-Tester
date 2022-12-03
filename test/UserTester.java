@@ -48,10 +48,11 @@ public class UserTester extends AbstractTest {
         ClientPetition userPetition = connector.getClientPetition(user);
 
         Position pos = connector.server.getPlayerPosition(user).add(0, -1, 0);
-        System.out.println(connector.server.getBlock(pos));
-        userPetition.breakBlock(pos);
+        System.out.println(pos);
+        System.out.println("Requested to break " + connector.server.getBlock(pos).toString() + "...");
+        userPetition.breakBlock(pos); // TODO what if it's stone?
 
-        Thread.sleep(5_000);
+        Thread.sleep(7_000);
         System.out.println(connector.server.getBlock(pos));
     }
 }
