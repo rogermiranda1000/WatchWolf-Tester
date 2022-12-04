@@ -3,18 +3,22 @@ package com.rogermiranda1000.watchwolf.tester;
 import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.entities.Message;
 import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ClientSocket implements ClientPetition {
     private final String username;
     private final Socket socket;
+    private final AsyncPetitionResolver asyncResolver;
 
-    public ClientSocket(String username, Socket socket) {
+    public ClientSocket(String username, Socket socket, AsyncPetitionResolver asyncResolver) {
         this.username = username;
         this.socket = socket;
+        this.asyncResolver = asyncResolver;
     }
 
     public String getClientUsername() {
@@ -80,6 +84,16 @@ public class ClientSocket implements ClientPetition {
         // synchronize header
         message.add((short) 0b000000001001_0_011);
 
-        message.send();
+        synchronized (this.socket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000001001_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+        }
     }
 }

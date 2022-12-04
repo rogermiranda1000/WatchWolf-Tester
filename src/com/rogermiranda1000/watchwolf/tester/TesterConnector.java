@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver {
     private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
@@ -64,7 +64,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     public void setClientSocket(Socket s, String username) {
-        this.clients.put(username, new ClientSocket(username, s));
+        this.clients.put(username, new ClientSocket(username, s, this));
     }
 
     public void close() {
@@ -175,7 +175,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         }
     }
 
-    private void processAsyncReturn(int header, DataInputStream dis) throws IOException {
+    public void processAsyncReturn(int header, DataInputStream dis) throws IOException {
         String error, username, message;
         switch (header) {
             /* -- SERVERS MANAGER ASYNC RETURN -- */
@@ -438,7 +438,18 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         message.add((byte) 0b00000000);
         message.add((short) 0x000B);
 
-        message.send();
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000B) throw new IOException("Expected response from 0x000B operation.");
+        }
     }
 
     @Override

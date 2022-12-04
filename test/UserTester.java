@@ -65,17 +65,12 @@ public class UserTester extends AbstractTest {
         connector.setBlock(pos, target_block);
         connector.giveItem(user, new Item(ItemType.DIAMOND)); // we don't want to add the pickaxe in the first slot
         connector.giveItem(user, pickaxe);
-
-        Thread.sleep(2_000); // TODO while server/client synchronization is not implemented
+        connector.synchronize();
 
         System.out.println("Requested to break " + target_block.toString() + "...");
         userPetition.equipItemInHand(pickaxe);
         userPetition.breakBlock(pos);
-
-        // wait till the block breaks (or timeout)
-        int timeout = 7_000;
-        Instant start = Instant.now();
-        while (connector.server.getBlock(pos).equals(target_block) && Duration.between(start, Instant.now()).toMillis() < timeout);
+        userPetition.synchronize();
 
         assertEquals(Blocks.AIR, connector.server.getBlock(pos));
     }
