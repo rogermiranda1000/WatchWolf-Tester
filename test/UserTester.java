@@ -12,8 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -66,16 +64,9 @@ public class UserTester extends AbstractTest {
         connector.giveItem(user, new Item(ItemType.DIAMOND)); // we don't want to add the pickaxe in the first slot
         connector.giveItem(user, pickaxe);
 
-        Thread.sleep(2_000); // TODO while server/client synchronization is not implemented
-
         System.out.println("Requested to break " + target_block.toString() + "...");
         userPetition.equipItemInHand(pickaxe);
         userPetition.breakBlock(pos);
-
-        // wait till the block breaks (or timeout)
-        int timeout = 7_000;
-        Instant start = Instant.now();
-        while (connector.server.getBlock(pos).equals(target_block) && Duration.between(start, Instant.now()).toMillis() < timeout);
 
         assertEquals(Blocks.AIR, connector.server.getBlock(pos));
     }

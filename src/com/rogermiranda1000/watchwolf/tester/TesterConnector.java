@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver, SynchronizationManager {
     private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
@@ -29,6 +29,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     private ServerType mcType;
     private String version;
 
+    private final boolean overrideSync;
+    private Petition lastSynchronization;
+
     /**
      * Ne need to wait n messages of the same type (one for each connected client)
      */
@@ -38,9 +41,10 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     public final ServerPetition server = this;
     // TODO client petition with variable
 
-    public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket) {
+    public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket, boolean overrideSync) {
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
+        this.overrideSync = overrideSync;
 
         this.clients = new HashMap<>();
         this.messageQueue = new ArrayList<>();
@@ -64,7 +68,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     public void setClientSocket(Socket s, String username) {
-        this.clients.put(username, new ClientSocket(username, s));
+        this.clients.put(username, new ClientSocket(username, s, this, this));
     }
 
     public void close() {
@@ -175,7 +179,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         }
     }
 
-    private void processAsyncReturn(int header, DataInputStream dis) throws IOException {
+    public void processAsyncReturn(int header, DataInputStream dis) throws IOException {
         String error, username, message;
         switch (header) {
             /* -- SERVERS MANAGER ASYNC RETURN -- */
@@ -253,6 +257,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void opPlayer(String nick) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
         // op player header
@@ -268,9 +275,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void whitelistPlayer(String nick) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
-        // op player header
+        // whitelist player header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0003);
@@ -283,9 +293,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public Position getPlayerPosition(String nick) throws IOException {
         if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
-        // get block header
+        // get player position header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0007);
@@ -310,9 +323,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void giveItem(String nick, Item item) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
-        // op player header
+        // give item header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0008);
@@ -326,9 +342,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public String[] getPlayers() throws IOException {
         if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
-        // get block header
+        // get players header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x000A);
@@ -356,6 +375,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void stopServer(ServerStopNotifier onServerStop) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
         // stop server header
@@ -373,6 +395,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void setBlock(Position position, Block block) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
         // set block header
@@ -389,6 +414,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public Block getBlock(Position position) throws IOException {
         if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
         // get block header
@@ -416,9 +444,12 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     @Override
     public void runCommand(String cmd) throws IOException {
         if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
         Message message = new Message(this.serverManagerSocket);
 
-        // set block header
+        // run command header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0009);
@@ -426,6 +457,33 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         message.add(cmd);
 
         message.send();
+    }
+
+    @Override
+    public void synchronize() throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // synchronize header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000B);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000B) throw new IOException("Expected response from 0x000B operation.");
+        }
     }
 
     @Override
@@ -450,5 +508,25 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             }
             return SocketHelper.readString(dis); // TODO if string is "" -> error
         }
+    }
+
+    @Override
+    public void requestSynchronization(Petition current) {
+        if (this.overrideSync) return; // ignore synchronization
+
+        if (this.lastSynchronization == null || this.lastSynchronization == current) {
+            // already synchronized
+            this.lastSynchronization = current;
+            return;
+        }
+
+        try {
+            this.lastSynchronization.synchronize();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // synchronized
+        this.lastSynchronization = current;
     }
 }

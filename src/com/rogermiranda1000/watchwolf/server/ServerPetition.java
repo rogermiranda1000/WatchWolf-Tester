@@ -3,17 +3,18 @@ package com.rogermiranda1000.watchwolf.server;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
+import com.rogermiranda1000.watchwolf.tester.Petition;
 
 import java.io.IOException;
 
-public interface ServerPetition {
-    void opPlayer(String nick) throws IOException;
-    void whitelistPlayer(String nick) throws IOException;
-    Position getPlayerPosition(String nick) throws IOException;
-    void giveItem(String nick, Item item) throws IOException;
-    String []getPlayers() throws IOException;
-    void stopServer(ServerStopNotifier onServerStop) throws IOException;
-    void setBlock(Position position, Block block) throws IOException;
-    Block getBlock(Position position) throws IOException;
-    void runCommand(String cmd) throws IOException;
+public interface ServerPetition extends Petition {
+    public void opPlayer(String nick) throws IOException;
+    public void whitelistPlayer(String nick) throws IOException;
+    public Position getPlayerPosition(String nick) throws IOException;
+    public void giveItem(String nick, Item item) throws IOException;
+    public String []getPlayers() throws IOException;
+    public void stopServer(ServerStopNotifier onServerStop) throws IOException;
+    public void setBlock(Position position, Block block) throws IOException;
+    public Block getBlock(Position position) throws IOException;
+    public void runCommand(String cmd) throws IOException;
 }

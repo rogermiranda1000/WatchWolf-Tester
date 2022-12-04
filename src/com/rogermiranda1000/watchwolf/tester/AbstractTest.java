@@ -36,6 +36,7 @@ public class AbstractTest implements TestWatcher, // send feedback
     public final String []clientsManagerIP = "127.0.0.1:7000".split(":");
     private final ServerType serverType = ServerType.Spigot;
     private final String []serverVersions = {"1.18.2", "1.14"};
+    private final boolean overrideSync = false;
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
@@ -53,7 +54,7 @@ public class AbstractTest implements TestWatcher, // send feedback
             this.servers.add(server);
 
             System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
-            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}, clientsManagerSocket, new String[]{"MinecraftGamer_Z"}) // TODO rest of variables
+            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}, clientsManagerSocket, new String[]{"MinecraftGamer_Z"}, this.overrideSync) // TODO rest of variables
                     .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
             server.tester.setOnServerReady((connector) -> {

@@ -3,18 +3,24 @@ package com.rogermiranda1000.watchwolf.tester;
 import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.entities.Message;
 import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ClientSocket implements ClientPetition {
     private final String username;
     private final Socket socket;
+    private final AsyncPetitionResolver asyncResolver;
+    private final SynchronizationManager syncManager;
 
-    public ClientSocket(String username, Socket socket) {
+    public ClientSocket(String username, Socket socket, AsyncPetitionResolver asyncResolver, SynchronizationManager syncManager) {
         this.username = username;
         this.socket = socket;
+        this.asyncResolver = asyncResolver;
+        this.syncManager = syncManager;
     }
 
     public String getClientUsername() {
@@ -27,6 +33,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void sendMessage(String msg) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // send message header
@@ -39,6 +47,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void runCommand(String cmd) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // send command header
@@ -51,6 +61,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void breakBlock(Position block) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // break block header
@@ -63,6 +75,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void equipItemInHand(Item item) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // equip in hand header
@@ -71,5 +85,27 @@ public class ClientSocket implements ClientPetition {
         message.add(item);
 
         message.send();
+    }
+
+    @Override
+    public void synchronize() throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // synchronize header
+        message.add((short) 0b000000001001_0_011);
+
+        synchronized (this.socket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000001001_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+        }
     }
 }

@@ -25,8 +25,8 @@ public class Tester implements Runnable, ServerStartNotifier {
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames) {
-        this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket);
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+        this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
         this.version = version;
