@@ -14,11 +14,13 @@ public class ClientSocket implements ClientPetition {
     private final String username;
     private final Socket socket;
     private final AsyncPetitionResolver asyncResolver;
+    private final SynchronizationManager syncManager;
 
-    public ClientSocket(String username, Socket socket, AsyncPetitionResolver asyncResolver) {
+    public ClientSocket(String username, Socket socket, AsyncPetitionResolver asyncResolver, SynchronizationManager syncManager) {
         this.username = username;
         this.socket = socket;
         this.asyncResolver = asyncResolver;
+        this.syncManager = syncManager;
     }
 
     public String getClientUsername() {
@@ -31,6 +33,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void sendMessage(String msg) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // send message header
@@ -43,6 +47,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void runCommand(String cmd) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // send command header
@@ -55,6 +61,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void breakBlock(Position block) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // break block header
@@ -67,6 +75,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void equipItemInHand(Item item) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // equip in hand header
@@ -79,6 +89,8 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public void synchronize() throws IOException {
+        this.syncManager.requestSynchronization(this);
+
         Message message = new Message(this.socket);
 
         // synchronize header

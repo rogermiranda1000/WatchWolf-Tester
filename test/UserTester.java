@@ -12,8 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -65,12 +63,10 @@ public class UserTester extends AbstractTest {
         connector.setBlock(pos, target_block);
         connector.giveItem(user, new Item(ItemType.DIAMOND)); // we don't want to add the pickaxe in the first slot
         connector.giveItem(user, pickaxe);
-        connector.synchronize();
 
         System.out.println("Requested to break " + target_block.toString() + "...");
         userPetition.equipItemInHand(pickaxe);
         userPetition.breakBlock(pos);
-        userPetition.synchronize();
 
         assertEquals(Blocks.AIR, connector.server.getBlock(pos));
     }
