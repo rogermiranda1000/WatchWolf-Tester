@@ -270,7 +270,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         if (this.serverManagerSocket == null) return;
         Message message = new Message(this.serverManagerSocket);
 
-        // op player header
+        // whitelist player header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0003);
@@ -285,7 +285,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         if (this.serverManagerSocket == null) return null;
         Message message = new Message(this.serverManagerSocket);
 
-        // get block header
+        // get player position header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0007);
@@ -312,7 +312,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         if (this.serverManagerSocket == null) return;
         Message message = new Message(this.serverManagerSocket);
 
-        // op player header
+        // give item header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0008);
@@ -328,7 +328,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         if (this.serverManagerSocket == null) return null;
         Message message = new Message(this.serverManagerSocket);
 
-        // get block header
+        // get players header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x000A);
@@ -418,12 +418,25 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         if (this.serverManagerSocket == null) return;
         Message message = new Message(this.serverManagerSocket);
 
-        // set block header
+        // run command header
         message.add((byte) 0b0001_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0009);
 
         message.add(cmd);
+
+        message.send();
+    }
+
+    @Override
+    public void synchronize() throws IOException {
+        if (this.serverManagerSocket == null) return;
+        Message message = new Message(this.serverManagerSocket);
+
+        // synchronize header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000B);
 
         message.send();
     }

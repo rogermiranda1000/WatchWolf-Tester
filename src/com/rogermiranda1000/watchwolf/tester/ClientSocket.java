@@ -72,4 +72,14 @@ public class ClientSocket implements ClientPetition {
 
         message.send();
     }
+
+    @Override
+    public void synchronize() throws IOException {
+        Message message = new Message(this.socket);
+
+        // synchronize header
+        message.add((short) 0b000000001001_0_011);
+
+        message.send();
+    }
 }

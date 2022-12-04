@@ -10,4 +10,5 @@ public interface ClientPetition {
     public void runCommand(String cmd) throws IOException;
     public void breakBlock(Position block) throws IOException;
     public void equipItemInHand(Item item) throws IOException;
+    public void synchronize() throws IOException;
 }
