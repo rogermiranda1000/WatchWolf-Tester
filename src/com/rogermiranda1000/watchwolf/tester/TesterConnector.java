@@ -5,6 +5,7 @@ import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
 import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.*;
@@ -307,6 +308,52 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public void giveItem(String nick, Item item) throws IOException {
+        if (this.serverManagerSocket == null) return;
+        Message message = new Message(this.serverManagerSocket);
+
+        // op player header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0008);
+
+        message.add(nick);
+        message.add(item);
+
+        message.send();
+    }
+
+    @Override
+    public String[] getPlayers() throws IOException {
+        if (this.serverManagerSocket == null) return null;
+        Message message = new Message(this.serverManagerSocket);
+
+        // get block header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000A);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000A) throw new IOException("Expected response from 0x000A operation.");
+
+            // TODO move to helper
+            int size = SocketHelper.readShort(dis);
+            String []players = new String[size];
+            for (int n = 0; n < size; n++) players[n] = SocketHelper.readString(dis);
+            return players;
+        }
+    }
+
+    @Override
     public void stopServer(ServerStopNotifier onServerStop) throws IOException {
         if (this.serverManagerSocket == null) return;
         Message message = new Message(this.serverManagerSocket);
@@ -364,6 +411,21 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             if (SocketHelper.readShort(dis) != 0x0006) throw new IOException("Expected response from 0x0006 operation.");
             return (Block) SocketData.readSocketData(dis, Block.class);
         }
+    }
+
+    @Override
+    public void runCommand(String cmd) throws IOException {
+        if (this.serverManagerSocket == null) return;
+        Message message = new Message(this.serverManagerSocket);
+
+        // set block header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0009);
+
+        message.add(cmd);
+
+        message.send();
     }
 
     @Override

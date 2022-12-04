@@ -5,6 +5,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Alright... We're doing a Tester to test plugins, but who tests the tester to test plugins?
@@ -22,14 +25,27 @@ public class TesterTester extends AbstractTest {
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
     public void opPlayer(TesterConnector connector) throws Exception {
-        // TODO we need Player interface to test it
-        connector.opPlayer(TesterTester.USER1);
+        String clientName = connector.getClients()[0];
+        connector.opPlayer(clientName);
+
+        connector.getClientPetition(0).runCommand("kick " + clientName);
+
+        assertFalse(Arrays.asList(connector.getPlayers()).contains(clientName));
     }
 
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
     public void whitelistPlayer(TesterConnector connector) throws Exception {
-        // TODO we need Player interface to test it
-        connector.whitelistPlayer(TesterTester.USER1);
+        // whitelist is automatic; just see if the player is online
+        assertTrue(Arrays.asList(connector.getPlayers()).contains(connector.getClients()[0]));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
+    public void runCommand(TesterConnector connector) throws Exception {
+        final String clientName = connector.getClients()[0];
+        connector.runCommand("kick " + clientName);
+
+        assertFalse(Arrays.asList(connector.getPlayers()).contains(clientName));
     }
 }
