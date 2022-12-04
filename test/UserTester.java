@@ -3,6 +3,8 @@ import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
+import com.rogermiranda1000.watchwolf.entities.items.ItemType;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +50,7 @@ public class UserTester extends AbstractTest {
     }
 
     /**
-     * Break the block at the bottom of the player
+     * Break a stone block (test give item & equip item & break block)
      */
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)
@@ -57,9 +59,18 @@ public class UserTester extends AbstractTest {
         ClientPetition userPetition = connector.getClientPetition(user);
 
         Position pos = connector.server.getPlayerPosition(user).add(0, -1, 0);
-        Block target_block = connector.server.getBlock(pos);
+
+        Block target_block = Blocks.STONE;
+        Item pickaxe = new Item(ItemType.DIAMOND_PICKAXE);
+        connector.setBlock(pos, target_block);
+        connector.giveItem(user, new Item(ItemType.DIAMOND)); // we don't want to add the pickaxe in the first slot
+        connector.giveItem(user, pickaxe);
+
+        Thread.sleep(2_000); // TODO while server/client synchronization is not implemented
+
         System.out.println("Requested to break " + target_block.toString() + "...");
-        userPetition.breakBlock(pos); // TODO what if it's stone?
+        userPetition.equipItemInHand(pickaxe);
+        userPetition.breakBlock(pos);
 
         // wait till the block breaks (or timeout)
         int timeout = 7_000;
