@@ -47,12 +47,28 @@ public class UserTester extends AbstractTest {
         connector.removeOnMessage(notifier);
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(UserTester.class)
+    public void breakBlock(TesterConnector connector) throws Exception {
+        String user = UserTester.USER1;
+        ClientPetition userPetition = connector.getClientPetition(user);
+
+        Position pos = connector.server.getPlayerPosition(user).add(0, -1, 0);
+
+        Block target_block = Blocks.DIRT;
+        connector.setBlock(pos, target_block);
+
+        userPetition.breakBlock(pos);
+
+        assertEquals(Blocks.AIR, connector.server.getBlock(pos));
+    }
+
     /**
      * Break a stone block (test give item & equip item & break block)
      */
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)
-    public void breakBlock(TesterConnector connector) throws Exception {
+    public void equipOnHand(TesterConnector connector) throws Exception {
         String user = UserTester.USER1;
         ClientPetition userPetition = connector.getClientPetition(user);
 
@@ -64,10 +80,32 @@ public class UserTester extends AbstractTest {
         connector.giveItem(user, new Item(ItemType.DIAMOND)); // we don't want to add the pickaxe in the first slot
         connector.giveItem(user, pickaxe);
 
-        System.out.println("Requested to break " + target_block.toString() + "...");
         userPetition.equipItemInHand(pickaxe);
         userPetition.breakBlock(pos);
 
         assertEquals(Blocks.AIR, connector.server.getBlock(pos));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserTester.class)
+    public void moveAt(TesterConnector connector) throws Exception {
+        String user = UserTester.USER1;
+        ClientPetition userPetition = connector.getClientPetition(user);
+
+        Position pos = connector.server.getPlayerPosition(user).add(1, 0, 0);
+        int blocksTraveled = 5;
+
+        // make sure that the player can go to that block
+        for (int n = 0; n < blocksTraveled; n++) {
+            connector.setBlock(pos, Blocks.AIR);
+            connector.setBlock(pos.add(0, 1, 0), Blocks.AIR);
+            connector.setBlock(pos.add(0, -1, 0), Blocks.STONE);
+            if (n != blocksTraveled-1) pos = pos.add(1, 0, 0);
+        }
+
+        userPetition.moveTo(pos);
+
+        Position currentPosition = connector.server.getPlayerPosition(user);
+        if (!currentPosition.equals(pos, 0.3f)) assertEquals(pos, currentPosition); // not equal => force error
     }
 }

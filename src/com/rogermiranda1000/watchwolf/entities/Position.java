@@ -76,10 +76,14 @@ public class Position extends SocketData {
 
     @Override
     public boolean equals(Object obj) {
+        return this.equals(obj, 0.0f);
+    }
+
+    public boolean equals(Object obj, float margin) {
         if (this == obj) return true;
         if (!(obj instanceof Position)) return false;
 
         Position that = (Position)obj;
-        return this.world.equals(that.world) && this.x == that.x && this.y == that.y && this.z == that.z;
+        return this.world.equals(that.world) && Math.abs(this.x - that.x) <= margin && Math.abs(this.y - that.y) <= margin && Math.abs(this.z - that.z) <= margin;
     }
 }
