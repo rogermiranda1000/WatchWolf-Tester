@@ -88,7 +88,7 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
-    public void moveAt(Position pos) throws IOException {
+    public void moveTo(Position pos) throws IOException {
         this.syncManager.requestSynchronization(this);
 
         Message message = new Message(this.socket);
