@@ -11,7 +11,10 @@ public interface ServerPetition extends Petition {
     public void opPlayer(String nick) throws IOException;
     public void whitelistPlayer(String nick) throws IOException;
     public Position getPlayerPosition(String nick) throws IOException;
+    public float getPlayerPitch(String nick) throws IOException;
+    public float getPlayerYaw(String nick) throws IOException;
     public void giveItem(String nick, Item item) throws IOException;
+    public void tp(String nick, Position pos) throws IOException;
     public String []getPlayers() throws IOException;
     public void stopServer(ServerStopNotifier onServerStop) throws IOException;
     public void setBlock(Position position, Block block) throws IOException;

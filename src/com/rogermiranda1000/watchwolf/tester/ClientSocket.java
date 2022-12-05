@@ -88,6 +88,59 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
+    public void moveAt(Position pos) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // move at header
+        message.add((short) 0b000000000111_0_011);
+
+        message.add(pos);
+
+        message.send();
+    }
+
+    @Override
+    public void lookAt(float pitch, float yaw) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // look at header
+        message.add((short) 0b000000001000_0_011);
+
+        message.add(pitch);
+        message.add(yaw);
+
+        message.send();
+    }
+
+    @Override
+    public void hit() throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // hit header
+        message.add((short) 0b000000001010_0_011);
+
+        message.send();
+    }
+
+    @Override
+    public void use() throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // use header
+        message.add((short) 0b000000001011_0_011);
+
+        message.send();
+    }
+
+    @Override
     public void synchronize() throws IOException {
         this.syncManager.requestSynchronization(this);
 

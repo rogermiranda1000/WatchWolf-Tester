@@ -11,4 +11,8 @@ public interface ClientPetition extends Petition {
     public void runCommand(String cmd) throws IOException;
     public void breakBlock(Position block) throws IOException;
     public void equipItemInHand(Item item) throws IOException;
+    public void moveAt(Position pos) throws IOException;
+    public void lookAt(float pitch, float yaw) throws IOException;
+    public void hit() throws IOException;
+    public void use() throws IOException;
 }

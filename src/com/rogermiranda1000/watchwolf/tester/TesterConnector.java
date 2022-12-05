@@ -321,6 +321,66 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public float getPlayerPitch(String nick) throws IOException {
+        if (this.serverManagerSocket == null) return 0.0f;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get player pitch header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000D);
+
+        message.add(nick);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000D) throw new IOException("Expected response from 0x000D operation.");
+            return (float)SocketHelper.readDouble(dis);
+        }
+    }
+
+    @Override
+    public float getPlayerYaw(String nick) throws IOException {
+        if (this.serverManagerSocket == null) return 0.0f;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get player yaw header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000E);
+
+        message.add(nick);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000E) throw new IOException("Expected response from 0x000E operation.");
+            return (float)SocketHelper.readDouble(dis);
+        }
+    }
+
+    @Override
     public void giveItem(String nick, Item item) throws IOException {
         if (this.serverManagerSocket == null) return;
 
@@ -335,6 +395,25 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
         message.add(nick);
         message.add(item);
+
+        message.send();
+    }
+
+    @Override
+    public void tp(String nick, Position pos) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // tp player header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000C);
+
+        message.add(nick);
+        message.add(pos);
 
         message.send();
     }
