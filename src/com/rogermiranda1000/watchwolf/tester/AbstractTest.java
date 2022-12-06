@@ -1,8 +1,5 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.entities.ConfigFile;
-import com.rogermiranda1000.watchwolf.entities.Map;
-import com.rogermiranda1000.watchwolf.entities.Plugin;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,7 +10,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -31,12 +27,13 @@ public class AbstractTest implements TestWatcher, // send feedback
     private ArrayList<ServerInstance> servers;
     private UUID testID;
 
-    // TODO move to file
-    public final String []serversManagerIP = "127.0.0.1:8000".split(":");
-    public final String []clientsManagerIP = "127.0.0.1:7000".split(":");
-    private final ServerType serverType = ServerType.Spigot;
-    private final String []serverVersions = {"1.18.2", "1.14"};
-    private final boolean overrideSync = false;
+    private final String []serversManagerIP = "127.0.0.1:8000".split(":");
+    private final String []clientsManagerIP = "127.0.0.1:7000".split(":");
+    private final TestConfigFileLoader fileLoader;
+
+    public AbstractTest() throws UnspecifiedConfigFileException {
+        this.fileLoader = new TestConfigFileLoader(this.getConfigFile());
+    }
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
@@ -46,23 +43,27 @@ public class AbstractTest implements TestWatcher, // send feedback
         this.testID = UUID.randomUUID();
 
         final Object waitForStartup = new Object();
-        for (String serverVersion : this.serverVersions) {
-            Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])), // ServersManager socket
-                clientsManagerSocket = new Socket(clientsManagerIP[0], Integer.parseInt(clientsManagerIP[1])); // ClientsManager socket
+        for (ServerType serverType : this.fileLoader.getServerTypes()) {
+            for (String serverVersion : this.fileLoader.getServerVersions(serverType)) {
+                Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])), // ServersManager socket
+                        clientsManagerSocket = new Socket(clientsManagerIP[0], Integer.parseInt(clientsManagerIP[1])); // ClientsManager socket
 
-            final ServerInstance server = new ServerInstance();
-            this.servers.add(server);
+                final ServerInstance server = new ServerInstance();
+                this.servers.add(server);
 
-            System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
-            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}, clientsManagerSocket, new String[]{"MinecraftGamer_Z"}, this.overrideSync) // TODO rest of variables
-                    .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
+                System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
+                server.tester = new Tester(serversManagerSocket, serverType, serverVersion, this.fileLoader.getPlugins(),
+                        this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(), clientsManagerSocket,
+                        this.fileLoader.getUsers(), this.fileLoader.getOverrideSync())
+                                .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
-            server.tester.setOnServerReady((connector) -> {
-                synchronized (waitForStartup) {
-                    server.connector = connector;
-                    waitForStartup.notify();
-                }
-            });
+                server.tester.setOnServerReady((connector) -> {
+                    synchronized (waitForStartup) {
+                        server.connector = connector;
+                        waitForStartup.notify();
+                    }
+                });
+            }
         }
 
         synchronized (waitForStartup) {
