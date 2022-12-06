@@ -9,9 +9,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * All AbstractTest's instances will have one of those objects to get the necessary data in order to run the tests.
@@ -20,6 +19,7 @@ import java.util.Set;
  */
 public class TestConfigFileLoader {
     private final InputStream inputStream;
+    private HashMap<String,Object> loadedYaml;
 
     /**
      * Server type, with all its versions
@@ -38,19 +38,31 @@ public class TestConfigFileLoader {
         if (this.inputStream == null) throw new IOException("Couldn't open InputStream at " + file);
     }
 
-    private Object getEntry() {
+    private <T> T getEntry(Function<HashMap<String,Object>,T> getter) {
         Yaml yaml = new Yaml();
-        HashMap<String,Object> obj = yaml.load(this.inputStream);
-        System.out.println(obj.toString());
-        return null;
+        if (this.loadedYaml == null) this.loadedYaml = yaml.load(this.inputStream);
+        if (this.loadedYaml == null) return null; // empty file
+        try {
+            return getter.apply(this.loadedYaml);
+        } catch (NullPointerException ignore) {
+            return null;
+        }
     }
 
-    public Set<ServerType> getServerTypes() {
+    public Set<ServerType> getServerTypes() throws IllegalArgumentException {
         if (this.serverType == null) {
             this.serverType = new HashMap<>();
 
-            this.getEntry();
-            this.serverType.put(ServerType.Spigot, null); // TODO
+            Set<ServerType> r = this.getEntry(it -> {
+                ArrayList<LinkedHashMap<String,Object>> types = (ArrayList<LinkedHashMap<String,Object>>) it.get("server-type");
+                final Set<ServerType> re = new HashSet<>();
+                for (LinkedHashMap<String,Object> e : types) {
+                    e.keySet().stream().map(type -> ServerType.valueOf(type)).forEach(s -> re.add(s));
+                }
+                return re;
+            });
+            if (r == null) return null; // not found
+            for (ServerType type : r) this.serverType.put(type, null);
         }
 
         return this.serverType.keySet();
@@ -62,15 +74,22 @@ public class TestConfigFileLoader {
      * @param serverType Type of server to get the versions
      * @return The versions of that server type; null if no server versions for that type.
      */
-    public Set<String> getServerVersions(ServerType serverType) {
+    public Set<String> getServerVersions(final ServerType serverType) {
         if (this.serverType == null) this.getServerTypes(); // first load hashmap
         Set<String> versions = this.serverType.get(serverType);
         if (versions == null) {
-            versions = new HashSet<>();
+            Set<String> r = this.getEntry(it -> {
+                ArrayList<LinkedHashMap<String,ArrayList<String>>> types = (ArrayList<LinkedHashMap<String,ArrayList<String>>>) it.get("server-type");
+                final Set<String> re = new HashSet<>();
+                for (LinkedHashMap<String,ArrayList<String>> e : types) {
+                    ArrayList<String> wantedElements = e.get(serverType.name());
+                    if (wantedElements != null) re.addAll(wantedElements);
+                }
+                return re;
+            });
 
-            versions.add("1.14"); // TODO
-
-            // TODO check if any version before adding
+            if (r == null || r.size() < 1) return null; // not found / not enough versions for the specified type
+            versions = r;
             this.serverType.put(serverType, versions);
         }
 

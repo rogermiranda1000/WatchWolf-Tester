@@ -17,6 +17,11 @@ public class ConfigLoaderTester {
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
         expectedServerTypes.add(ServerType.Spigot);
 
+        HashSet<String> expectedServerVersions = new HashSet<>();
+        expectedServerVersions.add("1.14");
+        expectedServerVersions.add("1.18.1");
+
         assertEquals(expectedServerTypes, loader.getServerTypes());
+        assertEquals(expectedServerVersions, loader.getServerVersions(ServerType.Spigot));
     }
 }
