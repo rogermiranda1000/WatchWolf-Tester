@@ -5,6 +5,7 @@ import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
 import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
@@ -419,6 +420,37 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public Container getInventory(String nick) throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get inventory header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x000F);
+
+        message.add(nick);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x000F) throw new IOException("Expected response from 0x000F operation.");
+
+            return (Container) SocketData.readSocketData(dis, Container.class);
+        }
+    }
+
+    @Override
     public String[] getPlayers() throws IOException {
         if (this.serverManagerSocket == null) return null;
 
@@ -536,6 +568,42 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         message.add(cmd);
 
         message.send();
+    }
+
+    @Override
+    public Entity[] getEntities(Position center, double radius) throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get players header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0010);
+
+        message.add(center);
+        message.add(radius);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0010) throw new IOException("Expected response from 0x0010 operation.");
+
+            // TODO move to helper
+            int size = SocketHelper.readShort(dis);
+            Entity []entities = new Entity[size];
+            for (int n = 0; n < size; n++) entities[n] = (Entity) SocketData.readSocketData(dis, Entity.class);
+            return entities;
+        }
     }
 
     @Override

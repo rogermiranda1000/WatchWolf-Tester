@@ -1,8 +1,11 @@
 package com.rogermiranda1000.watchwolf.entities.entities;
 
 import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketData;
 
-public class Entity {
+import java.util.ArrayList;
+
+public class Entity extends SocketData {
     private final String UUID;
     private final Position position;
 
@@ -17,5 +20,10 @@ public class Entity {
 
     public Position getPosition() {
         return this.position;
+    }
+
+    @Override
+    public void sendSocketData(ArrayList<Byte> out) {
+        // TODO
     }
 }

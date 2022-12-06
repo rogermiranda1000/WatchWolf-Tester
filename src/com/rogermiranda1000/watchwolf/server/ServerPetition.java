@@ -1,7 +1,9 @@
 package com.rogermiranda1000.watchwolf.server;
 
+import com.rogermiranda1000.watchwolf.entities.Container;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.tester.Petition;
 
@@ -15,9 +17,11 @@ public interface ServerPetition extends Petition {
     public float getPlayerYaw(String nick) throws IOException;
     public void giveItem(String nick, Item item) throws IOException;
     public void tp(String nick, Position pos) throws IOException;
+    public Container getInventory(String nick) throws IOException;
     public String []getPlayers() throws IOException;
     public void stopServer(ServerStopNotifier onServerStop) throws IOException;
     public void setBlock(Position position, Block block) throws IOException;
     public Block getBlock(Position position) throws IOException;
     public void runCommand(String cmd) throws IOException;
+    public Entity []getEntities(Position center, double radius) throws IOException;
 }
