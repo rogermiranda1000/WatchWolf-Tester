@@ -28,6 +28,10 @@ public class Item extends SocketData {
         this(type, (byte) 1);
     }
 
+    public Item(Item i) {
+        this(i.type, i.amount);
+    }
+
     public void setAmount(byte amount) throws IllegalArgumentException {
         if (amount < 1) throw new IllegalArgumentException("Quantity must be at least 1");
         this.amount = amount;
