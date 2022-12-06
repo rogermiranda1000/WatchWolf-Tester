@@ -32,6 +32,10 @@ public class Message {
         SocketHelper.addDouble(this.send, d);
     }
 
+    public void add(float d) {
+        SocketHelper.addFloat(this.send, d);
+    }
+
     public void add(short s) {
         SocketHelper.addShort(this.send, s);
     }
@@ -44,6 +48,7 @@ public class Message {
 
         if (o instanceof Byte) this.add((byte) o);
         else if (o instanceof Double) this.add((double) o);
+        else if (o instanceof Float) this.add((float) o);
         else if (o instanceof String) SocketHelper.addString(this.send, (String)o);
         else if (o instanceof Short) this.add((short) o);
         else throw new IllegalArgumentException("Unkwnown type " + o.getClass());

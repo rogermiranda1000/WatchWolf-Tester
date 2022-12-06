@@ -26,16 +26,16 @@ public class BlocksTester extends AbstractTest {
     @ArgumentsSource(BlocksTester.class)
     public void setBlock(TesterConnector connector) throws Exception {
         Position p = new Position("world", 0,0,0);
-        connector.setBlock(p, Blocks.IRON_BLOCK);
-        assertEquals(connector.getBlock(p), Blocks.IRON_BLOCK);
+        connector.server.setBlock(p, Blocks.IRON_BLOCK);
+        assertEquals(connector.server.getBlock(p), Blocks.IRON_BLOCK);
     }
 
     @ParameterizedTest
     @ArgumentsSource(BlocksTester.class)
     public void setComplexBlock(TesterConnector connector) throws Exception {
         Position p = new Position("world", 0,0,0);
-        connector.setBlock(p, Blocks.OAK_SLAB);
-        assertEquals(connector.getBlock(p), Blocks.OAK_SLAB);
+        connector.server.setBlock(p, Blocks.OAK_SLAB);
+        assertEquals(connector.server.getBlock(p), Blocks.OAK_SLAB);
     }
 
     @ParameterizedTest
@@ -43,8 +43,8 @@ public class BlocksTester extends AbstractTest {
     public void setChangedOrientableBlock(TesterConnector connector) throws Exception {
         Position p = new Position("world", 0,0,0);
         Block slab = (Block) Blocks.ACACIA_SLAB.setOrientation(Orientable.Orientation.U, true);
-        connector.setBlock(p, slab);
-        Block get = connector.getBlock(p);
+        connector.server.setBlock(p, slab);
+        Block get = connector.server.getBlock(p);
 
         ArrayList<Byte> originalData = new ArrayList<>(),
                 gettedData = new ArrayList<>();
@@ -59,8 +59,8 @@ public class BlocksTester extends AbstractTest {
         Position p = new Position("world", 0,0,0);
         Bell bell = (Bell) Blocks.BELL.setOrientation(Orientable.Orientation.W, true);
         bell = (Bell) bell.setDirection(Directionable.Direction.SINGLE_WALL);
-        connector.setBlock(p, bell);
-        Block get = connector.getBlock(p);
+        connector.server.setBlock(p, bell);
+        Block get = connector.server.getBlock(p);
 
         ArrayList<Byte> originalData = new ArrayList<>(),
                 gettedData = new ArrayList<>();
