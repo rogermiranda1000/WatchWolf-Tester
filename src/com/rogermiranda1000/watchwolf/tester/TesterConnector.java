@@ -1,6 +1,5 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.client.ClientPetition;
 import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
@@ -25,7 +24,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     private ServerErrorNotifier onServerError;
     private Socket serverManagerSocket;
 
-    private final HashMap<String,ClientSocket> clients;
+    private final HashMap<String,ExtendedClientPetition> clients;
 
     private ServerType mcType;
     private String version;
@@ -69,7 +68,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     public void setClientSocket(Socket s, String username) {
-        this.clients.put(username, new ClientSocket(username, s, this, this));
+        this.clients.put(username, new ExtendedClientSocket(username, s, this, this, this));
     }
 
     public void close() {
@@ -89,16 +88,16 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         return this.clients.keySet().toArray(new String[0]);
     }
 
-    public ClientPetition getClientPetition(String username) throws ClientNotFoundException {
-        ClientSocket client = this.clients.get(username);
+    public ExtendedClientPetition getClientPetition(String username) throws ClientNotFoundException {
+        ExtendedClientPetition client = this.clients.get(username);
         if (client == null) throw new ClientNotFoundException(username + " not in users pool");
         return client;
     }
 
-    public ClientPetition getClientPetition(int index) throws ClientNotFoundException {
+    public ExtendedClientPetition getClientPetition(int index) throws ClientNotFoundException {
         Object []clients = this.clients.values().toArray(); // TODO cache the array
         if (index < 0 || clients.length <= index) throw new ClientNotFoundException("There's only " + clients.length + " users in the pool; asked for number " + index);
-        return (ClientPetition) clients[index];
+        return (ExtendedClientPetition) clients[index];
     }
 
     private Socket getAsyncSocket(int index) throws IndexOutOfBoundsException {

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientSocket implements ClientPetition {
-    private final String username;
+    protected final String username;
     private final Socket socket;
     private final AsyncPetitionResolver asyncResolver;
     private final SynchronizationManager syncManager;
