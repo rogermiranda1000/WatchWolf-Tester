@@ -1,6 +1,7 @@
 package com.rogermiranda1000.watchwolf.entities;
 
 import com.rogermiranda1000.watchwolf.entities.items.Item;
+import com.rogermiranda1000.watchwolf.entities.items.ItemType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,13 @@ public class Container extends SocketData {
 
     static {
         SocketData.setReaderFunction(Container.class, (dis) -> {
+            Item air = new Item(ItemType.AIR);
             int size = SocketHelper.readShort(dis);
             Item []get = new Item[size];
-            for (int n = 0; n < get.length; n++) get[n] = (Item)SocketData.readSocketData(dis, Item.class);
+            for (int n = 0; n < get.length; n++) {
+                get[n] = (Item)SocketData.readSocketData(dis, Item.class);
+                if (get[n].equals(air)) get[n] = null;
+            }
 
             return new Container(get);
         });
@@ -43,7 +48,12 @@ public class Container extends SocketData {
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addArray(out, this.items, (o,obj) -> {
-            for (int n = 0; n < obj.length; n++) obj[n].sendSocketData(o);
+            Item air = new Item(ItemType.AIR);
+            for (int n = 0; n < obj.length; n++) {
+                Item send = obj[n];
+                if (send == null) send = air;
+                send.sendSocketData(o);
+            }
         });
     }
 }
