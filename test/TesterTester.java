@@ -72,6 +72,8 @@ public class TesterTester extends AbstractTest {
         HashMap<ItemType,Integer> r = new HashMap<>();
 
         for (Item i : items) {
+            if (i == null) continue;
+
             Integer acum = r.get(i.getType());
             if (acum == null) r.put(i.getType(), (int)i.getAmount());
             else r.put(i.getType(), acum + i.getAmount());
