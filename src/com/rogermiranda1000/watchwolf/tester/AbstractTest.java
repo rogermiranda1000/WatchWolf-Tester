@@ -33,8 +33,10 @@ public class AbstractTest implements TestWatcher, // send feedback
 
     // TODO move to file
     public final String []serversManagerIP = "127.0.0.1:8000".split(":");
+    public final String []clientsManagerIP = "127.0.0.1:7000".split(":");
     private final ServerType serverType = ServerType.Spigot;
     private final String []serverVersions = {"1.18.2", "1.14"};
+    private final boolean overrideSync = false;
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
@@ -45,16 +47,17 @@ public class AbstractTest implements TestWatcher, // send feedback
 
         final Object waitForStartup = new Object();
         for (String serverVersion : this.serverVersions) {
-            Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])); // ServersManager socket
+            Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])), // ServersManager socket
+                clientsManagerSocket = new Socket(clientsManagerIP[0], Integer.parseInt(clientsManagerIP[1])); // ClientsManager socket
 
             final ServerInstance server = new ServerInstance();
             this.servers.add(server);
 
             System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
-            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}) // TODO rest of variables
+            server.tester = new Tester(serversManagerSocket, this.serverType, serverVersion, new Plugin[]{}, new Map[]{}, new ConfigFile[]{}, clientsManagerSocket, new String[]{"MinecraftGamer_Z"}, this.overrideSync) // TODO rest of variables
                     .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
-            server.tester.setOnServerStart((connector) -> {
+            server.tester.setOnServerReady((connector) -> {
                 synchronized (waitForStartup) {
                     server.connector = connector;
                     waitForStartup.notify();
