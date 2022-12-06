@@ -5,6 +5,7 @@ import com.rogermiranda1000.watchwolf.clientsmanager.ClientManagerPetition;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.entities.Entity;
+import com.rogermiranda1000.watchwolf.entities.entities.EntityType;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
 import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
@@ -50,6 +51,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         this.messageQueue = new ArrayList<>();
         this.messageNotifier = new ArrayList<>();
         SocketData.loadStaticBlock(BlockReader.class);
+        SocketData.loadStaticBlock(EntityType.class);
     }
 
     public void addOnMessage(MessageNotifier onMessage) {

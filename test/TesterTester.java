@@ -1,15 +1,24 @@
 import com.rogermiranda1000.watchwolf.entities.Container;
+import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.blocks.Block;
+import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
+import com.rogermiranda1000.watchwolf.entities.entities.DroppedItem;
+import com.rogermiranda1000.watchwolf.entities.entities.Entity;
+import com.rogermiranda1000.watchwolf.entities.entities.EntityType;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.entities.items.ItemType;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
+import com.rogermiranda1000.watchwolf.tester.ExtendedClientPetition;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @ExtendWith(TesterTester.class) // run the tests with the AbstractTest overridden methods
 public class TesterTester extends AbstractTest {
-    private static final String USER1 = "rogermiranda1000";
-
     @Override
     public File getConfigFile() {
         return null; // TODO
@@ -80,5 +87,37 @@ public class TesterTester extends AbstractTest {
         }
 
         return r;
+    }
+
+    /**
+     * Break a dirt block far from the player, and then see if there's a dirt block dropped
+     */
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
+    public void getDrops(TesterConnector connector) throws Exception {
+        ExtendedClientPetition clientConnector = connector.getClientPetition(0);
+
+        Position pos = clientConnector.getPosition().add(0, 1, 0);
+        int farBlock = 3;
+
+        // place block
+        for (int n = 0; n < farBlock-1; n++) {
+            connector.setBlock(pos, Blocks.AIR);
+            pos.add(1, 0, 0);
+        }
+        connector.setBlock(pos, Blocks.DIRT);
+
+        // break block
+        clientConnector.breakBlock(pos);
+
+        Entity []entities = connector.getEntities(pos, 10);
+        List<Item> items = new ArrayList<>();
+        for (Entity e : entities) {
+            if (e.getType().equals(EntityType.DroppedItem)) items.add(((DroppedItem)e).getItem());
+        }
+
+        HashMap<ItemType,Integer> it = TesterTester.getAmounts(items.toArray(new Item[0]));
+        System.out.println("Found " + it.toString());
+        assertTrue(it.get(ItemType.DIRT) >= 1);
     }
 }

@@ -3,11 +3,9 @@ package com.rogermiranda1000.watchwolf.entities.entities;
 import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.SocketData;
 
-import java.util.ArrayList;
-
-public class Entity extends SocketData {
-    private final String UUID;
-    private final Position position;
+public abstract class Entity extends SocketData {
+    protected final String UUID;
+    protected final Position position;
 
     public Entity(String UUID, Position position) {
         this.UUID = UUID;
@@ -22,8 +20,7 @@ public class Entity extends SocketData {
         return this.position;
     }
 
-    @Override
-    public void sendSocketData(ArrayList<Byte> out) {
-        // TODO
+    public EntityType getType() {
+        return EntityType.getType(this);
     }
 }

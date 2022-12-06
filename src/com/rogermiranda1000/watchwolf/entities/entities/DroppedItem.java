@@ -1,7 +1,10 @@
 package com.rogermiranda1000.watchwolf.entities.entities;
 
 import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
+
+import java.util.ArrayList;
 
 public class DroppedItem extends Entity {
     private final Item item;
@@ -13,5 +16,13 @@ public class DroppedItem extends Entity {
 
     public Item getItem() {
         return new Item(this.item);
+    }
+
+    @Override
+    public void sendSocketData(ArrayList<Byte> out) {
+        SocketHelper.addShort(out, EntityType.DroppedItem.ordinal());
+        this.position.sendSocketData(out);
+        SocketHelper.addString(out, this.UUID);
+        this.item.sendSocketData(out);
     }
 }

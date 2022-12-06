@@ -1,5 +1,10 @@
 package com.rogermiranda1000.watchwolf.entities.entities;
 
+import com.rogermiranda1000.watchwolf.entities.Position;
+import com.rogermiranda1000.watchwolf.entities.SocketData;
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
+import com.rogermiranda1000.watchwolf.entities.items.Item;
+
 public enum EntityType {
     DroppedItem;
 
@@ -21,5 +26,19 @@ public enum EntityType {
      */
     public static EntityType getType(Entity e) throws IllegalArgumentException {
         return EntityType.getType(e.getClass());
+    }
+
+    static {
+        SocketData.setReaderFunction(Entity.class, (dis) -> {
+            EntityType type = EntityType.values()[SocketHelper.readShort(dis)];
+            Position pos = (Position) SocketData.readSocketData(dis, Position.class);
+            String uuid = SocketHelper.readString(dis);
+
+            if (type.equals(EntityType.DroppedItem)) {
+                Item droppedItem = (Item) SocketData.readSocketData(dis, Item.class);
+                return new DroppedItem(uuid, pos, droppedItem);
+            }
+            return null;
+        });
     }
 }
