@@ -677,4 +677,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         // synchronized
         this.lastSynchronization = current;
     }
+
+    @Override
+    public String toString() {
+        return "TesterConnector{" + this.getServerType() + " " + this.getServerVersion() + "}";
+    }
 }

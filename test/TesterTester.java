@@ -1,6 +1,5 @@
 import com.rogermiranda1000.watchwolf.entities.Container;
 import com.rogermiranda1000.watchwolf.entities.Position;
-import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.blocks.Blocks;
 import com.rogermiranda1000.watchwolf.entities.entities.DroppedItem;
 import com.rogermiranda1000.watchwolf.entities.entities.Entity;
@@ -11,6 +10,8 @@ import com.rogermiranda1000.watchwolf.tester.AbstractTest;
 import com.rogermiranda1000.watchwolf.tester.ExtendedClientPetition;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
@@ -27,21 +28,11 @@ import static org.junit.jupiter.api.Assertions.*;
  * That's right! We need a Tester for the Tester.
  */
 @ExtendWith(TesterTester.class) // run the tests with the AbstractTest overridden methods
+// TODO @Execution(ExecutionMode.CONCURRENT)
 public class TesterTester extends AbstractTest {
     @Override
     public File getConfigFile() {
         return null; // TODO
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(TesterTester.class)
-    public void opPlayer(TesterConnector connector) throws Exception {
-        String clientName = connector.getClients()[0];
-        connector.opPlayer(clientName);
-
-        connector.getClientPetition(0).runCommand("kick " + clientName);
-
-        assertFalse(Arrays.asList(connector.getPlayers()).contains(clientName));
     }
 
     @ParameterizedTest
@@ -53,8 +44,19 @@ public class TesterTester extends AbstractTest {
 
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
+    public void opPlayer(TesterConnector connector) throws Exception {
+        String clientName = connector.getClients()[1];
+        connector.opPlayer(clientName);
+
+        connector.getClientPetition(0).runCommand("kick " + clientName);
+
+        assertFalse(Arrays.asList(connector.getPlayers()).contains(clientName));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
     public void runCommand(TesterConnector connector) throws Exception {
-        final String clientName = connector.getClients()[0];
+        final String clientName = connector.getClients()[2];
         connector.runCommand("kick " + clientName);
 
         assertFalse(Arrays.asList(connector.getPlayers()).contains(clientName));
@@ -118,6 +120,6 @@ public class TesterTester extends AbstractTest {
 
         HashMap<ItemType,Integer> it = TesterTester.getAmounts(items.toArray(new Item[0]));
         System.out.println("Found " + it.toString());
-        assertTrue(it.get(ItemType.DIRT) >= 1);
+        assertTrue(((Integer)1).compareTo(it.get(ItemType.DIRT)) <= 0);
     }
 }
