@@ -18,7 +18,7 @@ public class SocketHelper {
         for (Byte b : (Byte[])file) out.add((byte)b);
     }
 
-    public static void addArray(ArrayList<Byte> out, Object[] array, ArrayAdder arrayAdder) {
+    public static <T> void addArray(ArrayList<Byte> out, T[] array, ArrayAdder<T> arrayAdder) {
         SocketHelper.addShort(out, (short)array.length);
         if (array.length > 0) arrayAdder.addToArray(out, array);
     }
