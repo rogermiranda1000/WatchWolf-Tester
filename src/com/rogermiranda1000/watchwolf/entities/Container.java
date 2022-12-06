@@ -27,7 +27,10 @@ public class Container extends SocketData {
 
     private static Item []clone(Item []from) {
         Item []r = new Item[from.length];
-        for (int n = 0; n < r.length; n++) r[n] = new Item(from[n]);
+        for (int n = 0; n < r.length; n++) {
+            if (r[n] == null) continue;
+            r[n] = new Item(from[n]);
+        }
         return r;
     }
 
