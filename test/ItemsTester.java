@@ -7,14 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
-import java.io.File;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ItemsTester.class)
 public class ItemsTester extends AbstractTest {
     @Override
-    public File getConfigFile() {
+    public String getConfigFile() {
         return null; // TODO
     }
 

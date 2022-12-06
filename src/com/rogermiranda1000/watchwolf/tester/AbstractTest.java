@@ -32,7 +32,11 @@ public class AbstractTest implements TestWatcher, // send feedback
     private final TestConfigFileLoader fileLoader;
 
     public AbstractTest() throws UnspecifiedConfigFileException {
-        this.fileLoader = new TestConfigFileLoader(this.getConfigFile());
+        try {
+            this.fileLoader = new TestConfigFileLoader(this.getConfigFile());
+        } catch (IOException ex) {
+            throw new UnspecifiedConfigFileException(ex);
+        }
     }
 
     @Override
@@ -113,5 +117,5 @@ public class AbstractTest implements TestWatcher, // send feedback
      * Method to override
      * @return WatchWolf config file
      */
-    public File getConfigFile() { throw new UnspecifiedConfigFileException(); }
+    public String getConfigFile() { throw new UnspecifiedConfigFileException(); }
 }

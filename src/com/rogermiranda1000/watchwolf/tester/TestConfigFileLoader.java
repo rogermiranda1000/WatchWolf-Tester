@@ -4,8 +4,11 @@ import com.rogermiranda1000.watchwolf.entities.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.Map;
 import com.rogermiranda1000.watchwolf.entities.Plugin;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +19,7 @@ import java.util.Set;
  * that's why we won't load any part of the file until it is explicitly requested.
  */
 public class TestConfigFileLoader {
-    private final File testFile;
+    private final InputStream inputStream;
 
     /**
      * Server type, with all its versions
@@ -28,13 +31,25 @@ public class TestConfigFileLoader {
     private Set<ConfigFile> configFiles;
     private Set<String> users;
 
-    public TestConfigFileLoader(File file) {
-        this.testFile = file;
+    public TestConfigFileLoader(String file) throws IOException {
+        this.inputStream = this.getClass()
+            .getClassLoader()
+            .getResourceAsStream(file);
+        if (this.inputStream == null) throw new IOException("Couldn't open InputStream at " + file);
+    }
+
+    private Object getEntry() {
+        Yaml yaml = new Yaml();
+        HashMap<String,Object> obj = yaml.load(this.inputStream);
+        System.out.println(obj.toString());
+        return null;
     }
 
     public Set<ServerType> getServerTypes() {
         if (this.serverType == null) {
             this.serverType = new HashMap<>();
+
+            this.getEntry();
             this.serverType.put(ServerType.Spigot, null); // TODO
         }
 
