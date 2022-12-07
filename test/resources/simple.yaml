@@ -3,5 +3,4 @@ server-type:
       - "1.14"
       - "1.18.1"
 
-plugins:
-  - Residence
+plugin: "Residence"

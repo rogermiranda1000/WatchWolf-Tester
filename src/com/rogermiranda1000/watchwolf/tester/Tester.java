@@ -7,6 +7,9 @@ import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Tester implements Runnable, ServerStartNotifier {
@@ -20,17 +23,19 @@ public class Tester implements Runnable, ServerStartNotifier {
     private ServerErrorNotifier onError;
     private final ServerType mcType;
     private final String version;
-    private final Plugin[] plugins;
+    private final Plugin testedPlugin;
+    private final Plugin[] extraPlugins;
     private final Map[] maps;
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
         this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
         this.version = version;
-        this.plugins = plugins;
+        this.testedPlugin = testedPlugin;
+        this.extraPlugins = extraPlugins;
         this.maps = maps;
         this.configFiles = configFiles;
         this.clientNames = clientNames;
@@ -54,7 +59,9 @@ public class Tester implements Runnable, ServerStartNotifier {
     @Override
     public void run() {
         try {
-            String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, this.plugins, this.maps, this.configFiles).split(":");
+            List<Plugin> serverPlugins = Arrays.asList(this.extraPlugins);
+            serverPlugins.add(testedPlugin);
+            String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, serverPlugins.toArray(new Plugin[0]), this.maps, this.configFiles).split(":");
             new Thread(this.connector).start();
 
             this.serverIp = ip[0];

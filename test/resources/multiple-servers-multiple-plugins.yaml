@@ -1,0 +1,11 @@
+server-type:
+  - Spigot:
+      - "1.14"
+      - "1.18.1"
+  - Paper:
+      - "1.19"
+
+plugin: "Residence"                                             # UsualPlugin
+extra-plugins:
+  - "./Vault.jar"                                               # FilePlugin
+  - "https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar" # UploadedPlugin

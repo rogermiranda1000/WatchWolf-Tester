@@ -1,9 +1,7 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.entities.ConfigFile;
+import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.Map;
-import com.rogermiranda1000.watchwolf.entities.Plugin;
-import com.rogermiranda1000.watchwolf.entities.ServerType;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -26,7 +24,8 @@ public class TestConfigFileLoader {
      */
     private HashMap<ServerType,Set<String>> serverType;
     private Boolean overrideSync;
-    private Set<Plugin> plugins;
+    private Plugin plugin;
+    private Set<Plugin> extraPlugins;
     private Set<Map> maps;
     private Set<ConfigFile> configFiles;
     private Set<String> users;
@@ -104,13 +103,26 @@ public class TestConfigFileLoader {
         return this.overrideSync;
     }
 
-    public Plugin []getPlugins() {
-        if (this.plugins == null) {
-            this.plugins = new HashSet<>();
-            // TODO
+    public Plugin getPlugin() throws UnspecifiedConfigFileException {
+        if (this.plugin == null) {
+            String r = this.getEntry(it -> (String) it.get("plugin"));
+            if (r == null) throw new UnspecifiedConfigFileException("The config file must contain a plugin to test.");
+            this.plugin = PluginBuilder.build(r);
         }
 
-        return this.plugins.toArray(new Plugin[0]);
+        return this.plugin;
+    }
+
+    public Plugin []getExtraPlugins() {
+        if (this.extraPlugins == null) {
+            this.extraPlugins = new HashSet<>();
+            ArrayList<String> r = this.getEntry(it -> (ArrayList<String>) it.get("extra-plugins"));
+            if (r != null) { // maybe any extra plugin?
+                for (String path : r) this.extraPlugins.add(PluginBuilder.build(path));
+            }
+        }
+
+        return this.extraPlugins.toArray(new Plugin[0]);
     }
 
     public String []getUsers() {

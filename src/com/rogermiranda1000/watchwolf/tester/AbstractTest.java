@@ -56,9 +56,9 @@ public class AbstractTest implements TestWatcher, // send feedback
                 this.servers.add(server);
 
                 System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
-                server.tester = new Tester(serversManagerSocket, serverType, serverVersion, this.fileLoader.getPlugins(),
-                        this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(), clientsManagerSocket,
-                        this.fileLoader.getUsers(), this.fileLoader.getOverrideSync())
+                server.tester = new Tester(serversManagerSocket, serverType, serverVersion, this.fileLoader.getPlugin(),
+                        this.fileLoader.getExtraPlugins(), this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(),
+                        clientsManagerSocket, this.fileLoader.getUsers(), this.fileLoader.getOverrideSync())
                                 .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
                 server.tester.setOnServerReady((connector) -> {
@@ -117,5 +117,5 @@ public class AbstractTest implements TestWatcher, // send feedback
      * Method to override
      * @return WatchWolf config file
      */
-    public String getConfigFile() { throw new UnspecifiedConfigFileException(); }
+    public String getConfigFile() { throw new UnspecifiedConfigFileException("The config file must be specified."); }
 }
