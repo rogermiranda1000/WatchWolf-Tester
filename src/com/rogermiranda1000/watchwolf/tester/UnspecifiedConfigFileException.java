@@ -1,11 +1,7 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-public class UnspecifiedConfigFileException extends RuntimeException {
-    public UnspecifiedConfigFileException(String msg) {
-        super(msg);
-    }
-
-    public UnspecifiedConfigFileException(Throwable ex) {
-        super("The config file was specified, but an error occurred while reading it.", ex);
+public class UnspecifiedConfigFileException extends ConfigFileException {
+    public UnspecifiedConfigFileException() {
+        super("The config file must be specified.");
     }
 }

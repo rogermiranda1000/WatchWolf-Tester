@@ -31,11 +31,11 @@ public class AbstractTest implements TestWatcher, // send feedback
     private final String []clientsManagerIP = "127.0.0.1:7000".split(":");
     private final TestConfigFileLoader fileLoader;
 
-    public AbstractTest() throws UnspecifiedConfigFileException {
+    public AbstractTest() throws ConfigFileException {
         try {
             this.fileLoader = new TestConfigFileLoader(this.getConfigFile());
         } catch (IOException ex) {
-            throw new UnspecifiedConfigFileException(ex);
+            throw new ConfigFileException(ex);
         }
     }
 
@@ -117,5 +117,5 @@ public class AbstractTest implements TestWatcher, // send feedback
      * Method to override
      * @return WatchWolf config file
      */
-    public String getConfigFile() { throw new UnspecifiedConfigFileException("The config file must be specified."); }
+    public String getConfigFile() { throw new UnspecifiedConfigFileException(); }
 }

@@ -103,22 +103,28 @@ public class TestConfigFileLoader {
         return this.overrideSync;
     }
 
-    public Plugin getPlugin() throws UnspecifiedConfigFileException {
+    public Plugin getPlugin() throws ConfigFileException {
         if (this.plugin == null) {
             String r = this.getEntry(it -> (String) it.get("plugin"));
-            if (r == null) throw new UnspecifiedConfigFileException("The config file must contain a plugin to test.");
-            this.plugin = PluginBuilder.build(r);
+            if (r == null) throw new ConfigFileException("The config file must contain a plugin to test.");
+            try {
+                this.plugin = PluginBuilder.build(r);
+            } catch (IOException ex) { throw new ConfigFileException(ex); }
         }
 
         return this.plugin;
     }
 
-    public Plugin []getExtraPlugins() {
+    public Plugin []getExtraPlugins() throws ConfigFileException {
         if (this.extraPlugins == null) {
             this.extraPlugins = new HashSet<>();
             ArrayList<String> r = this.getEntry(it -> (ArrayList<String>) it.get("extra-plugins"));
             if (r != null) { // maybe any extra plugin?
-                for (String path : r) this.extraPlugins.add(PluginBuilder.build(path));
+                for (String path : r) {
+                    try {
+                        this.extraPlugins.add(PluginBuilder.build(path));
+                    } catch (IOException ex) { throw new ConfigFileException(ex); }
+                }
             }
         }
 

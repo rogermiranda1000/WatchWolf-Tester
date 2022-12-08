@@ -37,4 +37,9 @@ public class UsualPlugin extends Plugin {
         SocketHelper.addString(out, this.name);
         SocketHelper.addString(out, (this.version == null) ? "" : this.version);
     }
+
+    @Override
+    public String toString() {
+        return "UsualPlugin{" + this.name + (this.version != null ? (" v" + this.version) : "") + "}";
+    }
 }
