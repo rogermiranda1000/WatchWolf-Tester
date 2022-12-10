@@ -1,4 +1,4 @@
-package com.rogermiranda1000.watchwolf.entities;
+package com.rogermiranda1000.watchwolf.entities.files;
 
 import java.util.ArrayList;
 

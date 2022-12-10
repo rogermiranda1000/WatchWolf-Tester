@@ -1,5 +1,10 @@
 package com.rogermiranda1000.watchwolf.entities;
 
+import com.rogermiranda1000.watchwolf.entities.files.FilePlugin;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
+import com.rogermiranda1000.watchwolf.entities.files.UploadedPlugin;
+import com.rogermiranda1000.watchwolf.entities.files.UsualPlugin;
+
 import java.io.File;
 import java.io.IOException;
 

@@ -1,5 +1,6 @@
-package com.rogermiranda1000.watchwolf.entities;
+package com.rogermiranda1000.watchwolf.entities.files;
 
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

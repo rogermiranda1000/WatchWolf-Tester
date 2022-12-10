@@ -1,10 +1,10 @@
 package com.rogermiranda1000.watchwolf.tester;
 
 import com.rogermiranda1000.watchwolf.entities.*;
-import com.rogermiranda1000.watchwolf.entities.Map;
+import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -26,7 +26,7 @@ public class TestConfigFileLoader {
     private Boolean overrideSync;
     private Plugin plugin;
     private Set<Plugin> extraPlugins;
-    private Set<Map> maps;
+    private Set<ConfigFile> maps;
     private Set<ConfigFile> configFiles;
     private Set<String> users;
 
@@ -143,13 +143,13 @@ public class TestConfigFileLoader {
         return this.users.toArray(new String[0]);
     }
 
-    public Map []getMaps() {
+    public ConfigFile []getMaps() {
         if (this.maps == null) {
             this.maps = new HashSet<>();
             // TODO
         }
 
-        return this.maps.toArray(new Map[0]);
+        return this.maps.toArray(new ConfigFile[0]);
     }
 
     public ConfigFile []getConfigFiles() {

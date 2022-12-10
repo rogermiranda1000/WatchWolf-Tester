@@ -6,6 +6,8 @@ import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.blocks.Block;
 import com.rogermiranda1000.watchwolf.entities.entities.Entity;
 import com.rogermiranda1000.watchwolf.entities.entities.EntityType;
+import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.server.ServerPetition;
 import com.rogermiranda1000.watchwolf.server.ServerStopNotifier;
@@ -218,7 +220,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
     /* INTERFACES */
     @Override
-    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles) throws IOException {
+    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, ConfigFile[] maps, ConfigFile[] configFiles) throws IOException {
         this.onServerStart = onServerStart;
         this.onServerError = onError;
 

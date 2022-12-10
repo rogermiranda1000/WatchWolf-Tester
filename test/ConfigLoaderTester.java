@@ -1,7 +1,7 @@
-import com.rogermiranda1000.watchwolf.entities.Plugin;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import com.rogermiranda1000.watchwolf.entities.PluginBuilder;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
-import com.rogermiranda1000.watchwolf.entities.UsualPlugin;
+import com.rogermiranda1000.watchwolf.entities.files.UsualPlugin;
 import com.rogermiranda1000.watchwolf.tester.TestConfigFileLoader;
 import com.rogermiranda1000.watchwolf.tester.UnspecifiedConfigFileException;
 import org.junit.jupiter.api.Test;

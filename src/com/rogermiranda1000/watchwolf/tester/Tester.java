@@ -1,13 +1,13 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.entities.*;
+import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,11 +25,11 @@ public class Tester implements Runnable, ServerStartNotifier {
     private final String version;
     private final Plugin testedPlugin;
     private final Plugin[] extraPlugins;
-    private final Map[] maps;
+    private final ConfigFile[] maps;
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, ConfigFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
         this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
