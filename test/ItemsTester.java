@@ -35,6 +35,7 @@ public class ItemsTester extends AbstractTest {
         String user = connector.getClients()[0];
         ExtendedClientPetition petition = connector.getClientPetition(user);
 
+        int numOK = 0;
         for (ItemType type : ItemType.values()) {
             System.out.println("Validating item " + type.name() + "...");
             Item give = new Item(type);
@@ -42,9 +43,12 @@ public class ItemsTester extends AbstractTest {
 
             ArrayList<Item> expected = new ArrayList<>();
             expected.add(give);
-            assertEquals(expected, Arrays.asList(petition.getInventory().getItems()));
+            if (expected.equals(Arrays.asList(petition.getInventory().getItems()))) numOK++;
+            else System.out.println("[e] Failed validation on " + type.name());
 
             connector.server.runCommand("clear " + user); // clear inventory
         }
+
+        assertEquals(ItemType.values().length, numOK);
     }
 }

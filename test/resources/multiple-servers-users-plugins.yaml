@@ -11,5 +11,5 @@ users:
 
 plugin: "Residence"                                             # UsualPlugin
 extra-plugins:
-  - "./Vault.jar"                                               # FilePlugin
+  - "./test/resources/Empty.jar"                                # FilePlugin
   - "https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar" # UploadedPlugin

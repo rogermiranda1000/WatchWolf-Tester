@@ -123,7 +123,7 @@ public class TestConfigFileLoader {
                 for (String path : r) {
                     try {
                         this.extraPlugins.add(PluginBuilder.build(path));
-                    } catch (IOException ex) { throw new ConfigFileException(ex); }
+                    } catch (IOException ex) { throw new ConfigFileException("Couldn't load " + path, ex); }
                 }
             }
         }
