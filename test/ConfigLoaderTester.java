@@ -5,6 +5,8 @@ import com.rogermiranda1000.watchwolf.tester.UnspecifiedConfigFileException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,8 +26,12 @@ public class ConfigLoaderTester {
         expectedServerVersions.add("1.14");
         expectedServerVersions.add("1.18.1");
 
+        ArrayList<String> expectedUsers = new ArrayList<>();
+        expectedUsers.add("MinecraftGamer_Z");
+
         assertEquals(expectedServerTypes, loader.getServerTypes());
         assertEquals(expectedServerVersions, loader.getServerVersions(ServerType.Spigot));
+        assertEquals(expectedUsers, Arrays.asList(loader.getUsers()));
         assertEquals(new UsualPlugin("Residence"), loader.getPlugin());
     }
 

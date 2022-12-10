@@ -5,6 +5,10 @@ server-type:
   - Paper:
       - "1.19"
 
+users:
+  - "MinecraftGamer_Z"
+  - "rogermiranda1000"
+
 plugin: "Residence"                                             # UsualPlugin
 extra-plugins:
   - "./Vault.jar"                                               # FilePlugin

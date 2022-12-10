@@ -134,7 +134,10 @@ public class TestConfigFileLoader {
     public String []getUsers() {
         if (this.users == null) {
             this.users = new HashSet<>();
-            this.users.add("rogermiranda1000"); // TODO
+            ArrayList<String> r = this.getEntry(it -> (ArrayList<String>) it.get("users"));
+            if (r != null) { // maybe any user?
+                this.users.addAll(r);
+            }
         }
 
         return this.users.toArray(new String[0]);

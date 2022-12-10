@@ -3,4 +3,7 @@ server-type:
       - "1.14"
       - "1.18.1"
 
+users:
+  - "MinecraftGamer_Z"
+
 plugin: "Residence"
