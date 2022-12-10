@@ -46,7 +46,7 @@ public class ConfigLoaderTester {
 
     @Test
     public void loadComplexFile() throws IOException {
-        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/multiple-servers-users-plugins.yaml");
+        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/complex.yaml");
 
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
         expectedServerTypes.add(ServerType.Spigot);
