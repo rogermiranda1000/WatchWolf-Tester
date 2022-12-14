@@ -9,7 +9,9 @@ import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -61,7 +63,8 @@ public class Tester implements Runnable, ServerStartNotifier {
     @Override
     public void run() {
         try {
-            List<Plugin> serverPlugins = Arrays.asList(this.extraPlugins);
+            List<Plugin> serverPlugins = new ArrayList<>();
+            Collections.addAll(serverPlugins, this.extraPlugins);
             serverPlugins.add(testedPlugin);
             String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, serverPlugins.toArray(new Plugin[0]),
                     Stream.of(this.maps, this.configFiles).flatMap(Stream::of).toArray(ConfigFile[]::new)).split(":");
