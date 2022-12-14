@@ -220,7 +220,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
     /* INTERFACES */
     @Override
-    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, ConfigFile[] maps, ConfigFile[] configFiles) throws IOException {
+    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, ConfigFile[] configFiles) throws IOException {
         this.onServerStart = onServerStart;
         this.onServerError = onError;
 
@@ -240,7 +240,6 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             }
         });
 
-        SocketHelper.addArray(message, maps, SocketHelper::addRaw); // TODO
         SocketHelper.addArray(message, configFiles, SocketHelper::addRaw); // TODO
 
         DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
