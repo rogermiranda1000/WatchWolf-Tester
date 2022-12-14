@@ -73,8 +73,8 @@ public class ConfigLoaderTester {
         String expectedWorld = "world";
 
         ArrayList<String> expectedConfigFiles = new ArrayList<>();
-        expectedConfigFiles.add("./Config.zip");
         expectedConfigFiles.add("Test2/Empty.jar");
+        expectedConfigFiles.add("./Config.zip");
 
         assertEquals(expectedServerTypes, loader.getServerTypes());
         assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.Spigot));
