@@ -70,7 +70,7 @@ public class ConfigFile extends SocketData {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        SocketHelper.addString(out, this.name);
+        SocketHelper.addString(out, this.name + "." + this.extension);
         SocketHelper.addString(out, this.offsetPath);
 
         // add a 4-byte integer
