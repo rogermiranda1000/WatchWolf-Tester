@@ -22,14 +22,14 @@ public class ConfigFile extends SocketData {
 
     public ConfigFile(String name, byte []file, String offset) throws IOException {
         String []nameAndExtension = name.split("\\.(?!.*\\.)"); // split by the last '.'
-        this.name = nameAndExtension[0];
+        this.name = nameAndExtension[0]; // TODO remove folders
         this.extension = (nameAndExtension.length > 1) ? nameAndExtension[1] : "";
         this.offsetPath = (offset == null || offset.length() == 0) ? "./" : offset;
         this.data = file;
     }
 
     public ConfigFile(String name, String offset) throws IOException {
-        this(name, new File(name), offset); // TODO remove folders
+        this(name, new File(name), offset);
     }
 
     private static byte []getDataFromFile(File f) throws IOException {
@@ -44,6 +44,10 @@ public class ConfigFile extends SocketData {
 
     public ConfigFile(String name, File f) throws IOException {
         this(name, f, "./");
+    }
+
+    public ConfigFile(String name) throws IOException {
+        this(name, new File(name));
     }
 
     public String getName() {

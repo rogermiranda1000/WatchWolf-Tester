@@ -175,7 +175,38 @@ public class TestConfigFileLoader {
     public ConfigFile []getConfigFiles() throws ConfigFileException {
         if (this.configFiles == null) {
             this.configFiles = new HashSet<>();
-            // TODO
+            final AtomicReference<String> crash = new AtomicReference<>();
+            ArrayList<ConfigFile> r = this.getEntry(it -> {
+                ArrayList<ConfigFile> files = new ArrayList<>();
+                for (Object f : (ArrayList<Object>)it.get("config-files")) {
+                    if (f instanceof String) {
+                        try {
+                            files.add(new ConfigFile((String) f));
+                        } catch (IOException ex) {
+                            crash.set((String) f);
+                            return files;
+                        }
+                    }
+                    else if (f instanceof LinkedHashMap) {
+                        for (Map.Entry<String,String> file : ((LinkedHashMap<String,String>)f).entrySet()) {
+                            try {
+                                files.add(new WorldFile(file.getKey(), file.getValue()));
+                            } catch (IOException ex) {
+                                crash.set(file.getValue());
+                                return files;
+                            }
+                        }
+                    }
+                    else {
+                        crash.set("typeof " + f.getClass().toString());
+                        return files;
+                    }
+                }
+                return files;
+            });
+
+            if (crash.get() != null) throw new ConfigFileException("Error while loading config file '" + crash.get() + "'");
+            if (r != null) this.configFiles.addAll(r);
         }
 
         return this.configFiles.toArray(new ConfigFile[0]);
