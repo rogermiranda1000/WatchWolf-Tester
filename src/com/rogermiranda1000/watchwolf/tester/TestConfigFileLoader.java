@@ -3,11 +3,14 @@ package com.rogermiranda1000.watchwolf.tester;
 import com.rogermiranda1000.watchwolf.entities.*;
 import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.files.Plugin;
+import com.rogermiranda1000.watchwolf.entities.files.WorldFile;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
@@ -26,7 +29,7 @@ public class TestConfigFileLoader {
     private Boolean overrideSync;
     private Plugin plugin;
     private Set<Plugin> extraPlugins;
-    private Set<ConfigFile> maps;
+    private Set<WorldFile> maps;
     private Set<ConfigFile> configFiles;
     private Set<String> users;
 
@@ -73,7 +76,7 @@ public class TestConfigFileLoader {
      * @param serverType Type of server to get the versions
      * @return The versions of that server type; null if no server versions for that type.
      */
-    public Set<String> getServerVersions(final ServerType serverType) {
+    public Set<String> getServerVersions(final ServerType serverType) throws ConfigFileException {
         if (this.serverType == null) this.getServerTypes(); // first load hashmap
         Set<String> versions = this.serverType.get(serverType);
         if (versions == null) {
@@ -143,16 +146,33 @@ public class TestConfigFileLoader {
         return this.users.toArray(new String[0]);
     }
 
-    public ConfigFile []getMaps() {
+    public WorldFile []getMaps() throws ConfigFileException {
         if (this.maps == null) {
             this.maps = new HashSet<>();
-            // TODO
+            final AtomicReference<String> crash = new AtomicReference<>();
+            ArrayList<WorldFile> r = this.getEntry(it -> {
+                ArrayList<WorldFile> worlds = new ArrayList<>();
+                for (LinkedHashMap<String,String> w : (ArrayList<LinkedHashMap<String,String>>)it.get("maps")) {
+                    for (Map.Entry<String,String> map : w.entrySet()) {
+                        try {
+                            worlds.add(new WorldFile(map.getKey(), map.getValue()));
+                        } catch (IOException ex) {
+                            crash.set(map.getValue());
+                            return worlds;
+                        }
+                    }
+                }
+                return worlds;
+            });
+
+            if (crash.get() != null) throw new ConfigFileException("Error while loading world file '" + crash.get() + "'");
+            if (r != null) this.maps.addAll(r);
         }
 
-        return this.maps.toArray(new ConfigFile[0]);
+        return this.maps.toArray(new WorldFile[0]);
     }
 
-    public ConfigFile []getConfigFiles() {
+    public ConfigFile []getConfigFiles() throws ConfigFileException {
         if (this.configFiles == null) {
             this.configFiles = new HashSet<>();
             // TODO

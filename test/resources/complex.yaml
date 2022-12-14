@@ -33,4 +33,4 @@ maps:
 
 config-files:                                                   # Files inside the 'plugins' directory
   - "./test/resources/Config.zip"                               # Files to expand inside the 'plugins' directory
-  - "Test2": "Empty.jar"                                        # File to save inside 'plugins/Test2'
+  - "Test2": "./test/resources/Empty.jar"                       # File to save inside 'plugins/Test2'

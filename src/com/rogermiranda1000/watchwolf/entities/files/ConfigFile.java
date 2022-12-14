@@ -19,7 +19,7 @@ public class ConfigFile extends SocketData {
         String []nameAndExtension = name.split("\\.(?!.*\\.)"); // split by the last '.'
         this.name = nameAndExtension[0];
         this.extension = (nameAndExtension.length > 1) ? nameAndExtension[1] : "";
-        this.offsetPath = offset;
+        this.offsetPath = (offset == null || offset.length() == 0) ? "./" : offset;
         this.data = ConfigFile.getDataFromFile(f);
     }
 
@@ -35,6 +35,22 @@ public class ConfigFile extends SocketData {
 
     public ConfigFile(String name, File f) throws IOException {
         this(name, f, "./");
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public String getOffsetPath() {
+        return offsetPath;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
     @Override

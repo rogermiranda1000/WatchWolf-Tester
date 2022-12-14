@@ -1,7 +1,9 @@
+import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import com.rogermiranda1000.watchwolf.entities.PluginBuilder;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
 import com.rogermiranda1000.watchwolf.entities.files.UsualPlugin;
+import com.rogermiranda1000.watchwolf.entities.files.WorldFile;
 import com.rogermiranda1000.watchwolf.tester.TestConfigFileLoader;
 import com.rogermiranda1000.watchwolf.tester.UnspecifiedConfigFileException;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -67,11 +70,19 @@ public class ConfigLoaderTester {
         expectedExtraPlugins.add(PluginBuilder.build("./test/" + ConfigLoaderTester.PREFIX + "/Empty.jar"));
         expectedExtraPlugins.add(PluginBuilder.build("https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar"));
 
+        String expectedWorld = "world";
+
+        ArrayList<String> expectedConfigFiles = new ArrayList<>();
+        expectedConfigFiles.add("./Config.zip");
+        expectedConfigFiles.add("Test2/Empty.jar");
+
         assertEquals(expectedServerTypes, loader.getServerTypes());
         assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.Spigot));
         assertEquals(expectedPaperServerVersions, loader.getServerVersions(ServerType.Paper));
         assertEquals(expectedUsers, Arrays.asList(loader.getUsers()));
         assertEquals(new UsualPlugin("Residence"), loader.getPlugin());
         assertEquals(expectedExtraPlugins, Arrays.asList(loader.getExtraPlugins()));
+        assertEquals(1, loader.getMaps().length); assertEquals(expectedWorld, loader.getMaps()[0].getWorldName());
+        assertEquals(expectedConfigFiles, Arrays.stream(loader.getConfigFiles()).map(file -> file.getOffsetPath() + file.getName() + "." + file.getExtension()).collect(Collectors.toList()));
     }
 }
