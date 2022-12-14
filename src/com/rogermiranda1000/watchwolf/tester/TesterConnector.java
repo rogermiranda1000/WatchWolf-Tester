@@ -240,7 +240,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             }
         });
 
-        SocketHelper.addArray(message, configFiles, SocketHelper::addRaw); // TODO
+        SocketHelper.addArray(message, configFiles);
 
         DataOutputStream dos = new DataOutputStream(this.serversManagerSocket.getOutputStream());
         synchronized (this.serversManagerSocket) { // response with return -> reserve the socket before the thread does
