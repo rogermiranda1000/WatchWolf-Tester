@@ -24,7 +24,7 @@ public class ConfigFile extends SocketData {
         String []nameAndExtension = name.split("\\.(?!.*\\.)"); // split by the last '.'
         nameAndExtension[0] = (nameAndExtension[0].split("\\/(?!.*\\/)").length == 1) ? nameAndExtension[0] : nameAndExtension[0].split("\\/(?!.*\\/)")[1]; // remove folders
         this.name = nameAndExtension[0];
-        this.extension = (nameAndExtension.length > 1) ? nameAndExtension[1] : "";
+        this.extension = (nameAndExtension.length > 1) ? nameAndExtension[1] : null;
         this.offsetPath = (offset == null || offset.length() == 0) ? "./" : offset;
         if (this.offsetPath.charAt(offsetPath.length() - 1) != '/') this.offsetPath += "/"; // add '/' termination
         this.data = file;

@@ -233,12 +233,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         SocketHelper.addString(message, mcType.name());
         SocketHelper.addString(message, version);
 
-        SocketHelper.addArray(message, plugins, (ArrayList<Byte> out, Object []file) -> {
-            // add the plugins
-            for (Plugin p : (Plugin[]) file) {
-                p.sendSocketData(out);
-            }
-        });
+        SocketHelper.addArray(message, plugins);
 
         SocketHelper.addArray(message, configFiles);
 
