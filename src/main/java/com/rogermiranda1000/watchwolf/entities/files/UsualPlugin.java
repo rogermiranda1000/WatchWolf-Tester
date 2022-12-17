@@ -1,14 +1,13 @@
 package com.rogermiranda1000.watchwolf.entities.files;
 
 import com.rogermiranda1000.watchwolf.entities.SocketHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
 public class UsualPlugin extends Plugin {
     private final String name;
-    @Nullable private final String version;
-    @Nullable private final Boolean isPremium;
+    private final String version;
+    private final Boolean isPremium;
 
     /**
      * A plugin that is already on the ServersManager
@@ -16,13 +15,13 @@ public class UsualPlugin extends Plugin {
      * @param version Plugin version (empty string or null if you don't care)
      * @param isPremium If the plugin is premium, or free
      */
-    public UsualPlugin(String name, @Nullable String version, boolean isPremium) {
+    public UsualPlugin(String name, String version, boolean isPremium) {
         this.name = name;
         this.version = version;
         this.isPremium = isPremium;
     }
 
-    public UsualPlugin(String name, @Nullable String version) {
+    public UsualPlugin(String name, String version) {
         this.name = name;
         this.version = version;
         this.isPremium = null;
