@@ -8,12 +8,3 @@ users:
 #  - "rogermiranda1000"
 
 plugin: "WatchWolf"
-extra-plugins:
-  - "./test/resources/Empty.jar"
-
-maps:
-  - "world": "./test/resources/world.zip"                       # Files inside the 'world' directory, to expand inside the server's 'world' directory
-
-config-files:                                                   # Files inside the 'plugins' directory
-  - "./test/resources/Config.zip"                               # Files to expand inside the 'plugins' directory
-  - "Test2": "./test/resources/Empty.jar"                       # File to save inside 'plugins/Test2'
