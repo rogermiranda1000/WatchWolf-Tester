@@ -1,0 +1,36 @@
+server-type:
+  - Spigot:
+      - "1.14"
+      - "1.18.1"
+  - Paper:
+      - "1.19"
+
+users:
+  - "MinecraftGamer_Z"
+  - "rogermiranda1000"
+
+plugin: "Residence"                                             # UsualPlugin
+extra-plugins:
+  - "./test/resources/Empty.jar"                                # FilePlugin
+  - "https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar" # UploadedPlugin
+
+
+# The following parameters will generate the following pattern:
+# <server>
+#  |- world
+#  |   |- empty.dat (files inside world.zip)
+#  |
+#  |- plugins
+#      |- Test (files inside Config.zip)
+#      |   |- empty.txt
+#      |
+#      |- Test2
+#          |- Empty.jar
+
+
+maps:
+  - "world": "./test/resources/world.zip"                       # Files inside the 'world' directory, to expand inside the server's 'world' directory
+
+config-files:                                                   # Files inside the 'plugins' directory
+  - "./test/resources/Config.zip"                               # Files to expand inside the 'plugins' directory
+  - "Test2": "./test/resources/Empty.jar"                       # File to save inside 'plugins/Test2'

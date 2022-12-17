@@ -19,5 +19,6 @@
     </orderEntry>
     <orderEntry type="library" name="junit.jupiter.engine" level="project" />
     <orderEntry type="library" name="junit.jupiter.params" level="project" />
+    <orderEntry type="library" name="yaml.snakeyaml" level="project" />
   </component>
 </module>

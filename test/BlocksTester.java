@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(BlocksTester.class) // run the tests with the AbstractTest overridden methods
 public class BlocksTester extends AbstractTest {
     @Override
-    public File getConfigFile() {
-        return null; // TODO
+    public String getConfigFile() {
+        return "config.yaml";
     }
 
     @ParameterizedTest
