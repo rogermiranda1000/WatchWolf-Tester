@@ -1,13 +1,20 @@
 package com.rogermiranda1000.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.client.MessageNotifier;
 import com.rogermiranda1000.watchwolf.entities.*;
+import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
+import com.rogermiranda1000.watchwolf.entities.files.Plugin;
+import com.rogermiranda1000.watchwolf.entities.files.WorldFile;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerErrorNotifier;
 import com.rogermiranda1000.watchwolf.serversmanager.ServerStartNotifier;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class Tester implements Runnable, ServerStartNotifier {
     public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
@@ -20,17 +27,19 @@ public class Tester implements Runnable, ServerStartNotifier {
     private ServerErrorNotifier onError;
     private final ServerType mcType;
     private final String version;
-    private final Plugin[] plugins;
-    private final Map[] maps;
+    private final Plugin testedPlugin;
+    private final Plugin[] extraPlugins;
+    private final WorldFile[] maps;
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin[] plugins, Map[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
         this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
         this.version = version;
-        this.plugins = plugins;
+        this.testedPlugin = testedPlugin;
+        this.extraPlugins = extraPlugins;
         this.maps = maps;
         this.configFiles = configFiles;
         this.clientNames = clientNames;
@@ -54,7 +63,11 @@ public class Tester implements Runnable, ServerStartNotifier {
     @Override
     public void run() {
         try {
-            String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, this.plugins, this.maps, this.configFiles).split(":");
+            List<Plugin> serverPlugins = new ArrayList<>();
+            Collections.addAll(serverPlugins, this.extraPlugins);
+            serverPlugins.add(testedPlugin);
+            String []ip = this.connector.startServer(this, this.onError, this.mcType, this.version, serverPlugins.toArray(new Plugin[0]),
+                    Stream.of(this.maps, this.configFiles).flatMap(Stream::of).toArray(ConfigFile[]::new)).split(":");
             new Thread(this.connector).start();
 
             this.serverIp = ip[0];

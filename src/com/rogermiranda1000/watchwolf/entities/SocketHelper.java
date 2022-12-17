@@ -23,6 +23,11 @@ public class SocketHelper {
         if (array.length > 0) arrayAdder.addToArray(out, array);
     }
 
+    public static <T extends SocketData> void addArray(ArrayList<Byte> out, T[] array) {
+        SocketHelper.addShort(out, (short)array.length);
+        for (T e : array) e.sendSocketData(out);
+    }
+
     public static void addString(ArrayList<Byte> out, String str) {
         Byte []arr = new Byte[str.length()];
         for (int n = 0; n < arr.length; n++) arr[n] = (byte)str.charAt(n);

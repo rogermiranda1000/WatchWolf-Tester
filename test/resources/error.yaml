@@ -1,0 +1,3 @@
+server-type:
+  - Spigot:
+      - "1.13"

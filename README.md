@@ -9,3 +9,4 @@ Use Java **8**.
 ### Dependencies
 - Maven's `org.junit.jupiter:junit-jupiter-engine:5.8.1`
 - Maven's `org.junit.jupiter:junit-jupiter-params:5.8.1`
+- Maven's `org.yaml:snakeyaml:1.21`

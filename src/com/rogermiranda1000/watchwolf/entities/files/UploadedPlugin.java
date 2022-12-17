@@ -1,4 +1,6 @@
-package com.rogermiranda1000.watchwolf.entities;
+package com.rogermiranda1000.watchwolf.entities.files;
+
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 
 import java.util.ArrayList;
 
@@ -11,6 +13,7 @@ public class UploadedPlugin extends Plugin {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        // TODO
+        out.add((byte) 0x01); // uploaded plugin
+        SocketHelper.addString(out, this.url);
     }
 }

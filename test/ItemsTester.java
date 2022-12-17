@@ -2,19 +2,21 @@ import com.rogermiranda1000.watchwolf.entities.Position;
 import com.rogermiranda1000.watchwolf.entities.items.Item;
 import com.rogermiranda1000.watchwolf.entities.items.ItemType;
 import com.rogermiranda1000.watchwolf.tester.AbstractTest;
+import com.rogermiranda1000.watchwolf.tester.ExtendedClientPetition;
 import com.rogermiranda1000.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ItemsTester.class)
 public class ItemsTester extends AbstractTest {
     @Override
-    public File getConfigFile() {
+    public String getConfigFile() {
         return null; // TODO
     }
 
@@ -29,11 +31,24 @@ public class ItemsTester extends AbstractTest {
 
     @ParameterizedTest
     @ArgumentsSource(ItemsTester.class)
-    public void equipPickaxe(TesterConnector connector) throws Exception {
+    public void checkItems(TesterConnector connector) throws Exception {
         String user = connector.getClients()[0];
-        // TODO place block
-        connector.getClientPetition(user).equipItemInHand(new Item(ItemType.DIAMOND_PICKAXE));
-        //connector.getClientPetition(user).breakBlock();
-        // TODO tp player to block & break
+        ExtendedClientPetition petition = connector.getClientPetition(user);
+
+        int numOK = 0;
+        for (ItemType type : ItemType.values()) {
+            System.out.println("Validating item " + type.name() + "...");
+            Item give = new Item(type);
+            connector.server.giveItem(user, give);
+
+            ArrayList<Item> expected = new ArrayList<>();
+            expected.add(give);
+            if (expected.equals(Arrays.asList(petition.getInventory().getItems()))) numOK++;
+            else System.out.println("[e] Failed validation on " + type.name());
+
+            connector.server.runCommand("clear " + user); // clear inventory
+        }
+
+        assertEquals(ItemType.values().length, numOK);
     }
 }

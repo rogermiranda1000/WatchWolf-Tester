@@ -1,5 +1,6 @@
-package com.rogermiranda1000.watchwolf.entities;
+package com.rogermiranda1000.watchwolf.entities.files;
 
+import com.rogermiranda1000.watchwolf.entities.SocketHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -36,5 +37,10 @@ public class UsualPlugin extends Plugin {
         out.add((byte) 0x00); // usual plugin
         SocketHelper.addString(out, this.name);
         SocketHelper.addString(out, (this.version == null) ? "" : this.version);
+    }
+
+    @Override
+    public String toString() {
+        return "UsualPlugin{" + this.name + (this.version != null ? (" v" + this.version) : "") + "}";
     }
 }
