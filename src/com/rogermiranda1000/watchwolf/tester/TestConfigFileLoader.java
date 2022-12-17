@@ -181,7 +181,7 @@ public class TestConfigFileLoader {
                 for (Object f : (ArrayList<Object>)it.get("config-files")) {
                     if (f instanceof String) {
                         try {
-                            files.add(new ConfigFile((String) f));
+                            files.add(new ConfigFile((String) f, "plugins/"));
                         } catch (IOException ex) {
                             crash.set((String) f);
                             return files;
@@ -190,7 +190,7 @@ public class TestConfigFileLoader {
                     else if (f instanceof LinkedHashMap) {
                         for (Map.Entry<String,String> file : ((LinkedHashMap<String,String>)f).entrySet()) {
                             try {
-                                files.add(new ConfigFile(file.getValue(), file.getKey()));
+                                files.add(new ConfigFile(file.getValue(), "plugins/" + file.getKey()));
                             } catch (IOException ex) {
                                 crash.set(file.getValue());
                                 return files;

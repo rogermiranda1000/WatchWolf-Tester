@@ -1,11 +1,9 @@
-import com.rogermiranda1000.watchwolf.entities.files.ConfigFile;
 import com.rogermiranda1000.watchwolf.entities.files.Plugin;
 import com.rogermiranda1000.watchwolf.entities.PluginBuilder;
 import com.rogermiranda1000.watchwolf.entities.ServerType;
 import com.rogermiranda1000.watchwolf.entities.files.UsualPlugin;
-import com.rogermiranda1000.watchwolf.entities.files.WorldFile;
+import com.rogermiranda1000.watchwolf.tester.ConfigFileException;
 import com.rogermiranda1000.watchwolf.tester.TestConfigFileLoader;
-import com.rogermiranda1000.watchwolf.tester.UnspecifiedConfigFileException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -44,7 +42,7 @@ public class ConfigLoaderTester {
     public void loadErrorFile() throws IOException {
         TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/error.yaml");
 
-        assertThrowsExactly(UnspecifiedConfigFileException.class, () -> loader.getPlugin()); // a file must contain (at least) the plugin to test
+        assertThrowsExactly(ConfigFileException.class, () -> loader.getPlugin()); // a file must contain (at least) the plugin to test
     }
 
     @Test
@@ -67,14 +65,15 @@ public class ConfigLoaderTester {
         expectedUsers.add("MinecraftGamer_Z");
 
         ArrayList<Plugin> expectedExtraPlugins = new ArrayList<>();
-        expectedExtraPlugins.add(PluginBuilder.build("./test/" + ConfigLoaderTester.PREFIX + "/Empty.jar"));
         expectedExtraPlugins.add(PluginBuilder.build("https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar"));
+        expectedExtraPlugins.add(PluginBuilder.build("./test/" + ConfigLoaderTester.PREFIX + "/Empty.jar"));
 
         String expectedWorld = "world";
 
         ArrayList<String> expectedConfigFiles = new ArrayList<>();
-        expectedConfigFiles.add("Test2/Empty.jar");
-        expectedConfigFiles.add("./Config.zip");
+        // remember that config-files put the files inside 'plugins/'
+        expectedConfigFiles.add("plugins/Config.zip");
+        expectedConfigFiles.add("plugins/Test2/Empty.jar");
 
         assertEquals(expectedServerTypes, loader.getServerTypes());
         assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.Spigot));
