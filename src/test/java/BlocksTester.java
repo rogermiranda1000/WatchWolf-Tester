@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BlocksTester extends AbstractTest {
     @Override
     public String getConfigFile() {
-        return "config.yaml";
+        return "src/test/java/resources/config.yaml";
     }
 
     @ParameterizedTest

@@ -8,6 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class ServersManagerTester extends AbstractTest {
     @Override
     public String getConfigFile() {
-        return null;
+        return "resources/config.yaml";
     }
 }

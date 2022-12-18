@@ -8,8 +8,10 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -19,7 +21,7 @@ import java.util.function.Function;
  * that's why we won't load any part of the file until it is explicitly requested.
  */
 public class TestConfigFileLoader {
-    private final InputStream inputStream;
+    private final String file;
     private HashMap<String,Object> loadedYaml;
 
     /**
@@ -34,15 +36,12 @@ public class TestConfigFileLoader {
     private Set<String> users;
 
     public TestConfigFileLoader(String file) throws IOException {
-        this.inputStream = this.getClass()
-            .getClassLoader()
-            .getResourceAsStream(file);
-        if (this.inputStream == null) throw new IOException("Couldn't open InputStream at " + file);
+        this.file = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
     }
 
     private <T> T getEntry(Function<HashMap<String,Object>,T> getter) {
         Yaml yaml = new Yaml();
-        if (this.loadedYaml == null) this.loadedYaml = yaml.load(this.inputStream);
+        if (this.loadedYaml == null) this.loadedYaml = yaml.load(this.file);
         if (this.loadedYaml == null) return null; // empty file
         try {
             return getter.apply(this.loadedYaml);
