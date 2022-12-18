@@ -1,8 +1,6 @@
 package dev.watchwolf.entities;
 
-import com.rogermiranda1000.watchwolf.entities.files.*;
 import dev.watchwolf.entities.files.*;
-import dev.watchwolf.tester.entities.files.*;
 
 import java.io.IOException;
 

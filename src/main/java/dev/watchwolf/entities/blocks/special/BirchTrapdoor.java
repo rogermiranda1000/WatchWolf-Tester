@@ -1,6 +1,6 @@
 package dev.watchwolf.entities.blocks.special;
 
-import com.rogermiranda1000.watchwolf.entities.blocks.*;
+import dev.watchwolf.entities.blocks.*;
 import dev.watchwolf.entities.SocketHelper;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Orientable;

@@ -1,8 +1,6 @@
 package dev.watchwolf.entities.blocks;
 
-import com.rogermiranda1000.watchwolf.entities.blocks.special.*;
 import dev.watchwolf.entities.blocks.special.*;
-import dev.watchwolf.tester.entities.blocks.special.*;
 
 import java.util.Arrays;
 import java.util.stream.Stream;

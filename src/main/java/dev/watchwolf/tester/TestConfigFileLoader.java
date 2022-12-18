@@ -1,6 +1,6 @@
 package dev.watchwolf.tester;
 
-import com.rogermiranda1000.watchwolf.entities.*;
+import dev.watchwolf.entities.*;
 import dev.watchwolf.entities.PluginBuilder;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.entities.files.ConfigFile;
