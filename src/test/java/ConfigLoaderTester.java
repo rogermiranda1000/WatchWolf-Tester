@@ -1,9 +1,9 @@
-import com.rogermiranda1000.watchwolf.entities.files.Plugin;
-import com.rogermiranda1000.watchwolf.entities.PluginBuilder;
-import com.rogermiranda1000.watchwolf.entities.ServerType;
-import com.rogermiranda1000.watchwolf.entities.files.UsualPlugin;
-import com.rogermiranda1000.watchwolf.tester.ConfigFileException;
-import com.rogermiranda1000.watchwolf.tester.TestConfigFileLoader;
+import dev.watchwolf.entities.files.Plugin;
+import dev.watchwolf.entities.PluginBuilder;
+import dev.watchwolf.entities.ServerType;
+import dev.watchwolf.entities.files.UsualPlugin;
+import dev.watchwolf.tester.ConfigFileException;
+import dev.watchwolf.tester.TestConfigFileLoader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

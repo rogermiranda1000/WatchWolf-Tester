@@ -1,4 +1,4 @@
-import com.rogermiranda1000.watchwolf.tester.AbstractTest;
+import dev.watchwolf.tester.AbstractTest;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
