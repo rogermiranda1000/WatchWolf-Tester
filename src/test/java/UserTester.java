@@ -6,6 +6,7 @@ import dev.watchwolf.entities.blocks.Blocks;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.entities.items.ItemType;
 import dev.watchwolf.tester.AbstractTest;
+import dev.watchwolf.tester.ExtendedClientPetition;
 import dev.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,6 +60,26 @@ public class UserTester extends AbstractTest {
         userPetition.breakBlock(pos);
 
         assertEquals(Blocks.AIR, connector.server.getBlock(pos));
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserTester.class)
+    public void placeBlock(TesterConnector connector) throws Exception {
+        String user = UserTester.USER1;
+        ExtendedClientPetition userPetition = connector.getClientPetition(user);
+
+        Position pos = connector.server.getPlayerPosition(user).add(1, 0, 0);
+
+        // make sure the player can place this block
+        connector.setBlock(pos, Blocks.AIR);
+        connector.setBlock(pos.add(0,-1,0), Blocks.STONE);
+
+        Block target_block = Blocks.DIRT;
+
+        connector.server.giveItem(user, new Item(target_block.getItemType()));
+        userPetition.setBlock(target_block, pos);
+
+        assertEquals(target_block, connector.server.getBlock(pos));
     }
 
     /**

@@ -74,6 +74,20 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
+    public void setBlock(Position block) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // break block header
+        message.add((short) 0b000000001100_0_011);
+
+        message.add(block);
+
+        message.send();
+    }
+
+    @Override
     public void equipItemInHand(Item item) throws IOException {
         this.syncManager.requestSynchronization(this);
 

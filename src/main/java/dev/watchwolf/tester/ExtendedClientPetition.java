@@ -3,8 +3,13 @@ package dev.watchwolf.tester;
 import dev.watchwolf.client.ClientPetition;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.Container;
+import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.entities.items.ItemNotFoundInContainerException;
+import dev.watchwolf.entities.items.ItemType;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * There's some petitions player-related that needs to be launched in the server-side.
@@ -49,5 +54,40 @@ public interface ExtendedClientPetition extends ClientPetition {
         pitch *= 180f / Math.PI;
 
         this.lookAt((float)pitch, (float)yaw);
+    }
+
+    /**
+     * Set a block from your inventory
+     * @param item Block to set
+     * @param pos Where to place the block
+     * @throws IOException Socket error
+     */
+    default public void setBlock(Item item, Position pos) throws IOException {
+        this.equipItemInHand(item);
+        this.setBlock(pos);
+    }
+
+    /**
+     * Set a block from your inventory
+     * @param block Block to set
+     * @param pos Where to place the block
+     * @throws IOException Socket error
+     * @throws ItemNotFoundInContainerException The specified item couldn't be found on player's inventory
+     */
+    default public void setBlock(final ItemType block, Position pos) throws IOException, ItemNotFoundInContainerException {
+        Item i = Arrays.stream(this.getInventory().getItems()).filter(it -> it.getType().equals(block)).findFirst().orElseThrow(() -> new ItemNotFoundInContainerException(block.name() + " not found in player's inventory."));
+        this.equipItemInHand(i);
+        this.setBlock(pos);
+    }
+
+    /**
+     * Set a block from your inventory
+     * @param block Block to set
+     * @param pos Where to place the block
+     * @throws IOException Socket error
+     * @throws ItemNotFoundInContainerException The specified item couldn't be found on player's inventory
+     */
+    default public void setBlock(Block block, Position pos) throws IOException, ItemNotFoundInContainerException {
+        this.setBlock(block.getItemType(), pos);
     }
 }
