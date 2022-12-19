@@ -76,7 +76,7 @@ public class UserTester extends AbstractTest {
 
         Block target_block = Blocks.DIRT;
 
-        connector.server.giveItem(user, new Item(target_block.getItemType()));
+        connector.server.giveItem(user, new Item(target_block.getItemType(), (byte) 2)); // make sure that it find the item with 2 blocks
         userPetition.setBlock(target_block, pos);
 
         assertEquals(target_block, connector.server.getBlock(pos));
