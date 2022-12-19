@@ -20,7 +20,7 @@ public class UserTester extends AbstractTest {
 
     @Override
     public String getConfigFile() {
-        return "resources/config.yaml";
+        return "src/test/java/resources/config.yaml";
     }
 
     @ParameterizedTest
