@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ItemsTester extends AbstractTest {
     @Override
     public String getConfigFile() {
-        return "resources/config.yaml";
+        return "src/test/java/resources/config.yaml";
     }
 
     /**

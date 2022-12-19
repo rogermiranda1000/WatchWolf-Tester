@@ -2,6 +2,7 @@ package dev.watchwolf.entities.blocks;
 
 import dev.watchwolf.entities.SocketData;
 import dev.watchwolf.entities.SocketHelper;
+import dev.watchwolf.entities.items.ItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class Block extends SocketData {
 
     public String getName() {
         return this.name;
+    }
+
+    public ItemType getItemType() {
+        return ItemType.valueOf(this.getName().toUpperCase());
     }
 
     @Override
