@@ -22,9 +22,9 @@ public interface ExtendedClientPetition extends ClientPetition {
     public Container getInventory() throws IOException;
 
     /**
-     * Instead of calculating the pitch&yaw, just specify the target position
+     * Instead of calculating the pitch and yaw, just specify the target position
      * TODO the author said that the yaw is not correct
-     * @ref https://www.spigotmc.org/threads/make-a-player-look-at-specific-block.492925/
+     * @see <a href="https://www.spigotmc.org/threads/make-a-player-look-at-specific-block.492925/">SpigotMC - Make a player look at specific block</a>
      * @param targetPosition Place to look
      * @throws IOException Socket error
      */

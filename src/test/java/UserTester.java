@@ -83,7 +83,7 @@ public class UserTester extends AbstractTest {
     }
 
     /**
-     * Break a stone block (test give item & equip item & break block)
+     * Break a stone block (test give item and equip item and break block)
      */
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)
