@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Message {
+    private static final int MAX_BYTES_SENT = 4096;
+
     private final DataOutputStream dos;
     private final ArrayList<Byte> send;
 
@@ -54,7 +57,27 @@ public class Message {
     }
 
     public void send() throws IOException {
-        this.dos.write(SocketHelper.toByteArray(this.send), 0, this.send.size());
-        // TODO close?
+        List<List<Byte>> chunks = Message.chopped(this.send, Message.MAX_BYTES_SENT);
+        for (List<Byte> l : chunks) this.dos.write(SocketHelper.toByteArray(l), 0, l.size());
+        // TODO close dos?
+    }
+
+    /**
+     * Split a list into smaller lists that don't exceed 'L' elements
+     * @ref https://stackoverflow.com/a/2895365
+     * @param list Original list
+     * @param L Max number of elements in the sublists
+     * @param <T> Type of list
+     * @return All the sublists
+     */
+    static <T> List<List<T>> chopped(List<T> list, final int L) {
+        List<List<T>> parts = new ArrayList<List<T>>();
+        final int N = list.size();
+        for (int i = 0; i < N; i += L) {
+            parts.add(new ArrayList<T>(
+                    list.subList(i, Math.min(N, i + L)))
+            );
+        }
+        return parts;
     }
 }
