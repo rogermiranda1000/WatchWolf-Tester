@@ -3,9 +3,10 @@ package dev.watchwolf.entities;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SocketHelper {
-    public static byte []toByteArray(ArrayList<Byte> bytes) {
+    public static byte []toByteArray(List<Byte> bytes) {
         byte []r = new byte[bytes.size()];
         for (int x = 0; x < r.length; x++) r[x] = bytes.get(x);
         return r;
