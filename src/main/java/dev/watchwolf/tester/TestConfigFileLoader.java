@@ -149,7 +149,7 @@ public class TestConfigFileLoader {
     public WorldFile []getMaps() throws ConfigFileException {
         if (this.maps == null) {
             this.maps = new HashSet<>();
-            final AtomicReference<String> crash = new AtomicReference<>();
+            final AtomicReference<String> crash = new AtomicReference<>("");
             ArrayList<WorldFile> r = this.getEntry(it -> {
                 ArrayList<WorldFile> worlds = new ArrayList<>();
                 for (LinkedHashMap<String,String> w : (ArrayList<LinkedHashMap<String,String>>)it.get("maps")) {
@@ -157,7 +157,7 @@ public class TestConfigFileLoader {
                         try {
                             worlds.add(new WorldFile(map.getKey(), map.getValue()));
                         } catch (IOException ex) {
-                            crash.set(map.getValue());
+                            crash.set(map.getKey() + " - " + map.getValue());
                             return worlds;
                         }
                     }
@@ -165,7 +165,7 @@ public class TestConfigFileLoader {
                 return worlds;
             });
 
-            if (crash.get() != null) throw new ConfigFileException("Error while loading world file '" + crash.get() + "'");
+            if (crash.get().length() > 0) throw new ConfigFileException("Error while loading world file '" + crash.get() + "'");
             if (r != null) this.maps.addAll(r);
         }
 
@@ -175,7 +175,7 @@ public class TestConfigFileLoader {
     public ConfigFile []getConfigFiles() throws ConfigFileException {
         if (this.configFiles == null) {
             this.configFiles = new HashSet<>();
-            final AtomicReference<String> crash = new AtomicReference<>();
+            final AtomicReference<String> crash = new AtomicReference<>("");
             ArrayList<ConfigFile> r = this.getEntry(it -> {
                 ArrayList<ConfigFile> files = new ArrayList<>();
                 for (Object f : (ArrayList<Object>)it.get("config-files")) {
@@ -205,7 +205,7 @@ public class TestConfigFileLoader {
                 return files;
             });
 
-            if (crash.get() != null) throw new ConfigFileException("Error while loading config file '" + crash.get() + "'");
+            if (crash.get().length() > 0) throw new ConfigFileException("Error while loading config file '" + crash.get() + "'");
             if (r != null) this.configFiles.addAll(r);
         }
 
