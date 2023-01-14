@@ -6,7 +6,7 @@ import dev.watchwolf.entities.SocketHelper;
 import dev.watchwolf.entities.items.Item;
 
 public enum EntityType {
-    DroppedItem;
+    DROPPED_ITEM;
 
     /**
      * Get the EntityType using a class
@@ -34,7 +34,7 @@ public enum EntityType {
             Position pos = (Position) SocketData.readSocketData(dis, Position.class);
             String uuid = SocketHelper.readString(dis);
 
-            if (type.equals(EntityType.DroppedItem)) {
+            if (type.equals(EntityType.DROPPED_ITEM)) {
                 Item droppedItem = (Item) SocketData.readSocketData(dis, Item.class);
                 return new DroppedItem(uuid, pos, droppedItem);
             }
