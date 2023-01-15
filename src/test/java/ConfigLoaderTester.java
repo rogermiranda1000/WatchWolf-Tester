@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 public class ConfigLoaderTester {
-    private static final String PREFIX = "resources";
+    private static final String PREFIX = "src/test/java/resources";
 
     @Test
     public void loadSimpleFile() throws IOException {
@@ -49,6 +49,8 @@ public class ConfigLoaderTester {
     public void loadComplexFile() throws IOException {
         TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/complex.yaml");
 
+        String expectedProvider = "192.168.1.80";
+
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
         expectedServerTypes.add(ServerType.Spigot);
         expectedServerTypes.add(ServerType.Paper);
@@ -65,8 +67,8 @@ public class ConfigLoaderTester {
         expectedUsers.add("MinecraftGamer_Z");
 
         ArrayList<Plugin> expectedExtraPlugins = new ArrayList<>();
+        expectedExtraPlugins.add(PluginBuilder.build(ConfigLoaderTester.PREFIX + "/Empty.jar"));
         expectedExtraPlugins.add(PluginBuilder.build("https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar"));
-        expectedExtraPlugins.add(PluginBuilder.build("./test/" + ConfigLoaderTester.PREFIX + "/Empty.jar"));
 
         String expectedWorld = "world";
 
@@ -75,6 +77,7 @@ public class ConfigLoaderTester {
         expectedConfigFiles.add("plugins/Config.zip");
         expectedConfigFiles.add("plugins/Test2/Empty.jar");
 
+        assertEquals(expectedProvider, loader.getProvider());
         assertEquals(expectedServerTypes, loader.getServerTypes());
         assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.Spigot));
         assertEquals(expectedPaperServerVersions, loader.getServerVersions(ServerType.Paper));
