@@ -19,6 +19,9 @@ import java.util.stream.Stream;
 public class Tester implements Runnable, ServerStartNotifier {
     public static final ServerErrorNotifier DEFAULT_ERROR_PRINT = (err) -> System.err.println("-- Server error --\n" + err.replaceAll("\\\\n", System.lineSeparator()).replaceAll("\\\\t", "\t"));
 
+    public static final IPModifier IP_NO_MODIFY = (ip)->ip,
+                                    IP_WSL_MODIFY = (ip)->"127.0.0.1";
+
     private TesterConnector connector;
     private String serverIp;
     private int serverPort, serverSocketPort;
@@ -33,7 +36,9 @@ public class Tester implements Runnable, ServerStartNotifier {
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+    private final IPModifier ipModifier;
+
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync, IPModifier ipModifier) {
         this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
@@ -43,6 +48,11 @@ public class Tester implements Runnable, ServerStartNotifier {
         this.maps = maps;
         this.configFiles = configFiles;
         this.clientNames = clientNames;
+        this.ipModifier = ipModifier;
+    }
+
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+        this(serverManagerSocket, mcType, version, testedPlugin, extraPlugins, maps, configFiles, clientsManagerSocket, clientNames, overrideSync, Tester.IP_NO_MODIFY);
     }
 
     public Tester setOnServerReady(ServerStartNotifier onServerReady) {
@@ -85,7 +95,7 @@ public class Tester implements Runnable, ServerStartNotifier {
         // connect to the server socket
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
-            this.connector.setServerManagerSocket(new Socket("127.0.0.1" /* inside docker use this.serverIp; outside use loopback ip (127.0.0.1) */, this.serverSocketPort), this.mcType, this.version);
+            this.connector.setServerManagerSocket(new Socket(this.ipModifier.modifyIp(this.serverIp), this.serverSocketPort), this.mcType, this.version);
 
             // whitelist the players
             for (String client : this.clientNames) this.connector.whitelistPlayer(client);
@@ -97,7 +107,7 @@ public class Tester implements Runnable, ServerStartNotifier {
                 if (ip.length() == 0) throw new IOException("Cannot start client");
                 System.out.println("Connecting to " + ip + " (client " + client + ")...");
                 String []clientIp = ip.split(":");
-                this.connector.setClientSocket(new Socket(clientIp[0], Integer.parseInt(clientIp[1])), client);
+                this.connector.setClientSocket(new Socket(this.ipModifier.modifyIp(clientIp[0]), Integer.parseInt(clientIp[1])), client);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
