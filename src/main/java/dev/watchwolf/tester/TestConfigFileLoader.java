@@ -26,6 +26,11 @@ public class TestConfigFileLoader {
     private HashMap<String,Object> loadedYaml;
 
     /**
+     * Machine with the servers and clients
+     */
+    private String provider;
+
+    /**
      * Server type, with all its versions
      */
     private HashMap<ServerType,Set<String>> serverType;
@@ -49,6 +54,15 @@ public class TestConfigFileLoader {
         } catch (NullPointerException ignore) {
             return null;
         }
+    }
+
+    public String getProvider() {
+        if (this.provider == null) {
+            this.provider = this.getEntry(it -> (String) it.get("provider"));
+            if (this.provider == null) this.provider = "127.0.0.1";
+        }
+
+        return this.provider;
     }
 
     public Set<ServerType> getServerTypes() throws IllegalArgumentException {

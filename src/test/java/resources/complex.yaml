@@ -1,3 +1,5 @@
+provider: "192.168.1.80"
+
 server-type:
   - Spigot:
       - "1.14"
@@ -11,7 +13,7 @@ users:
 
 plugin: "Residence"                                             # UsualPlugin
 extra-plugins:
-  - "./test/resources/Empty.jar"                                # FilePlugin
+  - "./src/test/java/resources/Empty.jar"                       # FilePlugin
   - "https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar" # UploadedPlugin
 
 
@@ -29,8 +31,8 @@ extra-plugins:
 
 
 maps:
-  - "world": "./test/resources/world.zip"                       # Files inside the 'world' directory, to expand inside the server's 'world' directory
+  - "world": "./src/test/java/resources/world.zip"              # Files inside the 'world' directory, to expand inside the server's 'world' directory
 
 config-files:                                                   # Files inside the 'plugins' directory
-  - "./test/resources/Config.zip"                               # Files to expand inside the 'plugins' directory
-  - "Test2": "./test/resources/Empty.jar"                       # File to save inside 'plugins/Test2'
+  - "./src/test/java/resources/Config.zip"                      # Files to expand inside the 'plugins' directory
+  - "Test2": "./src/test/java/resources/Empty.jar"              # File to save inside 'plugins/Test2'

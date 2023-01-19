@@ -26,8 +26,6 @@ public class AbstractTest implements TestWatcher, // send feedback
     private ArrayList<ServerInstance> servers;
     private UUID testID;
 
-    private final String []serversManagerIP = "127.0.0.1:8000".split(":");
-    private final String []clientsManagerIP = "127.0.0.1:7000".split(":");
     private final TestConfigFileLoader fileLoader;
 
     public AbstractTest() throws ConfigFileException {
@@ -48,8 +46,8 @@ public class AbstractTest implements TestWatcher, // send feedback
         final Object waitForStartup = new Object();
         for (ServerType serverType : this.fileLoader.getServerTypes()) {
             for (String serverVersion : this.fileLoader.getServerVersions(serverType)) {
-                Socket serversManagerSocket = new Socket(serversManagerIP[0], Integer.parseInt(serversManagerIP[1])), // ServersManager socket
-                        clientsManagerSocket = new Socket(clientsManagerIP[0], Integer.parseInt(clientsManagerIP[1])); // ClientsManager socket
+                Socket serversManagerSocket = new Socket(this.fileLoader.getProvider(), 8000), // ServersManager socket TODO change port
+                        clientsManagerSocket = new Socket(this.fileLoader.getProvider(), 7000); // ClientsManager socket TODO change port
 
                 final ServerInstance server = new ServerInstance();
                 this.servers.add(server);
@@ -57,7 +55,8 @@ public class AbstractTest implements TestWatcher, // send feedback
                 System.out.println("Starting server for " + serverType.name() + " " + serverVersion + " using ID " + testID.toString());
                 server.tester = new Tester(serversManagerSocket, serverType, serverVersion, this.fileLoader.getPlugin(),
                         this.fileLoader.getExtraPlugins(), this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(),
-                        clientsManagerSocket, this.fileLoader.getUsers(), this.fileLoader.getOverrideSync())
+                        clientsManagerSocket, this.fileLoader.getUsers(), this.fileLoader.getOverrideSync(),
+                        this.fileLoader.getProvider().equals("127.0.0.1") ? Tester.IP_WSL_MODIFY : Tester.IP_NO_MODIFY)
                                 .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
                 server.tester.setOnServerReady((connector) -> {
