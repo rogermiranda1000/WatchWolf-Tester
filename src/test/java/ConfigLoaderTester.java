@@ -23,7 +23,7 @@ public class ConfigLoaderTester {
         TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/simple.yaml");
 
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
-        expectedServerTypes.add(ServerType.Spigot);
+        expectedServerTypes.add(ServerType.SPIGOT);
 
         HashSet<String> expectedServerVersions = new HashSet<>();
         expectedServerVersions.add("1.14");
@@ -33,7 +33,7 @@ public class ConfigLoaderTester {
         expectedUsers.add("MinecraftGamer_Z");
 
         assertEquals(expectedServerTypes, loader.getServerTypes());
-        assertEquals(expectedServerVersions, loader.getServerVersions(ServerType.Spigot));
+        assertEquals(expectedServerVersions, loader.getServerVersions(ServerType.SPIGOT));
         assertEquals(expectedUsers, Arrays.asList(loader.getUsers()));
         assertEquals(new UsualPlugin("Residence"), loader.getPlugin());
     }
@@ -52,8 +52,8 @@ public class ConfigLoaderTester {
         String expectedProvider = "192.168.1.80";
 
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
-        expectedServerTypes.add(ServerType.Spigot);
-        expectedServerTypes.add(ServerType.Paper);
+        expectedServerTypes.add(ServerType.SPIGOT);
+        expectedServerTypes.add(ServerType.PAPER);
 
         HashSet<String> expectedSpigotServerVersions = new HashSet<>();
         expectedSpigotServerVersions.add("1.14");
@@ -79,8 +79,8 @@ public class ConfigLoaderTester {
 
         assertEquals(expectedProvider, loader.getProvider());
         assertEquals(expectedServerTypes, loader.getServerTypes());
-        assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.Spigot));
-        assertEquals(expectedPaperServerVersions, loader.getServerVersions(ServerType.Paper));
+        assertEquals(expectedSpigotServerVersions, loader.getServerVersions(ServerType.SPIGOT));
+        assertEquals(expectedPaperServerVersions, loader.getServerVersions(ServerType.PAPER));
         assertEquals(expectedUsers, Arrays.asList(loader.getUsers()));
         assertEquals(new UsualPlugin("Residence"), loader.getPlugin());
         assertEquals(expectedExtraPlugins, Arrays.asList(loader.getExtraPlugins()));

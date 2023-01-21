@@ -6,7 +6,7 @@ import java.util.Set;
  * Axis
  */
 public interface Directionable {
-    public static enum Direction {
+    enum Direction {
         NONE(0),
         X(1), Y(2), Z(3),
         DOUBLE_WALL(2), SINGLE_WALL(1);
@@ -21,7 +21,8 @@ public interface Directionable {
         }
     }
 
-    public Directionable.Direction getFacingDirection();
-    public Directionable setDirection(Directionable.Direction d) throws IllegalArgumentException;
-    public Set<Directionable.Direction> getValidDirections();
+    Directionable.Direction getFacingDirection();
+    Directionable setDirection(Directionable.Direction d) throws IllegalArgumentException;
+    Set<Directionable.Direction> getValidDirections();
+
 }
