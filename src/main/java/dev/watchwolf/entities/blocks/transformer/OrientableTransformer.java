@@ -9,6 +9,15 @@ import java.util.function.Function;
 public class OrientableTransformer extends AbstractTransformer<Orientable,Orientable.Orientation> {
     private static final int ORIENTABLE_SOCKET_DATA_INDEX = 3;
 
+    private static OrientableTransformer instance = null;
+
+    public static OrientableTransformer getInstance() {
+        if (OrientableTransformer.instance == null) OrientableTransformer.instance = new OrientableTransformer();
+        return OrientableTransformer.instance;
+    }
+
+    private OrientableTransformer() {}
+
     @Override
     public List<String> getOptions(String mat, String argument) {
         List<String> r = new ArrayList<>();

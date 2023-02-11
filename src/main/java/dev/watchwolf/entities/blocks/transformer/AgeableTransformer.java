@@ -2,8 +2,6 @@ package dev.watchwolf.entities.blocks.transformer;
 
 import dev.watchwolf.entities.blocks.Ageable;
 import dev.watchwolf.entities.blocks.Block;
-import dev.watchwolf.entities.blocks.Directionable;
-import dev.watchwolf.entities.blocks.Orientable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,6 +9,15 @@ import java.util.stream.Collectors;
 
 public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
     private static final int AGEABLE_SOCKET_DATA_INDEX = 2;
+
+    private static AgeableTransformer instance = null;
+
+    public static AgeableTransformer getInstance() {
+        if (AgeableTransformer.instance == null) AgeableTransformer.instance = new AgeableTransformer();
+        return AgeableTransformer.instance;
+    }
+
+    private AgeableTransformer() {}
 
     @Override
     public List<String> getOptions(String mat, String argument) {
