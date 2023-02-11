@@ -5,6 +5,7 @@ import dev.watchwolf.entities.blocks.BlockModifier;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * This is the base class to automatically generate all the `dev.watchwolf.entities.blocks.special`
@@ -177,5 +178,20 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      */
     protected static String setBlockDataProperty(String blockData, String property, String value) {
         return blockData.replaceAll("(?<=[,\\[])" + property + "=[^,\\]]+", property + "=" + value);
+    }
+
+    /**
+     * Check if any element in a list matches the regex
+     * @param list List of elements where to check the regex
+     * @param regex Pattern to compare
+     * @return If it's found (true), or not (false)
+     */
+    protected static boolean regexContains(List<String> list, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+
+        for (String e : list) {
+            if (pattern.matcher(e).find()) return true;
+        }
+        return false;
     }
 }
