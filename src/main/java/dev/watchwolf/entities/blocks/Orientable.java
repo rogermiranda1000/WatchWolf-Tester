@@ -2,7 +2,7 @@ package dev.watchwolf.entities.blocks;
 
 import java.util.Set;
 
-public interface Orientable {
+public interface Orientable extends BlockModifier {
     public static enum Orientation {
         U, D, N, S, E, W
     }

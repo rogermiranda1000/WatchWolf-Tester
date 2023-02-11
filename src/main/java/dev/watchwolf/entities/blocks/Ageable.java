@@ -1,6 +1,6 @@
 package dev.watchwolf.entities.blocks;
 
-public interface Ageable {
+public interface Ageable extends BlockModifier {
     int setAge(int age) throws IllegalArgumentException;
     int getAge();
     int getMaxAge();
