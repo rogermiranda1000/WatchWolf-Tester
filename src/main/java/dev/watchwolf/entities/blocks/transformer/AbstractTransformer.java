@@ -63,14 +63,14 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with its value
      * @return Given the specified options, it returns all the options the block modifier can take
      */
-    public Collection<E> get(Map<String, String> options) {
+    public Collection<E> get(String mat, Map<String, String> options) {
         HashMap<String, List<String>> arg = new HashMap<>();
         for (Map.Entry<String,String> option : options.entrySet()) {
             List<String> l = new ArrayList<>();
             l.add(option.getValue());
             arg.put(option.getKey(), l);
         }
-        return this.get(arg);
+        return this.get(mat, arg);
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with all its values
      * @return Given the specified options, it returns all the options the block modifier can take
      */
-    public abstract Collection<E> get(HashMap<String, List<String>> options);
+    public abstract Collection<E> get(String mat, HashMap<String, List<String>> options);
 
     /**
      * Convert from all the combinations of key-value to key-values, joining by the first value.
@@ -86,8 +86,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with its value
      * @return Given the specified options, it returns the first option the block modifier can take
      */
-    public E getSingle(Map<String, String> options) {
-        return this.get(options).stream().findFirst().orElse(null);
+    public E getSingle(String mat, Map<String, String> options) {
+        return this.get(mat, options).stream().findFirst().orElse(null);
     }
 
     /**
@@ -95,8 +95,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with all its values
      * @return Given the specified options, it returns the first option the block modifier can take
      */
-    public E getSingle(HashMap<String, List<String>> options) {
-        return this.get(options).stream().findFirst().orElse(null);
+    public E getSingle(String mat, HashMap<String, List<String>> options) {
+        return this.get(mat, options).stream().findFirst().orElse(null);
     }
 
     /**
@@ -104,8 +104,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with its value
      * @return True or False, depending if there's any value applicable to the block
      */
-    public boolean applies(Map<String, String> options) {
-        return this.applies(this.get(options));
+    public boolean applies(String mat, Map<String, String> options) {
+        return this.applies(this.get(mat, options));
     }
 
     /**
@@ -113,8 +113,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param options All the attributes that can take this block modifier, with all its values
      * @return True or False, depending if there's any value applicable to the block
      */
-    public boolean applies(HashMap<String, List<String>> options) {
-        return this.applies(this.get(options));
+    public boolean applies(String mat, HashMap<String, List<String>> options) {
+        return this.applies(this.get(mat, options));
     }
 
     /**
