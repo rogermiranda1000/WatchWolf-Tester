@@ -92,18 +92,13 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
                     r.add("ascending_east");
                     r.add("ascending_west");
                 }
-                else {
-                    r.add("straight");
-                    r.add("inner_right");
-                    r.add("inner_left");
-                    r.add("outer_right");
-                    r.add("outer_left");
-                }
                 break;
             case "type":
-                r.add("bottom");
-                r.add("top");
-                r.add("double");
+                if (mat.endsWith("_SLAB")) {
+                    r.add("bottom");
+                    r.add("top");
+                    r.add("double");
+                }
                 break;
             case "vertical-direction":
                 r.add("up");
