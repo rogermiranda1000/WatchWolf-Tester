@@ -18,7 +18,19 @@ public class Transformers {
             r.add(GroupableTransformer.getInstance());
             r.add(DelayableTransformer.getInstance());
             r.add(EyeableTransformer.getInstance());
-            // TODO others
+            r.add(HingedTransformer.getInstance());
+            r.add(OpenableTransformer.getInstance());
+            r.add(StaggeredTransformer.getInstance());
+            r.add(SectionableTransformer.getInstance());
+            r.add(RotableTransformer.getInstance());
+            r.add(PlayableTransformer.getInstance());
+            r.add(StatefulTransformer.getInstance());
+            r.add(LeavedTransform.getInstance());
+            r.add(IgnitableTransformer.getInstance());
+            r.add(LockableTransformer.getInstance());
+            r.add(ConditionableTransformer.getInstance());
+            r.add(InvertableTransformer.getInstance());
+            r.add(PowerableTransformer.getInstance());
 
             Transformers.transformers = r;
         }
