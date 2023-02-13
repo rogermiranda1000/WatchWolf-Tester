@@ -63,6 +63,7 @@ public class Block extends SocketData {
 
     @Override
     public String toString() {
+        // TODO RelevantBlockData on getters
         // extra variables?
         String variables = Arrays.stream(this.getClass().getDeclaredFields())
                 .filter(f -> f.isAnnotationPresent(RelevantBlockData.class))

@@ -4,10 +4,7 @@ import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Blocks;
 import dev.watchwolf.entities.blocks.Directionable;
 import dev.watchwolf.entities.blocks.Orientable;
-import dev.watchwolf.entities.blocks.transformer.AbstractTransformer;
-import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
-import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
-import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
+import dev.watchwolf.entities.blocks.transformer.*;
 
 public class BlockReader {
     static {
@@ -20,6 +17,7 @@ public class BlockReader {
             r = AgeableTransformer.getInstance().loadSocketData(r, blockData);
             r = OrientableTransformer.getInstance().loadSocketData(r, blockData);
             r = DirectionableTransformer.getInstance().loadSocketData(r, blockData);
+            r = GroupableTransformer.getInstance().loadSocketData(r, blockData);
 
             return r;
         });
