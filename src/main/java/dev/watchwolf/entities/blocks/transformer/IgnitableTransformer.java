@@ -2,7 +2,6 @@ package dev.watchwolf.entities.blocks.transformer;
 
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Ignitable;
-import dev.watchwolf.entities.blocks.Leaved;
 
 import java.util.*;
 import java.util.function.Function;
