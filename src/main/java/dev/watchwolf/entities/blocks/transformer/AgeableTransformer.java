@@ -70,7 +70,7 @@ public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
             r.add(0);
             r.add(1);
         }
-        if (options.containsKey("honey-level")) r.addAll(options.get("age").stream().map(Integer::valueOf).collect(Collectors.toList()));
+        if (options.containsKey("honey-level")) r.addAll(options.get("honey-level").stream().map(Integer::valueOf).collect(Collectors.toList()));
 
         return r;
     }
