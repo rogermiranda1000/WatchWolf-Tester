@@ -4,67 +4,23 @@ import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Blocks;
 import dev.watchwolf.entities.blocks.Directionable;
 import dev.watchwolf.entities.blocks.Orientable;
+import dev.watchwolf.entities.blocks.transformer.AbstractTransformer;
+import dev.watchwolf.entities.blocks.transformer.AgeableTransformer;
+import dev.watchwolf.entities.blocks.transformer.DirectionableTransformer;
+import dev.watchwolf.entities.blocks.transformer.OrientableTransformer;
 
 public class BlockReader {
     static {
         SocketData.setReaderFunction(Block.class, (dis) -> {
             Block r = Blocks.getBlockById(SocketHelper.readShort(dis));
-            if (r == null) {
-                SocketHelper.discard(dis, 54);
-                return null;
-            }
+            int []blockData = new int[AbstractTransformer.BLOCK_SOCKET_DATA_SIZE];
+            for (int i = 2; i < blockData.length; i++) blockData[i] = dis.readUnsignedByte(); // read 54 bytes (the first 2 were already readed)
+            if (r == null) return null;
 
-            dis.readUnsignedByte(); // TODO age
+            r = AgeableTransformer.getInstance().loadSocketData(r, blockData);
+            r = OrientableTransformer.getInstance().loadSocketData(r, blockData);
+            r = DirectionableTransformer.getInstance().loadSocketData(r, blockData);
 
-            int tmp = dis.readUnsignedByte(); // direction & axis
-            if (r instanceof Orientable) {
-                Orientable orientable = (Orientable) r;
-                try {
-                    if ((tmp & 0b00_000001) > 0) orientable = orientable.setOrientation(Orientable.Orientation.U);
-                    if ((tmp & 0b00_000010) > 0) orientable = orientable.setOrientation(Orientable.Orientation.D);
-                    if ((tmp & 0b00_000100) > 0) orientable = orientable.setOrientation(Orientable.Orientation.N);
-                    if ((tmp & 0b00_001000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.S);
-                    if ((tmp & 0b00_010000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.E);
-                    if ((tmp & 0b00_100000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.W);
-                } catch (IllegalArgumentException ignore) {
-                } finally {
-                    r = (Block) orientable;
-                }
-            }
-            if (r instanceof Directionable) {
-                Directionable directionable = (Directionable) r;
-                tmp >>= 6;
-                try {
-                    switch (tmp) {
-                        case 1:
-                            directionable = directionable.setDirection(Directionable.Direction.X);
-                            break;
-                        case 2:
-                            directionable = directionable.setDirection(Directionable.Direction.Y);
-                            break;
-                        case 3:
-                            directionable = directionable.setDirection(Directionable.Direction.Z);
-                            break;
-                    }
-                } catch (IllegalArgumentException ignore) {}
-                try {
-                    switch (tmp) {
-                        case 0:
-                            directionable = directionable.setDirection(Directionable.Direction.NONE);
-                            break;
-                        case 1:
-                            directionable = directionable.setDirection(Directionable.Direction.SINGLE_WALL);
-                            break;
-                        case 2:
-                            directionable = directionable.setDirection(Directionable.Direction.DOUBLE_WALL);
-                            break;
-                    }
-                } catch (IllegalArgumentException ignore) {}
-                r = (Block) directionable;
-            }
-
-            SocketHelper.discard(dis, 1); // reserved
-            SocketHelper.discard(dis, 51); // TODO
             return r;
         });
     }

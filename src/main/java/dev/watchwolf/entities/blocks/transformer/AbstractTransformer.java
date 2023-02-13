@@ -14,6 +14,12 @@ import java.util.regex.Pattern;
  * @param <E> Type of all the options that the block modifier (<T>) can take (enum/integer)
  */
 public abstract class AbstractTransformer<T extends BlockModifier, E> {
+    private final Class<T> classT;
+
+    protected AbstractTransformer(Class<T> classT) {
+        this.classT = classT;
+    }
+
     /**
      * Bytes that the Block packet has. The first 2 specifies the block itself,
      * and the rest adds information to the block. Refer to the
@@ -128,7 +134,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Get the code of the interface <T> that needs to be inserted in the special block's class.
+     * Get the code of the interface <T> that needs to be inserted in the special block's class
      * @param className Class name; name after `new` that generates an instance of that class
      * @param list Return of `get`; all the options the block modifier can take
      * @param listImplements Output list with all the implements of the class
@@ -143,14 +149,37 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     public abstract String getImplementation(String className, Collection<E> list, List<String> listImplements, List<String> loadEval, List<Function<String,String>> copyProperties, String socketData[]);
 
     /**
-     * Modify the socket data to send this exact block.
+     * Modify the socket data to send this exact block
      * @param socketData Output array of size AbstractTransformer.BLOCK_SOCKET_DATA_SIZE, that
      *                   specifies the code needed to run in order to get the byte value at that
      *                   position.
      *                   The first 2 bytes are the block enum value.
      *                   If empty, it's the same as `(byte)0`
      */
-    protected abstract void getSocketData(String socketData[]);
+    protected abstract void getSocketData(String[] socketData);
+
+    /**
+     * Inverse of `getSocketData`; modify the base block accordingly with the socket data
+     * @param b Base block of instance <T>
+     * @param socketData Array of size AbstractTransformer.BLOCK_SOCKET_DATA_SIZE, that
+     *                   specifies the byte at that position.
+     *                   The first 2 bytes are the block enum value.
+     * @return Modified block
+     */
+    protected abstract T loadSocketData(T b, int[] socketData);
+
+    /**
+     * Inverse of `getSocketData`; modify the base block accordingly with the socket data
+     * @param b Base block
+     * @param socketData Array of size AbstractTransformer.BLOCK_SOCKET_DATA_SIZE, that
+     *                   specifies the byte at that position.
+     *                   The first 2 bytes are the block enum value.
+     * @return Modified block (if applicable)
+     */
+    public Block loadSocketData(Block b, int[] socketData) {
+        if (!this.classT.isInstance(b)) return b;
+        return (Block) this.loadSocketData(this.classT.cast(b), socketData);
+    }
 
     /**
      * Given a block without `arguments` loaded into the interface <T>, load them

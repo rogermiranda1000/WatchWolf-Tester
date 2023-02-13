@@ -17,7 +17,9 @@ public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
         return AgeableTransformer.instance;
     }
 
-    private AgeableTransformer() {}
+    private AgeableTransformer() {
+        super(Ageable.class);
+    }
 
     @Override
     public List<String> getOptions(String mat, String argument) {
@@ -110,6 +112,12 @@ public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
     @Override
     protected void getSocketData(String[] socketData) {
         socketData[AGEABLE_SOCKET_DATA_INDEX] = "(byte)this.age";
+    }
+
+    @Override
+    protected Ageable loadSocketData(Ageable b, int[] socketData) {
+        int age = socketData[AgeableTransformer.AGEABLE_SOCKET_DATA_INDEX];
+        return b.setAge(age);
     }
 
     @Override

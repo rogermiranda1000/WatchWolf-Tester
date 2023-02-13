@@ -16,7 +16,9 @@ public class DirectionableTransformer extends AbstractTransformer<Directionable,
         return DirectionableTransformer.instance;
     }
 
-    private DirectionableTransformer() {}
+    private DirectionableTransformer() {
+        super(Directionable.class);
+    }
 
     @Override
     public List<String> getOptions(String mat, String argument) {
@@ -91,6 +93,38 @@ public class DirectionableTransformer extends AbstractTransformer<Directionable,
     @Override
     protected void getSocketData(String[] socketData) {
         socketData[DIRECTIONABLE_SOCKET_DATA_INDEX] += " |\n\t\t\t\t(byte)(this.direction.getSendData() << 6)";
+    }
+
+    @Override
+    protected Directionable loadSocketData(Directionable directionable, int[] socketData) {
+        int tmp = (socketData[DirectionableTransformer.DIRECTIONABLE_SOCKET_DATA_INDEX] >> 6);
+        try {
+            switch (tmp) {
+                case 1:
+                    directionable = directionable.setDirection(Directionable.Direction.X);
+                    break;
+                case 2:
+                    directionable = directionable.setDirection(Directionable.Direction.Y);
+                    break;
+                case 3:
+                    directionable = directionable.setDirection(Directionable.Direction.Z);
+                    break;
+            }
+        } catch (IllegalArgumentException ignore) {}
+        try {
+            switch (tmp) {
+                case 0:
+                    directionable = directionable.setDirection(Directionable.Direction.NONE);
+                    break;
+                case 1:
+                    directionable = directionable.setDirection(Directionable.Direction.SINGLE_WALL);
+                    break;
+                case 2:
+                    directionable = directionable.setDirection(Directionable.Direction.DOUBLE_WALL);
+                    break;
+            }
+        } catch (IllegalArgumentException ignore) {}
+        return directionable;
     }
 
     @Override

@@ -16,7 +16,9 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
         return OrientableTransformer.instance;
     }
 
-    private OrientableTransformer() {}
+    private OrientableTransformer() {
+        super(Orientable.class);
+    }
 
     @Override
     public List<String> getOptions(String mat, String argument) {
@@ -215,6 +217,20 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.S)) ? 0b00_001000 : 0x00) |\n" +
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.E)) ? 0b00_010000 : 0x00) |\n" +
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.W)) ? 0b00_100000 : 0x00))";
+    }
+
+    @Override
+    protected Orientable loadSocketData(Orientable orientable, int[] socketData) {
+        int tmp = socketData[OrientableTransformer.ORIENTABLE_SOCKET_DATA_INDEX];
+        try {
+            if ((tmp & 0b00_000001) > 0) orientable = orientable.setOrientation(Orientable.Orientation.U);
+            if ((tmp & 0b00_000010) > 0) orientable = orientable.setOrientation(Orientable.Orientation.D);
+            if ((tmp & 0b00_000100) > 0) orientable = orientable.setOrientation(Orientable.Orientation.N);
+            if ((tmp & 0b00_001000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.S);
+            if ((tmp & 0b00_010000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.E);
+            if ((tmp & 0b00_100000) > 0) orientable = orientable.setOrientation(Orientable.Orientation.W);
+        } catch (IllegalArgumentException ignore) {}
+        return orientable;
     }
 
     @Override
