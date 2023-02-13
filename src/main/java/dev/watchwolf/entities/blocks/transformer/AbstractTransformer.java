@@ -20,6 +20,10 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
         this.classT = classT;
     }
 
+    public Class<? extends BlockModifier> getT() {
+        return this.classT;
+    }
+
     /**
      * Bytes that the Block packet has. The first 2 specifies the block itself,
      * and the rest adds information to the block. Refer to the
