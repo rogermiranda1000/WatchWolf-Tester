@@ -2,11 +2,9 @@ package dev.watchwolf.entities.blocks.transformer;
 
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Eyeable;
-import dev.watchwolf.entities.blocks.Groupable;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
     private static final int EYABLE_SOCKET_DATA_INDEX = 5;
@@ -21,6 +19,7 @@ public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
     private EyeableTransformer() {
         super(Eyeable.class);
     }
+
     @Override
     public List<String> getOptions(String mat, String argument) {
         List<String> r = new ArrayList<>();
@@ -50,22 +49,20 @@ public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
         if (!this.applies(list)) return "";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\t/*   --- GROUPABLE INTERFACE ---   */\n");
+        sb.append("\t/*   --- EYEABLE INTERFACE ---   */\n");
         sb.append("\t@RelevantBlockData\n")
                 .append("\tprivate boolean hasEye;\n");
 
-        sb.append("\n\tpublic Eyeable setEyePlaced(boolean placed) {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Eyeable setEyePlaced(boolean placed) {\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.hasEye = hasEye;\n")
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic boolean isEyePlaced() {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic boolean isEyePlaced() {\n")
                 .append("\t\treturn this.hasEye;\n")
-                .append("\t}\n");
-
-        sb.append("\n\tpublic int getMaxGroupAmount() {\n")
-                .append("\t\treturn this.maxGroupAmount;\n")
                 .append("\t}\n");
 
         loadEval.add("this.hasEye = false;");

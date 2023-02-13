@@ -86,16 +86,19 @@ public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
                 .append("\tprivate int age;\n")
                 .append("\tprivate final int maxAge;\n");
 
-        sb.append("\n\tpublic Ageable setAge(int age) throws IllegalArgumentException {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Ageable setAge(int age) throws IllegalArgumentException {\n")
                 .append("\t\tif (age > this.getMaxAge()) throw new IllegalArgumentException(\"" + className + " block only allows age from 0 to \" + this.getMaxAge());\n")
                 .append("\t\tthis.age = age;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic int getAge() {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic int getAge() {\n")
                 .append("\t\treturn this.age;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic int getMaxAge() {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic int getMaxAge() {\n")
                 .append("\t\treturn this.maxAge;\n")
                 .append("\t}\n");
 

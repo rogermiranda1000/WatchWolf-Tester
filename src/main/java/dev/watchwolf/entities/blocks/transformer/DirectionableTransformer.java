@@ -69,14 +69,16 @@ public class DirectionableTransformer extends AbstractTransformer<Directionable,
                 .append("\t\treturn this.direction;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic Directionable setDirection(Directionable.Direction d) throws IllegalArgumentException {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Directionable setDirection(Directionable.Direction d) throws IllegalArgumentException {\n")
                 .append("\t\tif (!this.allowedDirections.contains(d)) throw new IllegalArgumentException(\"" + className + " block doesn't allow the direction \" + d.name());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.direction = d;\n")
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
-        sb.append("\tpublic Set<Directionable.Direction> getValidDirections() {\n")
+        sb.append("\t@Override\n")
+                .append("\tpublic Set<Directionable.Direction> getValidDirections() {\n")
                 .append("\t\treturn (HashSet)this.allowedDirections.clone();\n")
                 .append("\t}\n");
 

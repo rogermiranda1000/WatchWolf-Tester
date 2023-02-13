@@ -47,10 +47,11 @@ public class DelayableTransformer extends AbstractTransformer<Delayable,Integer>
 
         int maxGroup = Collections.max(list);
         StringBuilder sb = new StringBuilder();
-        sb.append("\t/*   --- GROUPABLE INTERFACE ---   */\n");
+        sb.append("\t/*   --- DELAYABLE INTERFACE ---   */\n");
         sb.append("\tprivate int delayMinusOne;\n");
 
-        sb.append("\n\tpublic Delayable setDelay(int delay) throws IllegalArgumentException {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Delayable setDelay(int delay) throws IllegalArgumentException {\n")
                 .append("\t\tif (delay < 1 || delay > 4) throw new IllegalArgumentException(\"" + className + " block only allows delay from 1 to 4\");\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.delayMinusOne = delay - 1;\n")
@@ -58,6 +59,7 @@ public class DelayableTransformer extends AbstractTransformer<Delayable,Integer>
                 .append("\t}\n");
 
         sb.append("\t@RelevantBlockData\n")
+                .append("\t@Override\n")
                 .append("\n\tpublic int getDelay() {\n")
                 .append("\t\treturn this.delayMinusOne + 1;\n")
                 .append("\t}\n");

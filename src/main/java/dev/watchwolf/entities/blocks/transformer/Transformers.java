@@ -17,6 +17,7 @@ public class Transformers {
             r.add(DirectionableTransformer.getInstance());
             r.add(GroupableTransformer.getInstance());
             r.add(DelayableTransformer.getInstance());
+            r.add(EyeableTransformer.getInstance());
             // TODO others
 
             Transformers.transformers = r;

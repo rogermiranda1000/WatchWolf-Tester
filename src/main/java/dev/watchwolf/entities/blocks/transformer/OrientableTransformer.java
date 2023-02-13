@@ -174,29 +174,25 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
         StringBuilder sb = new StringBuilder();
         sb.append("\t/*   --- ORIENTABLE INTERFACE ---   */\n");
         sb.append("\t@RelevantBlockData\n")
-                .append("\tprivate final Map<Orientable.Orientation,Boolean> orientation = new HashMap<>();\n")
+                .append("\tprivate final Map<Orientable.Orientation,Boolean> orientation = new HashMap<>();\n");
+
+        sb.append("\t@Override\n")
                 .append("\tpublic boolean isOrientationSet(Orientable.Orientation o) throws IllegalArgumentException {\n")
                 .append("\t\tBoolean result = this.orientation.get(o);\n");
         if (list.size() < 6) sb.append("\t\tif (result == null) throw new IllegalArgumentException(\"" + className + " block doesn't contain orientation \" + o.name());\n");
         sb.append("\t\treturn result;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic Orientable setOrientation(Orientable.Orientation o, boolean value) throws IllegalArgumentException {\n");
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Orientable setOrientation(Orientable.Orientation o, boolean value) throws IllegalArgumentException {\n");
         if (list.size() < 6) sb.append("\t\tif (!this.orientation.containsKey(o)) throw new IllegalArgumentException(\"" + className + " block doesn't contain orientation \" + o.name());\n");
         sb.append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.orientation.put(o, value);\n")
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
-        sb.append("\n\tpublic Orientable setOrientation(Orientable.Orientation o) throws IllegalArgumentException {\n")
-                .append("\t\treturn this.setOrientation(o, true);\n")
-                .append("\t}\n");
-
-        sb.append("\n\tpublic Orientable unsetOrientation(Orientable.Orientation o) throws IllegalArgumentException {\n")
-                .append("\t\treturn this.setOrientation(o, false);\n")
-                .append("\t}\n");
-
-        sb.append("\n\tpublic Set<Orientable.Orientation> getValidOrientations() {\n")
+        sb.append("\t@Override\n")
+                .append("\n\tpublic Set<Orientable.Orientation> getValidOrientations() {\n")
                 .append("\t\treturn this.orientation.keySet();\n")
                 .append("\t}\n");
 
