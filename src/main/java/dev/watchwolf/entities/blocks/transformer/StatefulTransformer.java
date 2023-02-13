@@ -1,12 +1,10 @@
 package dev.watchwolf.entities.blocks.transformer;
 
 import dev.watchwolf.entities.blocks.Block;
-import dev.watchwolf.entities.blocks.Directionable;
 import dev.watchwolf.entities.blocks.Stateful;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class StatefulTransformer extends AbstractTransformer<Stateful,Stateful.Mode> {
     private static final int STATEFUL_SOCKET_DATA_INDEX = 9;
