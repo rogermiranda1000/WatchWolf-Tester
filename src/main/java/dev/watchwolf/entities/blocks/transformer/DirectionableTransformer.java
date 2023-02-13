@@ -64,7 +64,9 @@ public class DirectionableTransformer extends AbstractTransformer<Directionable,
         sb.append("\t/*   --- DIRECTIONABLE INTERFACE ---   */\n");
         sb.append("\t@RelevantBlockData\n")
                 .append("\tprivate Directionable.Direction direction;\n")
-                .append("\tprivate final HashSet<Directionable.Direction> allowedDirections = new HashSet<>();\n")
+                .append("\tprivate final HashSet<Directionable.Direction> allowedDirections = new HashSet<>();\n");
+
+        sb.append("\t@Override\n")
                 .append("\tpublic Directionable.Direction getFacingDirection() {\n")
                 .append("\t\treturn this.direction;\n")
                 .append("\t}\n");
