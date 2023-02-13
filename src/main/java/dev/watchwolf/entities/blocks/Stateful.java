@@ -8,7 +8,7 @@ import java.util.Set;
 public interface Stateful extends BlockModifier {
     public static enum Mode {
         COMPARE(0), SUBTRACT(1),
-        LOAD(1), CORNER(2), SAVE(3);
+        LOAD(0), CORNER(1), SAVE(2);
 
         private final byte send;
         private Mode(int send) {
@@ -20,7 +20,7 @@ public interface Stateful extends BlockModifier {
         }
     }
 
-    Stateful getMode();
-    Stateful setMode(Stateful mode) throws IllegalArgumentException;
-    Set<Stateful> getValidModes();
+    Mode getMode();
+    Stateful setMode(Mode mode) throws IllegalArgumentException;
+    Set<Mode> getValidModes();
 }
