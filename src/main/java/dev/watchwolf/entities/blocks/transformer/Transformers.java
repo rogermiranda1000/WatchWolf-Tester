@@ -12,7 +12,12 @@ public class Transformers {
         if (Transformers.transformers == null) {
             ArrayList<AbstractTransformer<?,?>> r = new ArrayList<>();
 
-            //r.add(); // TODO
+            r.add(AgeableTransformer.getInstance());
+            r.add(OrientableTransformer.getInstance());
+            r.add(DirectionableTransformer.getInstance());
+            r.add(GroupableTransformer.getInstance());
+            r.add(DelayableTransformer.getInstance());
+            // TODO others
 
             Transformers.transformers = r;
         }

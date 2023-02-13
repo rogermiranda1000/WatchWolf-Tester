@@ -14,11 +14,9 @@ public class BlockReader {
             for (int i = 2; i < blockData.length; i++) blockData[i] = dis.readUnsignedByte(); // read 54 bytes (the first 2 were already readed)
             if (r == null) return null;
 
-            r = AgeableTransformer.getInstance().loadSocketData(r, blockData);
-            r = OrientableTransformer.getInstance().loadSocketData(r, blockData);
-            r = DirectionableTransformer.getInstance().loadSocketData(r, blockData);
-            r = GroupableTransformer.getInstance().loadSocketData(r, blockData);
-            r = DelayableTransformer.getInstance().loadSocketData(r, blockData);
+            for (AbstractTransformer<?,?> transformer : Transformers.getTransformers()) {
+                r = transformer.loadSocketData(r, blockData);
+            }
 
             return r;
         });
