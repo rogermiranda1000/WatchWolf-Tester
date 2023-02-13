@@ -18,6 +18,7 @@ public class BlockReader {
             r = OrientableTransformer.getInstance().loadSocketData(r, blockData);
             r = DirectionableTransformer.getInstance().loadSocketData(r, blockData);
             r = GroupableTransformer.getInstance().loadSocketData(r, blockData);
+            r = DelayableTransformer.getInstance().loadSocketData(r, blockData);
 
             return r;
         });

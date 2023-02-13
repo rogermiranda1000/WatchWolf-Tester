@@ -59,7 +59,7 @@ public class GroupableTransformer extends AbstractTransformer<Groupable,Integer>
                 .append("\tprivate final int maxGroupAmount;\n");
 
         sb.append("\n\tpublic Ageable setGroupAmount(int amount) throws IllegalArgumentException {\n")
-                .append("\t\tif (amount > this.getMaxGroupAmount()) throw new IllegalArgumentException(\"" + className + " block only allows grouping from 1 to \" + this.getMaxGroupAmount());\n")
+                .append("\t\tif (amount < 1 || amount > this.getMaxGroupAmount()) throw new IllegalArgumentException(\"" + className + " block only allows grouping from 1 to \" + this.getMaxGroupAmount());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.groupAmountMinusOne = amount - 1;\n")
                 .append("\t\treturn current;\n")
@@ -86,12 +86,12 @@ public class GroupableTransformer extends AbstractTransformer<Groupable,Integer>
 
     @Override
     protected void getSocketData(String[] socketData) {
-        socketData[GROUPABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.groupAmount << 5)";
+        socketData[GROUPABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.groupAmountMinusOne << 5)";
     }
 
     @Override
     protected Groupable loadSocketData(Groupable b, int[] socketData) {
-        int group = socketData[GROUPABLE_SOCKET_DATA_INDEX] >> 5;
+        int group = (socketData[GROUPABLE_SOCKET_DATA_INDEX] >> 5) + 1;
         return b.setGroupAmount(group);
     }
 
