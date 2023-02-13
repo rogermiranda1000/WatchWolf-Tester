@@ -56,7 +56,7 @@ public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
         sb.append("\t@Override\n")
                 .append("\n\tpublic Eyeable setEyePlaced(boolean placed) {\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
-                .append("\t\tcurrent.hasEye = hasEye;\n")
+                .append("\t\tcurrent.hasEye = placed;\n")
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
