@@ -77,7 +77,7 @@ public class OpenableTransformer extends AbstractTransformer<Openable,Boolean> {
 
     @Override
     protected void getSocketData(String[] socketData) {
-        socketData[OPENABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.hasEye ? 1 : 0)";
+        socketData[OPENABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.isOpen ? 1 : 0)";
     }
 
     @Override

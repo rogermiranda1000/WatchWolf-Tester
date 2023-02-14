@@ -36,7 +36,7 @@ public class RotableTransformer extends AbstractTransformer<Rotable,Rotable.Rota
     public Collection<Rotable.Rotation> get(String mat, HashMap<String, List<String>> options) {
         Collection<Rotable.Rotation> r = new HashSet<>();
 
-        if (options.containsKey("rotation")) r.addAll(options.get("candles").stream().map(Integer::valueOf).map(rot -> Rotable.Rotation.values()[rot]).collect(Collectors.toList()));
+        if (options.containsKey("rotation")) r.addAll(options.get("rotation").stream().map(Integer::valueOf).map(rot -> Rotable.Rotation.values()[rot]).collect(Collectors.toList()));
 
         return r;
     }
@@ -51,20 +51,20 @@ public class RotableTransformer extends AbstractTransformer<Rotable,Rotable.Rota
                 .append("\tprivate Rotable.Rotation rotation;\n");
 
         sb.append("\t@Override\n")
-                .append("\n\tpublic Rotable setRotation(Rotation rotation) {\n")
+                .append("\n\tpublic Rotable setRotation(Rotable.Rotation rotation) {\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.rotation = rotation;\n")
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
         sb.append("\t@Override\n")
-                .append("\n\tpublic Rotation getRotation() {\n")
+                .append("\n\tpublic Rotable.Rotation getRotation() {\n")
                 .append("\t\treturn this.rotation;\n")
                 .append("\t}\n");
 
         loadEval.add("this.rotation = Rotable.Rotation.S;");
         copyProperties.add((var) -> "this.rotation = " + var + ".rotation;");
-        listImplements.add("Rotation");
+        listImplements.add("Rotable");
 
         this.getSocketData(socketData);
 

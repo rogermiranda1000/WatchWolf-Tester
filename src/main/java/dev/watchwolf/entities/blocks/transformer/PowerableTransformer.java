@@ -76,7 +76,7 @@ public class PowerableTransformer extends AbstractTransformer<Powerable,Boolean>
 
     @Override
     protected void getSocketData(String[] socketData) {
-        socketData[POWERABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.inverted ? 0b00000_1_0_0 : 0)";
+        socketData[POWERABLE_SOCKET_DATA_INDEX] = " |\n\t\t\t\t(byte)(this.powered ? 0b00000_1_0_0 : 0)";
     }
 
     @Override

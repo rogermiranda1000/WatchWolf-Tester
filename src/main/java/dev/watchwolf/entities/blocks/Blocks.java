@@ -5,6 +5,7 @@ import dev.watchwolf.entities.blocks.special.*;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+/* THIS CLASS WAS AUTOMATICALLY GENERATED; DO NOT MODIFY */
 public class Blocks {
 	public static final Block AIR=new Block(0,"AIR"),
 STONE=new Block(1,"STONE"),
@@ -142,10 +143,6 @@ WARPED_FUNGUS=new Block(200,"WARPED_FUNGUS"),
 CRIMSON_ROOTS=new Block(201,"CRIMSON_ROOTS"),
 WARPED_ROOTS=new Block(202,"WARPED_ROOTS"),
 NETHER_SPROUTS=new Block(203,"NETHER_SPROUTS"),
-WEEPING_VINES=new Block(204,"WEEPING_VINES"),
-TWISTING_VINES=new Block(205,"TWISTING_VINES"),
-SUGAR_CANE=new Block(206,"SUGAR_CANE"),
-KELP=new Block(207,"KELP"),
 MOSS_CARPET=new Block(208,"MOSS_CARPET"),
 MOSS_BLOCK=new Block(209,"MOSS_BLOCK"),
 SMOOTH_QUARTZ=new Block(240,"SMOOTH_QUARTZ"),
@@ -162,7 +159,6 @@ SPAWNER=new Block(255,"SPAWNER"),
 CRAFTING_TABLE=new Block(257,"CRAFTING_TABLE"),
 ICE=new Block(263,"ICE"),
 SNOW_BLOCK=new Block(264,"SNOW_BLOCK"),
-CACTUS=new Block(265,"CACTUS"),
 CLAY=new Block(266,"CLAY"),
 JUKEBOX=new Block(267,"JUKEBOX"),
 PUMPKIN=new Block(277,"PUMPKIN"),
@@ -448,6 +444,10 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 	public static final AzaleaLeaves AZALEA_LEAVES=new AzaleaLeaves(149);
 	public static final FloweringAzaleaLeaves FLOWERING_AZALEA_LEAVES=new FloweringAzaleaLeaves(150);
 	public static final SeaPickle SEA_PICKLE=new SeaPickle(166);
+	public static final WeepingVines WEEPING_VINES=new WeepingVines(204);
+	public static final TwistingVines TWISTING_VINES=new TwistingVines(205);
+	public static final SugarCane SUGAR_CANE=new SugarCane(206);
+	public static final Kelp KELP=new Kelp(207);
 	public static final HangingRoots HANGING_ROOTS=new HangingRoots(210);
 	public static final BigDripleaf BIG_DRIPLEAF=new BigDripleaf(211);
 	public static final SmallDripleaf SMALL_DRIPLEAF=new SmallDripleaf(212);
@@ -489,6 +489,7 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 	public static final Ladder LADDER=new Ladder(260);
 	public static final CobblestoneStairs COBBLESTONE_STAIRS=new CobblestoneStairs(261);
 	public static final Snow SNOW=new Snow(262);
+	public static final Cactus CACTUS=new Cactus(265);
 	public static final OakFence OAK_FENCE=new OakFence(268);
 	public static final SpruceFence SPRUCE_FENCE=new SpruceFence(269);
 	public static final BirchFence BIRCH_FENCE=new BirchFence(270);
@@ -941,6 +942,7 @@ POTTED_FLOWERING_AZALEA_BUSH=new Block(930,"POTTED_FLOWERING_AZALEA_BUSH");
 	public static Block getBlockById(int id) {
 		return Blocks.getBlocks().filter(b -> b.id == id).findFirst().orElse(null);
 	}
+
 
 	public static Block getBlock(String name) {
 		return Blocks.getBlocks().filter(b -> b.name.equals(name)).findFirst().orElse(null);

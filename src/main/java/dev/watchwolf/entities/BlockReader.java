@@ -2,8 +2,6 @@ package dev.watchwolf.entities;
 
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.blocks.Blocks;
-import dev.watchwolf.entities.blocks.Directionable;
-import dev.watchwolf.entities.blocks.Orientable;
 import dev.watchwolf.entities.blocks.transformer.*;
 
 public class BlockReader {

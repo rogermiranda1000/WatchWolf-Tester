@@ -73,7 +73,7 @@ public class StatefulTransformer extends AbstractTransformer<Stateful,Stateful.M
 
         sb.append("\t@Override\n")
                 .append("\n\tpublic Stateful setMode(Stateful.Mode mode) throws IllegalArgumentException {\n")
-                .append("\t\tif (!this.allowedStates.contains(d)) throw new IllegalArgumentException(\"" + className + " block doesn't allow the state \" + d.name());\n")
+                .append("\t\tif (!this.allowedStates.contains(mode)) throw new IllegalArgumentException(\"" + className + " block doesn't allow the state \" + mode.name());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.state = mode;\n")
                 .append("\t\treturn current;\n")

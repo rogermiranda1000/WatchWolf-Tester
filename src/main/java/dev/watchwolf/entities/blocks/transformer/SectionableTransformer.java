@@ -87,8 +87,8 @@ public class SectionableTransformer extends AbstractTransformer<Sectionable,Sect
                 .append("\t}\n");
 
         sb.append("\t@Override\n")
-                .append("\n\tpublic Sectionable setSection(Section section) throws IllegalArgumentException {\n")
-                .append("\t\tif (!this.allowedSections.contains(d)) throw new IllegalArgumentException(\"" + className + " block doesn't allow the section \" + d.name());\n")
+                .append("\n\tpublic Sectionable setSection(Sectionable.Section section) throws IllegalArgumentException {\n")
+                .append("\t\tif (!this.allowedSections.contains(section)) throw new IllegalArgumentException(\"" + className + " block doesn't allow the section \" + section.name());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.section = section;\n")
                 .append("\t\treturn current;\n")

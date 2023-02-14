@@ -67,7 +67,7 @@ public class LeavedTransform extends AbstractTransformer<Leaved,Leaved.Leaves> {
                 .append("\t\treturn current;\n")
                 .append("\t}\n");
 
-        loadEval.add("this.section = Leaved.Leaves.NONE;");
+        loadEval.add("this.leaves = Leaved.Leaves.NONE;");
         copyProperties.add((var) -> "this.leaves = " + var + ".leaves;");
         listImplements.add("Leaved");
 

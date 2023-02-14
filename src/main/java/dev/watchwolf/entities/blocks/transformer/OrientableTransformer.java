@@ -207,7 +207,7 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
 
     @Override
     protected void getSocketData(String[] socketData) {
-        socketData[ORIENTABLE_SOCKET_DATA_INDEX] += " |\n\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.U)) ? 0b00_000001 : 0x00) |\n" +
+        socketData[ORIENTABLE_SOCKET_DATA_INDEX] += " |\n\t\t\t\t(byte)((Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.U)) ? 0b00_000001 : 0x00) |\n" +
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.D)) ? 0b00_000010 : 0x00) |\n" +
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.N)) ? 0b00_000100 : 0x00) |\n" +
                                                             "\t\t\t\t(Boolean.TRUE.equals(this.orientation.get(Orientable.Orientation.S)) ? 0b00_001000 : 0x00) |\n" +

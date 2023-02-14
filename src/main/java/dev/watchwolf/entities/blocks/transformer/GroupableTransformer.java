@@ -59,7 +59,7 @@ public class GroupableTransformer extends AbstractTransformer<Groupable,Integer>
                 .append("\tprivate final int maxGroupAmount;\n");
 
         sb.append("\t@Override\n")
-                .append("\n\tpublic Ageable setGroupAmount(int amount) throws IllegalArgumentException {\n")
+                .append("\n\tpublic Groupable setGroupAmount(int amount) throws IllegalArgumentException {\n")
                 .append("\t\tif (amount < 1 || amount > this.getMaxGroupAmount()) throw new IllegalArgumentException(\"" + className + " block only allows grouping from 1 to \" + this.getMaxGroupAmount());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.groupAmountMinusOne = amount - 1;\n")

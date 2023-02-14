@@ -82,7 +82,7 @@ public class StaggeredTransformer extends AbstractTransformer<Staggered,Integer>
 
         sb.append("\t@Override\n")
                 .append("\n\tpublic Staggered setStage(int stage) throws IllegalArgumentException {\n")
-                .append("\t\tif (amount < this.getMinStage() || amount > this.getMaxStage()) throw new IllegalArgumentException(\"" + className + " block only allows stages from \" + this.getMinStage() + \" to \" + this.getMaxStage());\n")
+                .append("\t\tif (stage < this.getMinStage() || stage > this.getMaxStage()) throw new IllegalArgumentException(\"" + className + " block only allows stages from \" + this.getMinStage() + \" to \" + this.getMaxStage());\n")
                 .append("\t\t" + className + " current = new " + className + "(this);\n")
                 .append("\t\tcurrent.stage = stage;\n")
                 .append("\t\treturn current;\n")
