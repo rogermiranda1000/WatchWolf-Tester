@@ -2,25 +2,64 @@ package dev.watchwolf.entities.blocks.special;
 
 import dev.watchwolf.entities.blocks.*;
 import dev.watchwolf.entities.SocketHelper;
-import dev.watchwolf.entities.blocks.Block;
-
 import java.util.*;
 
-public class Lava extends Block {
+/* THIS CLASS WAS AUTOMATICALLY GENERATED; DO NOT MODIFY */
+public class Lava extends Block implements Staggered {
+	/*   --- STAGGERED INTERFACE ---   */
+	@RelevantBlockData
+	private int stage;
+	private final int maxStage, minStage;
+	@Override
+
+	public Staggered setStage(int stage) throws IllegalArgumentException {
+		if (stage < this.getMinStage() || stage > this.getMaxStage()) throw new IllegalArgumentException("Lava block only allows stages from " + this.getMinStage() + " to " + this.getMaxStage());
+		Lava current = new Lava(this);
+		current.stage = stage;
+		return current;
+	}
+	@Override
+
+	public int getStage() {
+		return this.stage;
+	}
+	@Override
+
+	public int getMaxStage() {
+		return this.maxStage;
+	}
+	@Override
+
+	public int getMinStage() {
+		return this.minStage;
+	}
 
 	/*   --- SOCKET DATA OVERRIDE ---   */
 	@Override
 	public void sendSocketData(ArrayList<Byte> out) {
 		SocketHelper.addShort(out, this.id);
-		out.add((byte)0);
-		out.add((byte)0);
-		out.add((byte)0);
-		SocketHelper.fill(out, 51);
+		out.add((byte)(0)); // age
+		out.add((byte)(0)); // directionable & orientable
+		out.add((byte)0); // reserved
+		out.add((byte)(0)); // group_count & delay & eye & hinge & open
+		out.add((byte)((byte)(this.stage))); // stage
+		out.add((byte)(0)); // part & rotation
+		out.add((byte)(0)); // note
+		out.add((byte)(0)); // mode & leaves & lit & locked
+		out.add((byte)0); // reserved
+		out.add((byte)(0)); // cond & inv & pow
+		SocketHelper.fill(out, 44); // reserved
 	}
 
 	/*   --- CONSTRUCTORS ---   */
 	public Lava(short id) {
-		super(id, "LAVA");
+		super(id, "LAVA", (ins, f) -> {
+			try { return f.get(ins).toString(); }
+			catch (IllegalAccessException ignore) { return "?"; }
+		});
+		this.stage = 0;
+		this.maxStage = 7;
+		this.minStage = 0;
 	}
 
 	public Lava(int id) {
@@ -29,6 +68,7 @@ public class Lava extends Block {
 
 	private Lava(Lava old) {
 		this(old.id);
+		this.stage = old.stage;
 	}
 
 }

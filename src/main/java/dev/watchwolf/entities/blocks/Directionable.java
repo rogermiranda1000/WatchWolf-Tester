@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * Axis
  */
-public interface Directionable {
+public interface Directionable extends BlockModifier {
     public static enum Direction {
         NONE(0),
         X(1), Y(2), Z(3),
