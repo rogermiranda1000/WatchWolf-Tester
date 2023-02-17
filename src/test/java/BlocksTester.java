@@ -4,6 +4,7 @@ import dev.watchwolf.entities.blocks.Blocks;
 import dev.watchwolf.entities.blocks.Directionable;
 import dev.watchwolf.entities.blocks.Orientable;
 import dev.watchwolf.entities.blocks.special.Bell;
+import dev.watchwolf.entities.blocks.special.TurtleEgg;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,5 +67,11 @@ public class BlocksTester extends AbstractTest {
         bell.sendSocketData(originalData);
         get.sendSocketData(gettedData);
         assertEquals(originalData, gettedData);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(BlocksTester.class)
+    public void getRelevantDataFromFunction(TesterConnector connector) throws Exception {
+        assertEquals(Blocks.TURTLE_EGG.toString(), "TURTLE_EGG{groupAmount=1}");
     }
 }
