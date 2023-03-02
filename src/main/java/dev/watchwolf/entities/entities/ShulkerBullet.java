@@ -13,7 +13,7 @@ public class ShulkerBullet extends Entity {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        SocketHelper.addShort(out, EntityType.DroppedItem.ordinal());
+        SocketHelper.addShort(out, EntityType.SHULKER_BULLET.ordinal());
         this.position.sendSocketData(out);
         SocketHelper.addString(out, this.UUID);
     }

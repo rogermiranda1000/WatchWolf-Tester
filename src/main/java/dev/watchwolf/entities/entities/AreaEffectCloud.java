@@ -13,7 +13,7 @@ public class AreaEffectCloud extends Entity {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        SocketHelper.addShort(out, EntityType.DroppedItem.ordinal());
+        SocketHelper.addShort(out, EntityType.AREA_EFFECT_CLOUD.ordinal());
         this.position.sendSocketData(out);
         SocketHelper.addString(out, this.UUID);
     }

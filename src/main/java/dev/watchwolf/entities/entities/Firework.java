@@ -13,7 +13,7 @@ public class Firework extends Entity {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        SocketHelper.addShort(out, EntityType.DroppedItem.ordinal());
+        SocketHelper.addShort(out, EntityType.FIREWORK.ordinal());
         this.position.sendSocketData(out);
         SocketHelper.addString(out, this.UUID);
     }

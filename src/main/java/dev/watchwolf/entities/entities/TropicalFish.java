@@ -13,7 +13,7 @@ public class TropicalFish extends Entity {
 
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
-        SocketHelper.addShort(out, EntityType.DroppedItem.ordinal());
+        SocketHelper.addShort(out, EntityType.TROPICAL_FISH.ordinal());
         this.position.sendSocketData(out);
         SocketHelper.addString(out, this.UUID);
     }

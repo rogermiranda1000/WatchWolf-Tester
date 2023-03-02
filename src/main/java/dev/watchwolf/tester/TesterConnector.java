@@ -2,17 +2,16 @@ package dev.watchwolf.tester;
 
 import dev.watchwolf.client.MessageNotifier;
 import dev.watchwolf.entities.*;
+import dev.watchwolf.entities.blocks.BlockReader;
 import dev.watchwolf.server.ServerPetition;
 import dev.watchwolf.server.ServerStopNotifier;
 import dev.watchwolf.clientsmanager.ClientManagerPetition;
-import dev.watchwolf.entities.*;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.entities.EntityType;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.items.Item;
-import dev.watchwolf.serversmanager.*;
 import dev.watchwolf.serversmanager.ServerErrorNotifier;
 import dev.watchwolf.serversmanager.ServerManagerPetition;
 import dev.watchwolf.serversmanager.ServerStartNotifier;

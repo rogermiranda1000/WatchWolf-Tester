@@ -1,7 +1,7 @@
-package dev.watchwolf.entities;
+package dev.watchwolf.entities.blocks;
 
-import dev.watchwolf.entities.blocks.Block;
-import dev.watchwolf.entities.blocks.Blocks;
+import dev.watchwolf.entities.SocketData;
+import dev.watchwolf.entities.SocketHelper;
 import dev.watchwolf.entities.blocks.transformer.*;
 
 public class BlockReader {
