@@ -607,6 +607,24 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public void spawnEntity(Entity e) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // spawn entity header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0011);
+
+        message.add(e);
+
+        message.send();
+    }
+
+    @Override
     public void synchronize() throws IOException {
         if (this.serverManagerSocket == null) return;
 

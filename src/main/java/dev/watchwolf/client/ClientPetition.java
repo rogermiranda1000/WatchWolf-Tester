@@ -1,6 +1,7 @@
 package dev.watchwolf.client;
 
 import dev.watchwolf.entities.Position;
+import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.tester.Petition;
 
@@ -16,4 +17,5 @@ public interface ClientPetition extends Petition {
     public void lookAt(float pitch, float yaw) throws IOException;
     public void hit() throws IOException;
     public void use() throws IOException;
+    public void attack(Entity e) throws IOException;
 }

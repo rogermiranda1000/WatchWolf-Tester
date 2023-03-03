@@ -4,6 +4,7 @@ import dev.watchwolf.client.ClientPetition;
 import dev.watchwolf.entities.Message;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.SocketHelper;
+import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
@@ -150,6 +151,20 @@ public class ClientSocket implements ClientPetition {
 
         // use header
         message.add((short) 0b000000001011_0_011);
+
+        message.send();
+    }
+
+    @Override
+    public void attack(Entity e) throws IOException {
+        this.syncManager.requestSynchronization(this);
+
+        Message message = new Message(this.socket);
+
+        // look at header
+        message.add((short) 0b000000001101_0_011);
+
+        message.add(e);
 
         message.send();
     }
