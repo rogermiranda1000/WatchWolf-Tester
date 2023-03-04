@@ -24,4 +24,5 @@ public interface ServerPetition extends Petition {
     public Block getBlock(Position position) throws IOException;
     public void runCommand(String cmd) throws IOException;
     public Entity []getEntities(Position center, double radius) throws IOException;
+    public String spawnEntity(Entity e) throws IOException;
 }

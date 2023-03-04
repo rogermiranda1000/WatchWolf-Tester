@@ -2,17 +2,16 @@ package dev.watchwolf.tester;
 
 import dev.watchwolf.client.MessageNotifier;
 import dev.watchwolf.entities.*;
+import dev.watchwolf.entities.blocks.BlockReader;
 import dev.watchwolf.server.ServerPetition;
 import dev.watchwolf.server.ServerStopNotifier;
 import dev.watchwolf.clientsmanager.ClientManagerPetition;
-import dev.watchwolf.entities.*;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.entities.EntityType;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.items.Item;
-import dev.watchwolf.serversmanager.*;
 import dev.watchwolf.serversmanager.ServerErrorNotifier;
 import dev.watchwolf.serversmanager.ServerManagerPetition;
 import dev.watchwolf.serversmanager.ServerStartNotifier;
@@ -604,6 +603,36 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             Entity []entities = new Entity[size];
             for (int n = 0; n < size; n++) entities[n] = (Entity) SocketData.readSocketData(dis, Entity.class);
             return entities;
+        }
+    }
+
+    @Override
+    public String spawnEntity(Entity e) throws IOException {
+        if (this.serverManagerSocket == null) return "";
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // spawn entity header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0011);
+
+        message.add(e);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0011) throw new IOException("Expected response from 0x0011 operation.");
+            return SocketHelper.readString(dis);
         }
     }
 

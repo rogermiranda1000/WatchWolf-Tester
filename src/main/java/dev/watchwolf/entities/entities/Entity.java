@@ -12,6 +12,14 @@ public abstract class Entity extends SocketData {
         this.position = position;
     }
 
+    /**
+     * Used for spawning entities; as they don't exist yet, they don't have an identifier
+     * @param position Entity position
+     */
+    public Entity(Position position) {
+        this("", position);
+    }
+
     public String getUUID() {
         return this.UUID;
     }
