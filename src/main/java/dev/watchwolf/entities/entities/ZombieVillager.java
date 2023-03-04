@@ -11,6 +11,10 @@ public class ZombieVillager extends Entity {
         super(UUID, position);
     }
 
+    public ZombieVillager(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ZOMBIE_VILLAGER.ordinal());

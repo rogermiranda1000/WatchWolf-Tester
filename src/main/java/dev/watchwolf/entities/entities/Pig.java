@@ -11,6 +11,10 @@ public class Pig extends Entity {
         super(UUID, position);
     }
 
+    public Pig(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.PIG.ordinal());

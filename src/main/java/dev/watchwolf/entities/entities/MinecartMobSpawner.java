@@ -11,6 +11,10 @@ public class MinecartMobSpawner extends Entity {
         super(UUID, position);
     }
 
+    public MinecartMobSpawner(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.MINECART_MOB_SPAWNER.ordinal());

@@ -11,6 +11,10 @@ public class ShulkerBullet extends Entity {
         super(UUID, position);
     }
 
+    public ShulkerBullet(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SHULKER_BULLET.ordinal());

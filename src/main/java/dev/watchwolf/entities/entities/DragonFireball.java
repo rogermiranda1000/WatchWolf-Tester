@@ -11,6 +11,10 @@ public class DragonFireball extends Entity {
         super(UUID, position);
     }
 
+    public DragonFireball(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.DRAGON_FIREBALL.ordinal());

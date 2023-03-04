@@ -11,6 +11,10 @@ public class Snowman extends Entity {
         super(UUID, position);
     }
 
+    public Snowman(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SNOWMAN.ordinal());

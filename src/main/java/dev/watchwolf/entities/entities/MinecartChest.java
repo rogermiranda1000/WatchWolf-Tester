@@ -11,6 +11,10 @@ public class MinecartChest extends Entity {
         super(UUID, position);
     }
 
+    public MinecartChest(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.MINECART_CHEST.ordinal());

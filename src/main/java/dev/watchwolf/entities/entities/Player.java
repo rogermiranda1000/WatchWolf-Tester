@@ -11,6 +11,10 @@ public class Player extends Entity {
         super(UUID, position);
     }
 
+    public Player(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.PLAYER.ordinal());

@@ -11,6 +11,10 @@ public class EnderSignal extends Entity {
         super(UUID, position);
     }
 
+    public EnderSignal(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ENDER_SIGNAL.ordinal());

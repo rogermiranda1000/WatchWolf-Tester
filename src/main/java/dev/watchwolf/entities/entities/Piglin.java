@@ -11,6 +11,10 @@ public class Piglin extends Entity {
         super(UUID, position);
     }
 
+    public Piglin(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.PIGLIN.ordinal());

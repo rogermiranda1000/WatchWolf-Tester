@@ -11,6 +11,10 @@ public class Sheep extends Entity {
         super(UUID, position);
     }
 
+    public Sheep(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SHEEP.ordinal());

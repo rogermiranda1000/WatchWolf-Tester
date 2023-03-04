@@ -11,6 +11,10 @@ public class LeashHitch extends Entity {
         super(UUID, position);
     }
 
+    public LeashHitch(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.LEASH_HITCH.ordinal());

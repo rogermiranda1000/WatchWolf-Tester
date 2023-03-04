@@ -11,6 +11,10 @@ public class Blaze extends Entity {
         super(UUID, position);
     }
 
+    public Blaze(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.BLAZE.ordinal());

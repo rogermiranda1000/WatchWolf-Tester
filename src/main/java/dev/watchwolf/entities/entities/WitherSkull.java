@@ -11,6 +11,10 @@ public class WitherSkull extends Entity {
         super(UUID, position);
     }
 
+    public WitherSkull(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.WITHER_SKULL.ordinal());

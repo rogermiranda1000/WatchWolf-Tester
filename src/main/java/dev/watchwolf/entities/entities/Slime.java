@@ -11,6 +11,10 @@ public class Slime extends Entity {
         super(UUID, position);
     }
 
+    public Slime(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SLIME.ordinal());

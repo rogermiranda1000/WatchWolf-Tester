@@ -11,6 +11,10 @@ public class SplashPotion extends Entity {
         super(UUID, position);
     }
 
+    public SplashPotion(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SPLASH_POTION.ordinal());

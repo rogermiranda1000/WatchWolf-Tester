@@ -11,6 +11,10 @@ public class Guardian extends Entity {
         super(UUID, position);
     }
 
+    public Guardian(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.GUARDIAN.ordinal());

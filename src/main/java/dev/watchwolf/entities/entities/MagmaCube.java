@@ -11,6 +11,10 @@ public class MagmaCube extends Entity {
         super(UUID, position);
     }
 
+    public MagmaCube(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.MAGMA_CUBE.ordinal());

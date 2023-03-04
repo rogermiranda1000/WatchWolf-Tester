@@ -11,6 +11,10 @@ public class Husk extends Entity {
         super(UUID, position);
     }
 
+    public Husk(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.HUSK.ordinal());

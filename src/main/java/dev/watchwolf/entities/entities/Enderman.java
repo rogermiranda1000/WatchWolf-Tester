@@ -11,6 +11,10 @@ public class Enderman extends Entity {
         super(UUID, position);
     }
 
+    public Enderman(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ENDERMAN.ordinal());

@@ -11,6 +11,10 @@ public class Skeleton extends Entity {
         super(UUID, position);
     }
 
+    public Skeleton(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SKELETON.ordinal());

@@ -11,6 +11,10 @@ public class Illusioner extends Entity {
         super(UUID, position);
     }
 
+    public Illusioner(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ILLUSIONER.ordinal());

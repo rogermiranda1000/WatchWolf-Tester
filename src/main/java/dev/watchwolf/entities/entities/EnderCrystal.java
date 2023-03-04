@@ -11,6 +11,10 @@ public class EnderCrystal extends Entity {
         super(UUID, position);
     }
 
+    public EnderCrystal(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ENDER_CRYSTAL.ordinal());

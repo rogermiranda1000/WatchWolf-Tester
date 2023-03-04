@@ -11,6 +11,10 @@ public class CaveSpider extends Entity {
         super(UUID, position);
     }
 
+    public CaveSpider(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.CAVE_SPIDER.ordinal());

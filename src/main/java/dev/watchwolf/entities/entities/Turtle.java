@@ -11,6 +11,10 @@ public class Turtle extends Entity {
         super(UUID, position);
     }
 
+    public Turtle(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.TURTLE.ordinal());

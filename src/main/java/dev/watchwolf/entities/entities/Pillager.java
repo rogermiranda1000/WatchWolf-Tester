@@ -11,6 +11,10 @@ public class Pillager extends Entity {
         super(UUID, position);
     }
 
+    public Pillager(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.PILLAGER.ordinal());

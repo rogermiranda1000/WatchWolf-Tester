@@ -11,6 +11,10 @@ public class ItemFrame extends Entity {
         super(UUID, position);
     }
 
+    public ItemFrame(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ITEM_FRAME.ordinal());

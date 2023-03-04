@@ -11,6 +11,10 @@ public class ZombieHorse extends Entity {
         super(UUID, position);
     }
 
+    public ZombieHorse(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.ZOMBIE_HORSE.ordinal());

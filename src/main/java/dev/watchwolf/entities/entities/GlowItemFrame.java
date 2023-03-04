@@ -11,6 +11,10 @@ public class GlowItemFrame extends Entity {
         super(UUID, position);
     }
 
+    public GlowItemFrame(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.GLOW_ITEM_FRAME.ordinal());

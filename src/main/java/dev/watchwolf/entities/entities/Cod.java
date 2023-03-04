@@ -11,6 +11,10 @@ public class Cod extends Entity {
         super(UUID, position);
     }
 
+    public Cod(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.COD.ordinal());

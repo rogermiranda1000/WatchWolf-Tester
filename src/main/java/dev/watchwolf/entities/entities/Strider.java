@@ -11,6 +11,10 @@ public class Strider extends Entity {
         super(UUID, position);
     }
 
+    public Strider(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.STRIDER.ordinal());

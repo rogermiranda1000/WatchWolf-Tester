@@ -11,6 +11,10 @@ public class Silverfish extends Entity {
         super(UUID, position);
     }
 
+    public Silverfish(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.SILVERFISH.ordinal());

@@ -11,6 +11,10 @@ public class Giant extends Entity {
         super(UUID, position);
     }
 
+    public Giant(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.GIANT.ordinal());

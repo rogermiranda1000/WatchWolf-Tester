@@ -11,6 +11,10 @@ public class Bee extends Entity {
         super(UUID, position);
     }
 
+    public Bee(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.BEE.ordinal());

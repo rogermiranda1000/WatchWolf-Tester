@@ -11,6 +11,10 @@ public class ExperienceOrb extends Entity {
         super(UUID, position);
     }
 
+    public ExperienceOrb(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.EXPERIENCE_ORB.ordinal());

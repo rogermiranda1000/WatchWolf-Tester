@@ -11,6 +11,10 @@ public class Llama extends Entity {
         super(UUID, position);
     }
 
+    public Llama(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.LLAMA.ordinal());

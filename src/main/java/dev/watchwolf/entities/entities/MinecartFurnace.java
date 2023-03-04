@@ -11,6 +11,10 @@ public class MinecartFurnace extends Entity {
         super(UUID, position);
     }
 
+    public MinecartFurnace(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.MINECART_FURNACE.ordinal());

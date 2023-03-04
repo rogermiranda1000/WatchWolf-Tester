@@ -11,6 +11,10 @@ public class MushroomCow extends Entity {
         super(UUID, position);
     }
 
+    public MushroomCow(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.MUSHROOM_COW.ordinal());

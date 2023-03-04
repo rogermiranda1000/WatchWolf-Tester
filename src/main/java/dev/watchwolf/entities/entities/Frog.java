@@ -11,6 +11,10 @@ public class Frog extends Entity {
         super(UUID, position);
     }
 
+    public Frog(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.FROG.ordinal());

@@ -11,6 +11,10 @@ public class ChestBoat extends Entity {
         super(UUID, position);
     }
 
+    public ChestBoat(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.CHEST_BOAT.ordinal());

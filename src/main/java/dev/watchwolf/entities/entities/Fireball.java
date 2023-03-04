@@ -11,6 +11,10 @@ public class Fireball extends Entity {
         super(UUID, position);
     }
 
+    public Fireball(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.FIREBALL.ordinal());

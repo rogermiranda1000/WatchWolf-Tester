@@ -11,6 +11,10 @@ public class Ravager extends Entity {
         super(UUID, position);
     }
 
+    public Ravager(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.RAVAGER.ordinal());

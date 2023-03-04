@@ -11,6 +11,10 @@ public class Dolphin extends Entity {
         super(UUID, position);
     }
 
+    public Dolphin(Position position) {
+        super(position);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addShort(out, EntityType.DOLPHIN.ordinal());
