@@ -33,8 +33,8 @@ public class EntitiesTester extends AbstractTest {
         connector.server.setBlock(spawnPosition.add(0,1,0), Blocks.AIR);
         connector.server.setBlock(spawnPosition.add(0,-1,0), Blocks.STONE);
 
-        connector.server.spawnEntity(new Zombie("", spawnPosition));
-        assertTrue(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getType().equals(EntityType.ZOMBIE)));
+        final String uuid = connector.server.spawnEntity(new Zombie("", spawnPosition));
+        assertTrue(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getType().equals(EntityType.ZOMBIE) && e.getUUID().equals(uuid)));
     }
 
     @ParameterizedTest
