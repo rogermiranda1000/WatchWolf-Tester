@@ -607,8 +607,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
-    public void spawnEntity(Entity e) throws IOException {
-        if (this.serverManagerSocket == null) return;
+    public String spawnEntity(Entity e) throws IOException {
+        if (this.serverManagerSocket == null) return "";
 
         this.requestSynchronization((ServerPetition)this);
 
@@ -621,7 +621,19 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
         message.add(e);
 
-        message.send();
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0011) throw new IOException("Expected response from 0x0011 operation.");
+            return SocketHelper.readString(dis);
+        }
     }
 
     @Override
