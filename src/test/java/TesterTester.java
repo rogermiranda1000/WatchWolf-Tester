@@ -112,7 +112,7 @@ public class TesterTester extends AbstractTest {
         Entity []entities = connector.getEntities(pos, 10);
         List<Item> items = new ArrayList<>();
         for (Entity e : entities) {
-            if (e.getType().equals(EntityType.DroppedItem)) items.add(((DroppedItem)e).getItem());
+            if (e.getType().equals(EntityType.DROPPED_ITEM)) items.add(((DroppedItem)e).getItem());
         }
 
         HashMap<ItemType,Integer> it = TesterTester.getAmounts(items.toArray(new Item[0]));
