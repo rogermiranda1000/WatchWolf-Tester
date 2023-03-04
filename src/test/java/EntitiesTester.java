@@ -53,9 +53,11 @@ public class EntitiesTester extends AbstractTest {
         Entity spawnedChicken = Arrays.stream(connector.server.getEntities(spawnPosition,3)).filter(e -> e.getType().equals(EntityType.CHICKEN)).findFirst().orElseThrow(() -> new RuntimeException("Chicken spawned but not found"));
 
         Item sword = new Item(ItemType.DIAMOND_SWORD);
-        connector.server.giveItem(connector.getClients()[0], sword);
+        String clientName = connector.getClients()[0];
+        connector.server.giveItem(clientName, sword);
         ExtendedClientPetition client = connector.getClientPetition(0);
         client.equipItemInHand(sword);
+        connector.server.tp(clientName, playerPosition);
 
         client.attack(spawnedChicken);
 
