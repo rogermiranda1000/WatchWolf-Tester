@@ -49,16 +49,23 @@ public class EntitiesTester extends AbstractTest {
         connector.server.setBlock(playerPosition.add(0,1,0), Blocks.AIR);
         connector.server.setBlock(playerPosition.add(0,-1,0), Blocks.STONE);
 
-        connector.server.spawnEntity(new Chicken("", spawnPosition));
-        Entity spawnedChicken = Arrays.stream(connector.server.getEntities(spawnPosition,3)).filter(e -> e.getType().equals(EntityType.CHICKEN)).findFirst().orElseThrow(() -> new RuntimeException("Chicken spawned but not found"));
-
         Item sword = new Item(ItemType.DIAMOND_SWORD);
-        connector.server.giveItem(connector.getClients()[0], sword);
+        String clientName = connector.getClients()[0];
+        connector.server.giveItem(clientName, sword);
         ExtendedClientPetition client = connector.getClientPetition(0);
         client.equipItemInHand(sword);
+        connector.server.tp(clientName, playerPosition);
 
+        connector.server.spawnEntity(new Chicken("", spawnPosition));
+        final Entity spawnedChicken = Arrays.stream(connector.server.getEntities(spawnPosition,3)).filter(e -> e.getType().equals(EntityType.CHICKEN)).findFirst().orElseThrow(() -> new RuntimeException("Chicken spawned but not found"));
+
+        Thread.sleep(3000); // let the client update the entities list
+
+        // one diamond hit should be enough to kill a chicken
+        // @ref https://minecraft.fandom.com/wiki/Sword
+        // @ref https://minecraft.fandom.com/wiki/Chicken
         client.attack(spawnedChicken);
 
-        assertFalse(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getType().equals(EntityType.CHICKEN)));
+        assertFalse(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getUUID().equals(spawnedChicken.getUUID())));
     }
 }
