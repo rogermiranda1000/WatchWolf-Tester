@@ -14,6 +14,8 @@ public class SocketHelper {
 
     /**
      * Add a byte[] directly to the socket
+     * @param out Where to add
+     * @param file Array to add
      */
     public static void addRaw(ArrayList<Byte> out, Object []file) {
         for (Byte b : (Byte[])file) out.add((byte)b);
@@ -36,7 +38,10 @@ public class SocketHelper {
     }
 
     /**
+     * Adds a double to send via sockets.
      * @author https://stackoverflow.com/a/13072387/9178470
+     * @param out Where to add
+     * @param d Double
      */
     public static void addDouble(ArrayList<Byte> out, double d) {
         long lng = Double.doubleToLongBits(d);

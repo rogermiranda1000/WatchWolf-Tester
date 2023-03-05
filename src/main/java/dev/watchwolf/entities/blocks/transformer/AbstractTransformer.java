@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * This is the base class to automatically generate all the `dev.watchwolf.entities.blocks.special`
  * classes.
  * @param <T> One block modifier (Directionable, Orientable, Ageable...)
- * @param <E> Type of all the options that the block modifier (<T>) can take (enum/integer)
+ * @param <E> Type of all the options that the block modifier (T) can take (enum/integer)
  */
 public abstract class AbstractTransformer<T extends BlockModifier, E> {
     private final Class<T> classT;
@@ -71,6 +71,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     /**
      * Convert from all the combinations of key-value to key-values, joining by the first value.
      * Then it returns all the options the block modifier can take.
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with its value
      * @return Given the specified options, it returns all the options the block modifier can take
      */
@@ -86,6 +87,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
 
     /**
      * Get all the options the block modifier can take
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with all its values
      * @return Given the specified options, it returns all the options the block modifier can take
      */
@@ -94,6 +96,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     /**
      * Convert from all the combinations of key-value to key-values, joining by the first value.
      * Then, get one option the block modifier can take.
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with its value
      * @return Given the specified options, it returns the first option the block modifier can take
      */
@@ -103,6 +106,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
 
     /**
      * Get one option the block modifier can take
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with all its values
      * @return Given the specified options, it returns the first option the block modifier can take
      */
@@ -111,7 +115,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Check if the block applies to the interface <T>
+     * Check if the block applies to the interface T
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with its value
      * @return True or False, depending if there's any value applicable to the block
      */
@@ -120,7 +125,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Check if the block applies to the interface <T>
+     * Check if the block applies to the interface T
+     * @param mat Block
      * @param options All the attributes that can take this block modifier, with all its values
      * @return True or False, depending if there's any value applicable to the block
      */
@@ -129,7 +135,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Check if the block applies to the interface <T>
+     * Check if the block applies to the interface T
      * @param list All the options the block modifier can take
      * @return True or False, depending if there's any value applicable to the block
      */
@@ -138,7 +144,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Get the code of the interface <T> that needs to be inserted in the special block's class
+     * Get the code of the interface T that needs to be inserted in the special block's class
      * @param className Class name; name after `new` that generates an instance of that class
      * @param list Return of `get`; all the options the block modifier can take
      * @param listImplements Output list with all the implements of the class
@@ -148,7 +154,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      *                       all the variables needed to clone another block of the same type.
      * @param socketData Output array of size AbstractTransformer.BLOCK_SOCKET_DATA_SIZE, that specifies
      *                   the code needed to run in order to get the byte value at that position.
-     * @return Methods needed to insert in the class in order to implement the interface <T>
+     * @return Methods needed to insert in the class in order to implement the interface T
      */
     public abstract String getImplementation(String className, Collection<E> list, List<String> listImplements, List<String> loadEval, List<Function<String,String>> copyProperties, String socketData[]);
 
@@ -164,7 +170,7 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
 
     /**
      * Inverse of `getSocketData`; modify the base block accordingly with the socket data
-     * @param b Base block of instance <T>
+     * @param b Base block of instance T
      * @param socketData Array of size AbstractTransformer.BLOCK_SOCKET_DATA_SIZE, that
      *                   specifies the byte at that position.
      *                   The first 2 bytes are the block enum value.
@@ -186,15 +192,15 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
     }
 
     /**
-     * Given a block without `arguments` loaded into the interface <T>, load them
-     * @param base Base block without <T>'s values
+     * Given a block without `arguments` loaded into the interface T, load them
+     * @param base Base block without T's values
      * @param arguments All the attributes that can take this block modifier, with its value
      * @return Base block with the new values loaded
      */
     public abstract T applyPropertiesToBlock(T base, Map<String,String> arguments);
 
     /**
-     * Given the default block data for the interface <T>, change it so the result block
+     * Given the default block data for the interface T, change it so the result block
      * equals the specified by `block`'s variables
      * @param block WatchWolf block
      * @param blockData Base block data

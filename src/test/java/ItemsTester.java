@@ -21,6 +21,7 @@ public class ItemsTester extends AbstractTest {
 
     /**
      * This test doesn't touch the connector, but validates the enum.
+     * @param connector The object to access the server/clients
      */
     @ParameterizedTest
     @ArgumentsSource(ItemsTester.class)

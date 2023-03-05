@@ -84,6 +84,8 @@ public class UserTester extends AbstractTest {
 
     /**
      * Break a stone block (test give item and equip item and break block)
+     * @param connector The object to access the server/clients
+     * @throws Exception IOException or assertion failed
      */
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)

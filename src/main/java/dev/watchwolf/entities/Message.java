@@ -64,7 +64,7 @@ public class Message {
 
     /**
      * Split a list into smaller lists that don't exceed 'L' elements
-     * @ref https://stackoverflow.com/a/2895365
+     * @see <a href="https://stackoverflow.com/a/2895365">https://stackoverflow.com/a/2895365</a>
      * @param list Original list
      * @param L Max number of elements in the sublists
      * @param <T> Type of list

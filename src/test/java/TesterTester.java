@@ -90,6 +90,8 @@ public class TesterTester extends AbstractTest {
 
     /**
      * Break a dirt block far from the player, and then see if there's a dirt block dropped
+     * @param connector The object to access the server/clients
+     * @throws Exception IOException or assertion failed
      */
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
