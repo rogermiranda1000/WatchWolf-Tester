@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Message {
-    private static final int MAX_BYTES_SENT = 4096;
+    private static final int MAX_BYTES_SENT = 1024;
 
     private final DataOutputStream dos;
     private final ArrayList<Byte> send;
