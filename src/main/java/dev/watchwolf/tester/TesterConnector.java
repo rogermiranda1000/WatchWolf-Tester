@@ -618,6 +618,13 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         }
     }
 
+    /**
+     * Spawns an entity with the specified properties (position, type...).
+     * The UUID is invalid, as it will be specified on spawn time.
+     * @param e Entity to spawn
+     * @return The spawned entity
+     * @throws IOException Socket error
+     */
     @Override
     public Entity spawnEntity(Entity e) throws IOException {
         if (this.serverManagerSocket == null) return null;
@@ -644,7 +651,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
                 r = SocketHelper.readShort(dis);
             }
             if (SocketHelper.readShort(dis) != 0x0011) throw new IOException("Expected response from 0x0011 operation.");
-            return (Entity) SocketData.readSocketData(dis, Entity.class);
+            Entity spawned = (Entity) SocketData.readSocketData(dis, Entity.class);
+            e.setUUID(spawned.getUUID());
+            return spawned;
         }
     }
 
