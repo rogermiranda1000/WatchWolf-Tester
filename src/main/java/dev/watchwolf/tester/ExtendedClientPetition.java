@@ -4,6 +4,7 @@ import dev.watchwolf.client.ClientPetition;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.Container;
 import dev.watchwolf.entities.blocks.Block;
+import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.entities.items.ItemNotFoundInContainerException;
 import dev.watchwolf.entities.items.ItemType;
@@ -89,5 +90,13 @@ public interface ExtendedClientPetition extends ClientPetition {
      */
     default public void setBlock(Block block, Position pos) throws IOException, ItemNotFoundInContainerException {
         this.setBlock(block.getItemType(), pos);
+    }
+
+    default public void attack(Entity e) throws IOException {
+        this.attack(e.getUUID());
+    }
+
+    default public String runCommand(String cmd) throws IOException {
+        return this.runCommand(cmd, 6000); // 6s should be more than enough for low-tier servers to process anything they need
     }
 }

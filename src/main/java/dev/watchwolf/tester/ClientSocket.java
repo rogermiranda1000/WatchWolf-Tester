@@ -47,7 +47,7 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
-    public void runCommand(String cmd) throws IOException {
+    public String runCommand(String cmd, int timeout) throws IOException {
         this.syncManager.requestSynchronization(this);
 
         Message message = new Message(this.socket);
@@ -56,8 +56,20 @@ public class ClientSocket implements ClientPetition {
         message.add((short) 0b000000000100_0_011);
 
         message.add(cmd);
+        message.add((short) timeout);
 
-        message.send();
+        synchronized (this.socket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000100_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
+        }
     }
 
     @Override
@@ -156,7 +168,7 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
-    public void attack(Entity e) throws IOException {
+    public void attack(String uuid) throws IOException {
         this.syncManager.requestSynchronization(this);
 
         Message message = new Message(this.socket);
@@ -164,7 +176,7 @@ public class ClientSocket implements ClientPetition {
         // look at header
         message.add((short) 0b000000001101_0_011);
 
-        message.add(e);
+        message.add(uuid);
 
         message.send();
     }

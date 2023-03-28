@@ -22,7 +22,8 @@ public interface ServerPetition extends Petition {
     public void stopServer(ServerStopNotifier onServerStop) throws IOException;
     public void setBlock(Position position, Block block) throws IOException;
     public Block getBlock(Position position) throws IOException;
-    public void runCommand(String cmd) throws IOException;
+    public String runCommand(String cmd) throws IOException;
     public Entity []getEntities(Position center, double radius) throws IOException;
-    public String spawnEntity(Entity e) throws IOException;
+    public Entity spawnEntity(Entity e) throws IOException;
+    public Entity getEntity(String UUID) throws IOException;
 }

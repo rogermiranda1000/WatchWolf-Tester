@@ -11,10 +11,14 @@ import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.ExtendedClientPetition;
 import dev.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(UserTester.class) // run the tests with the AbstractTest overridden methods
 public class UserTester extends AbstractTest {
@@ -23,6 +27,21 @@ public class UserTester extends AbstractTest {
     @Override
     public String getConfigFile() {
         return "src/test/java/generic/resources/config.yaml";
+    }
+
+    /**
+     * For the test `getCommandReply` we need USER1 to be OP
+     */
+    @Override
+    public void beforeAll(ExtensionContext extensionContext) throws IOException {
+        super.beforeAll(extensionContext); // start the servers & clients
+
+        // move the player to its desired location & give him a tool and the MineIt tool
+        super.provideArguments(extensionContext).map(arg -> (TesterConnector)arg.get()[0]).forEach(server -> {
+            try {
+                server.server.opPlayer(USER1);
+            } catch (IOException ignore) {}
+        });
     }
 
     @ParameterizedTest
@@ -130,5 +149,17 @@ public class UserTester extends AbstractTest {
 
         Position currentPosition = connector.server.getPlayerPosition(user);
         if (!currentPosition.equals(pos, 0.3f)) assertEquals(pos, currentPosition); // not equal => force error
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(UserTester.class)
+    public void getCommandReply(TesterConnector connector) throws Exception {
+        String user = UserTester.USER1;
+        ExtendedClientPetition userPetition = connector.getClientPetition(user);
+
+        String got = userPetition.runCommand("tps");
+        System.out.println("Got as a `tps` reply: " + got);
+
+        assertTrue(got.contains("TPS from last 1m, 5m, 15m:"));
     }
 }

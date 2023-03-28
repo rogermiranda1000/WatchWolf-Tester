@@ -553,8 +553,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
-    public void runCommand(String cmd) throws IOException {
-        if (this.serverManagerSocket == null) return;
+    public String runCommand(String cmd) throws IOException {
+        if (this.serverManagerSocket == null) return "";
 
         this.requestSynchronization((ServerPetition)this);
 
@@ -567,7 +567,19 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
         message.add(cmd);
 
-        message.send();
+        synchronized (this.serverManagerSocket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0009) throw new IOException("Expected response from 0x0009 operation.");
+            return SocketHelper.readString(dis);
+        }
     }
 
     @Override
@@ -606,9 +618,16 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         }
     }
 
+    /**
+     * Spawns an entity with the specified properties (position, type...).
+     * The UUID is invalid, as it will be specified on spawn time.
+     * @param e Entity to spawn
+     * @return The spawned entity
+     * @throws IOException Socket error
+     */
     @Override
-    public String spawnEntity(Entity e) throws IOException {
-        if (this.serverManagerSocket == null) return "";
+    public Entity spawnEntity(Entity e) throws IOException {
+        if (this.serverManagerSocket == null) return null;
 
         this.requestSynchronization((ServerPetition)this);
 
@@ -632,7 +651,39 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
                 r = SocketHelper.readShort(dis);
             }
             if (SocketHelper.readShort(dis) != 0x0011) throw new IOException("Expected response from 0x0011 operation.");
-            return SocketHelper.readString(dis);
+            Entity spawned = (Entity) SocketData.readSocketData(dis, Entity.class);
+            e.setUUID(spawned.getUUID());
+            return spawned;
+        }
+    }
+
+    @Override
+    public Entity getEntity(String UUID) throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0012);
+
+        message.add(UUID);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0012) throw new IOException("Expected response from 0x0012 operation.");
+            return (Entity) SocketData.readSocketData(dis, Entity.class);
         }
     }
 
