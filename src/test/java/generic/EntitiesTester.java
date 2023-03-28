@@ -30,13 +30,17 @@ public class EntitiesTester extends AbstractTest {
     @ArgumentsSource(ItemsTester.class)
     public void checkSpawn(TesterConnector connector) throws Exception {
         Position spawnPosition = new Position("world", 100,100,100);
+        Zombie spawnEntity = new Zombie(spawnPosition);
 
         connector.server.setBlock(spawnPosition, Blocks.AIR);
         connector.server.setBlock(spawnPosition.add(0,1,0), Blocks.AIR);
         connector.server.setBlock(spawnPosition.add(0,-1,0), Blocks.STONE);
 
-        final String uuid = connector.server.spawnEntity(new Zombie(spawnPosition)).getUUID();
-        assertTrue(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getType().equals(EntityType.ZOMBIE) && e.getUUID().equals(uuid)));
+        connector.server.spawnEntity(spawnEntity);
+        final String uuid = spawnEntity.getUUID(); // `spawnEntity` should change the original UUID as the actual
+
+        assertEquals(uuid, connector.server.getEntity(uuid).getUUID());
+        assertTrue(Arrays.stream(connector.server.getEntities(spawnPosition,3)).anyMatch(e -> e.getType().equals(EntityType.ZOMBIE) && e.getUUID().equals(uuid))); // a more in-depth check
     }
 
     @ParameterizedTest
@@ -58,8 +62,8 @@ public class EntitiesTester extends AbstractTest {
         client.equipItemInHand(sword);
         connector.server.tp(clientName, playerPosition);
 
-        connector.server.spawnEntity(new Chicken(spawnPosition));
-        final Entity spawnedChicken = Arrays.stream(connector.server.getEntities(spawnPosition,3)).filter(e -> e.getType().equals(EntityType.CHICKEN)).findFirst().orElseThrow(() -> new RuntimeException("Chicken spawned but not found"));
+        final Entity spawnedChicken = connector.server.spawnEntity(new Chicken(spawnPosition));
+        assertNotEquals("-1", spawnedChicken.getUUID()); // UUID -1 means error
 
         Thread.sleep(3000); // let the client update the entities list
 
