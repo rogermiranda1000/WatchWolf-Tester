@@ -95,4 +95,8 @@ public interface ExtendedClientPetition extends ClientPetition {
     default public void attack(Entity e) throws IOException {
         this.attack(e.getUUID());
     }
+
+    default public String runCommand(String cmd) throws IOException {
+        return this.runCommand(cmd, 6000); // 6s should be more than enough for low-tier servers to process anything they need
+    }
 }

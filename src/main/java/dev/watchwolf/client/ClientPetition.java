@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public interface ClientPetition extends Petition {
     public void sendMessage(String msg) throws IOException;
-    public String runCommand(String cmd) throws IOException;
+    public String runCommand(String cmd, int timeout) throws IOException;
     public void breakBlock(Position block) throws IOException;
     public void setBlock(Position block) throws IOException;
     public void equipItemInHand(Item item) throws IOException;

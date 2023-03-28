@@ -47,7 +47,7 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
-    public String runCommand(String cmd) throws IOException {
+    public String runCommand(String cmd, int timeout) throws IOException {
         this.syncManager.requestSynchronization(this);
 
         Message message = new Message(this.socket);
@@ -56,6 +56,7 @@ public class ClientSocket implements ClientPetition {
         message.add((short) 0b000000000100_0_011);
 
         message.add(cmd);
+        message.add((short) timeout);
 
         synchronized (this.socket) {
             message.send();
