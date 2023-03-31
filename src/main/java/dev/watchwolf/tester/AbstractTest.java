@@ -36,9 +36,13 @@ public class AbstractTest implements TestWatcher, // send feedback
         }
     }
 
+    protected static void addInstance(Class<? extends AbstractTest> cls, AbstractTest instance) {
+        AbstractTest.instances.put(cls, instance);
+    }
+
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
-        AbstractTest.instances.put((Class<? extends AbstractTest>) extensionContext.getTestClass().orElseThrow((Supplier<? extends RuntimeException>) () -> {throw new IllegalArgumentException("Extension context not extends of AbstractTest");}), this);
+        AbstractTest.addInstance((Class<? extends AbstractTest>) extensionContext.getTestClass().orElseThrow((Supplier<? extends RuntimeException>) () -> {throw new IllegalArgumentException("Extension context not extends of AbstractTest");}), this);
 
         this.servers = new ArrayList<>();
         this.testID = UUID.randomUUID();
@@ -97,13 +101,15 @@ public class AbstractTest implements TestWatcher, // send feedback
         System.err.println("Test " + context.getDisplayName() + " failed: " + cause.getMessage());
     }
 
-    @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
-        Class<?> cls = extensionContext.getTestClass().orElse(null);
+    protected static AbstractTest getInstance(Class<?> cls) throws IllegalArgumentException {
         AbstractTest instance = AbstractTest.instances.get(cls);
         if (instance == null) throw new IllegalArgumentException("Instance of " + cls + " not instantiated.");
+        return instance;
+    }
 
-        return instance.servers.stream().map(e -> Arguments.of(e.connector));
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+        return AbstractTest.getInstance(extensionContext.getTestClass().orElse(null)).servers.stream().map(e -> Arguments.of(e.connector));
     }
 
     /*@Override

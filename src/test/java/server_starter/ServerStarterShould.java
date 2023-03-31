@@ -3,21 +3,19 @@ package server_starter;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.Tester;
-import dev.watchwolf.tester.TesterConnector;
-import generic.UserTester;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 @ExtendWith(ServerStarterShould.class)
 public class ServerStarterShould extends AbstractTest {
-    private static final int TIMEOUT = /*(3+10)*/1*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
+    private static final int TIMEOUT = (3+10)*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
 
     private ArrayList<String> expected, got;
     private ArrayList<Tester> serverTesters;
@@ -30,6 +28,8 @@ public class ServerStarterShould extends AbstractTest {
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws IOException {
         // code inspired by AbstractTest#beforeAll
+        AbstractTest.addInstance((Class<? extends AbstractTest>) extensionContext.getTestClass().orElseThrow((Supplier<? extends RuntimeException>) () -> {throw new IllegalArgumentException("Extension context not extends of AbstractTest");}), this);
+
         this.serverTesters = new ArrayList<>();
         this.expected = new ArrayList<>();
         this.got = new ArrayList<>();
@@ -89,15 +89,16 @@ public class ServerStarterShould extends AbstractTest {
         for (Tester server : this.serverTesters) server.close();
     }
 
-    @ParameterizedTest
-    @ArgumentsSource(UserTester.class)
-    public void startupSucceeded(TesterConnector connector) throws Exception {
-        if (this.expected.size() == this.got.size()) return; // all ok!
+    @Test
+    public void startupSucceeded() throws Exception {
+        ServerStarterShould tis = (ServerStarterShould) AbstractTest.getInstance(this.getClass());
+
+        if (tis.expected.size() == tis.got.size()) return; // all ok!
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Expected ").append(this.expected.size()).append(" servers, got ").append(this.got.size()).append(".\n\nDifferences:\n");
-        for (String expected : this.expected) {
-            boolean isUp = got.contains(expected);
+        sb.append("Expected ").append(tis.expected.size()).append(" servers, got ").append(tis.got.size()).append(".\n\nDifferences:\n");
+        for (String expected : tis.expected) {
+            boolean isUp = tis.got.contains(expected);
             if (!isUp) sb.append("- ").append(expected).append("\n");
         }
         throw new RuntimeException(sb.toString());
