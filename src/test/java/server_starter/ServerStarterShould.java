@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class ServerStarterShould extends AbstractTest {
     private static final int TIMEOUT = 10*60; // 10 minutes to start all the servers
 
-    private ArrayList<String> expected;
+    private ArrayList<String> expected, got;
     private ArrayList<Tester> serverTesters;
 
     @Override
@@ -31,11 +31,12 @@ public class ServerStarterShould extends AbstractTest {
         // code inspired by AbstractTest#beforeAll
         this.serverTesters = new ArrayList<>();
         this.expected = new ArrayList<>();
+        this.got = new ArrayList<>();
 
         final Object waitForStartup = new Object();
         for (ServerType serverType : this.fileLoader.getServerTypes()) {
             for (String serverVersion : this.fileLoader.getServerVersions(serverType)) {
-                this.expected.add(serverType.toString() + " " + serverVersion);
+                this.expected.add(serverType.name() + " " + serverVersion);
 
                 Socket serversManagerSocket = new Socket(this.fileLoader.getProvider(), 8000),
                         clientsManagerSocket = new Socket(this.fileLoader.getProvider(), 7000); // TODO we won't use any user
@@ -51,6 +52,8 @@ public class ServerStarterShould extends AbstractTest {
 
                 tester.setOnServerReady((connector) -> {
                     synchronized (waitForStartup) {
+                        this.got.add(connector.getServerType().name() + " " + connector.getServerVersion());
+
                         //server.connector = connector; // TODO why is this needed?
                         waitForStartup.notify();
                     }
@@ -77,20 +80,12 @@ public class ServerStarterShould extends AbstractTest {
     @ParameterizedTest
     @ArgumentsSource(UserTester.class)
     public void startupSucceeded(TesterConnector connector) throws Exception {
-        if (this.expected.size() == this.serverTesters.size()) return; // all ok!
+        if (this.expected.size() == this.got.size()) return; // all ok!
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Expected ").append(this.expected.size()).append(" servers, got ").append(this.serverTesters.size()).append(".\n\nDifferences:\n");
+        sb.append("Expected ").append(this.expected.size()).append(" servers, got ").append(this.got.size()).append(".\n\nDifferences:\n");
         for (String expected : this.expected) {
-            boolean isUp = false;
-            // is the expected server up?
-            for (Tester tester : this.serverTesters) {
-                if ((tester.getConnector().getServerType().toString() + " " + tester.getConnector().getServerVersion()).equals(expected)) {
-                    isUp = true;
-                    break;
-                }
-            }
-
+            boolean isUp = got.contains(expected);
             if (!isUp) sb.append("- ").append(expected).append("\n");
         }
         throw new RuntimeException(sb.toString());
