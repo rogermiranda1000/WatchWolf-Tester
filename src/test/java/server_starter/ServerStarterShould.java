@@ -13,10 +13,11 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 @ExtendWith(ServerStarterShould.class)
 public class ServerStarterShould extends AbstractTest {
-    private static final int TIMEOUT = 10*60; // 10 minutes to start all the servers
+    private static final int TIMEOUT = /*(3+10)*/1*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
 
     private ArrayList<String> expected, got;
     private ArrayList<Tester> serverTesters;
@@ -61,13 +62,24 @@ public class ServerStarterShould extends AbstractTest {
             }
         }
 
-        synchronized (waitForStartup) {
-            for (Tester server : this.serverTesters) server.run();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            synchronized (waitForStartup) {
+                for (Tester server : this.serverTesters) server.run();
 
-            try {
-                for (int n = 0; n < this.serverTesters.size(); n++) waitForStartup.wait(TIMEOUT * 1000); // wait n times
-                // at this point the connectors are ready; end the setup and start the tests
-            } catch (InterruptedException ignore) {} // timedout; leave the loop
+                try {
+                    for (int n = 0; n < this.serverTesters.size(); n++) waitForStartup.wait();
+                    // at this point the connectors are ready; end the setup and start the tests
+                } catch (InterruptedException ignore) {} // timedout; leave the loop
+            }
+        });
+        try {
+            future.get(TIMEOUT, TimeUnit.SECONDS); // wait for the servers to start until timeout
+        } catch (TimeoutException e) {
+            future.cancel(true);
+        } catch (Exception ignore) {}
+          finally {
+            executor.shutdownNow();
         }
     }
 
@@ -90,4 +102,6 @@ public class ServerStarterShould extends AbstractTest {
         }
         throw new RuntimeException(sb.toString());
     }
+
+    // TODO test that performs a basic call (eg. sync) to all the server and check that everyone replied (in other words, no IOException was raised)
 }
