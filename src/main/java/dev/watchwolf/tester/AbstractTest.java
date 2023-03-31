@@ -26,7 +26,7 @@ public class AbstractTest implements TestWatcher, // send feedback
     private ArrayList<ServerInstance> servers;
     private UUID testID;
 
-    private final TestConfigFileLoader fileLoader;
+    protected TestConfigFileLoader fileLoader;
 
     public AbstractTest() throws ConfigFileException {
         try {
