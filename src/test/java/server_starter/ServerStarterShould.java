@@ -3,6 +3,7 @@ package server_starter;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.Tester;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -47,7 +48,7 @@ public class ServerStarterShould extends AbstractTest {
                         this.fileLoader.getExtraPlugins(), this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(),
                         clientsManagerSocket, this.fileLoader.getUsers(), this.fileLoader.getOverrideSync(),
                         this.fileLoader.getProvider().equals("127.0.0.1") ? Tester.IP_WSL_MODIFY : Tester.IP_NO_MODIFY)
-                        .setOnServerError(Tester.DEFAULT_ERROR_PRINT);
+                        /*.setOnServerError(Tester.DEFAULT_ERROR_PRINT)*/;
 
                 this.serverTesters.add(tester);
 
@@ -85,11 +86,20 @@ public class ServerStarterShould extends AbstractTest {
 
     @Override
     public void afterAll(ExtensionContext extensionContext) {
-        // code from AbstractTest#afterAll
-        for (Tester server : this.serverTesters) server.close();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        for (final Tester server : this.serverTesters) {
+            Future<?> future = executor.submit(() -> server.close());
+            try {
+                future.get(5, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                future.cancel(true); // dead connection
+            } catch (Exception ignore) {}
+        }
+        executor.shutdownNow();
     }
 
     @Test
+    @Order(1)
     public void startupSucceeded() throws Exception {
         ServerStarterShould tis = (ServerStarterShould) AbstractTest.getInstance(this.getClass());
 
@@ -104,5 +114,37 @@ public class ServerStarterShould extends AbstractTest {
         throw new RuntimeException(sb.toString());
     }
 
-    // TODO test that performs a basic call (eg. sync) to all the server and check that everyone replied (in other words, no IOException was raised)
+    @Test
+    @Order(2)
+    public void testConnection() throws Exception {
+        ServerStarterShould tis = (ServerStarterShould) AbstractTest.getInstance(this.getClass());
+
+        final ArrayList<String> timedout = new ArrayList<>();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        for (final Tester t : tis.serverTesters) {
+            // try to ask to sync the server; if failed, append to `timedout`
+            Future<?> future = executor.submit(() -> {
+                try {
+                    t.getConnector().server.synchronize();
+                } catch (IOException e) {
+                    timedout.add(t.getConnector().getServerType().name() + " " + t.getConnector().getServerVersion());
+                }
+            });
+            try {
+                future.get(5, TimeUnit.SECONDS); // 5s to get the response
+            } catch (TimeoutException e) {
+                future.cancel(true);
+                timedout.add(t.getConnector().getServerType().name() + " " + t.getConnector().getServerVersion());
+            } catch (Exception ignore) {}
+        }
+        executor.shutdownNow();
+
+        if (timedout.size() == 0) return; // all ok
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("This servers didn't keep their connection opened: ");
+        for (String server : timedout) sb.append(server).append(", ");
+        sb.setLength(sb.length()-2); // remove last ', '
+        throw new RuntimeException(sb.toString());
+    }
 }
