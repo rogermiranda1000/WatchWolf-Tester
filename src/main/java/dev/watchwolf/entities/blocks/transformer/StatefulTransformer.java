@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class StatefulTransformer extends AbstractTransformer<Stateful,Stateful.Mode> {
     private static final int STATEFUL_SOCKET_DATA_INDEX = 9;
 
-    private static StatefulTransformer instance = null;
-
-    public static StatefulTransformer getInstance() {
-        if (StatefulTransformer.instance == null) StatefulTransformer.instance = new StatefulTransformer();
-        return StatefulTransformer.instance;
-    }
-
-    private StatefulTransformer() {
+    public StatefulTransformer() {
         super(Stateful.class);
     }
 
@@ -129,7 +122,7 @@ public class StatefulTransformer extends AbstractTransformer<Stateful,Stateful.M
     }
 
     @Override
-    public Stateful applyPropertiesToBlock(Stateful base, Map<String, String> arguments) {
+    public Stateful applyPropertyToBlock(Stateful base, Map<String, String> arguments) {
         Stateful.Mode mode = this.getSingle(((Block)base).getName(), arguments);
         if (mode != null) base = base.setMode(mode);
         return base;

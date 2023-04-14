@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 public abstract class AbstractTransformer<T extends BlockModifier, E> {
     private final Class<T> classT;
 
+    private AbstractTransformer<? extends BlockModifier, ?> next;
+
     protected AbstractTransformer(Class<T> classT) {
         this.classT = classT;
     }
@@ -24,13 +26,18 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
         return this.classT;
     }
 
-    /**
-     * Bytes that the Block packet has. The first 2 specifies the block itself,
-     * and the rest adds information to the block. Refer to the
-     * <a href="https://github.com/watch-wolf/WatchWolf/blob/9d3a6016b5823aba1ee61187349e13c0edfe9c5f/Standard/Protocols.pdf">API documentation</a>,
-     * under subsection 2.4.9. Block.
-     */
-    public static final int BLOCK_SOCKET_DATA_SIZE = 56;
+    public void setNext(AbstractTransformer<? extends BlockModifier, ?> next) throws IllegalArgumentException {
+        if (next == this) throw new IllegalArgumentException("The next transformer can't be the same");
+        if (next.next != null) {
+            // there may be a loop?
+            AbstractTransformer<? extends BlockModifier, ?> candidate = next.next;
+            while (candidate != null && candidate != this) candidate = candidate.next;
+            if (candidate == this) throw new IllegalArgumentException("Loop detected; can't add this transformer as next");
+        }
+
+        // all ok; add as next
+        this.next = next;
+    }
 
     /**
      * This should place a block with the `Bukkit.createBlockData` using the param,
@@ -186,9 +193,10 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      *                   The first 2 bytes are the block enum value.
      * @return Modified block (if applicable)
      */
-    public Block loadSocketData(Block b, int[] socketData) {
-        if (!this.classT.isInstance(b)) return b;
-        return (Block) this.loadSocketData(this.classT.cast(b), socketData);
+    public Block loadAllSocketData(Block b, int[] socketData) {
+        if (this.classT.isInstance(b)) b = (Block) this.loadSocketData(this.classT.cast(b), socketData);
+        if (this.next == null) return b;
+        return this.next.loadAllSocketData(b, socketData);
     }
 
     /**
@@ -197,7 +205,20 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @param arguments All the attributes that can take this block modifier, with its value
      * @return Base block with the new values loaded
      */
-    public abstract T applyPropertiesToBlock(T base, Map<String,String> arguments);
+    public abstract T applyPropertyToBlock(T base, Map<String,String> arguments);
+
+    /**
+     * Loads the blockData's arguments into a base block;
+     * same as `applyPropertyToBlock`, but calling all the `next`'s elements
+     * @param base Block without arguments
+     * @param arguments Arguments to add
+     * @return Modified block
+     */
+    public Block applyPropertiesToBlock(Block base, Map<String,String> arguments) {
+        if (base.getClass().isInstance(this.classT)) base = (Block) this.applyPropertyToBlock(this.classT.cast(base), arguments);
+        if (this.next == null) return base;
+        return this.next.applyPropertiesToBlock(base, arguments);
+    }
 
     /**
      * Given the default block data for the interface T, change it so the result block
@@ -207,6 +228,18 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      * @return Modified block data
      */
     public abstract String modifyBlockData(T block, String blockData);
+
+    /**
+     * Create the blockData from a block
+     * @param block Block
+     * @param blockData Base blockData
+     * @return Changed blockData
+     */
+    public String modifyAllBlockData(Block block, String blockData) {
+        if (block.getClass().isInstance(this.classT)) blockData = this.modifyBlockData(this.classT.cast(block), blockData);
+        if (this.next == null) return blockData;
+        return this.next.modifyAllBlockData(block, blockData);
+    }
 
     /**
      * Given the original block data, the key, and the desired value, get the modified block data

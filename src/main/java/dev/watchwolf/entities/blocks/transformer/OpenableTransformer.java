@@ -9,17 +9,9 @@ import java.util.function.Function;
 public class OpenableTransformer extends AbstractTransformer<Openable,Boolean> {
     private static final int OPENABLE_SOCKET_DATA_INDEX = 5;
 
-    private static OpenableTransformer instance = null;
-
-    public static OpenableTransformer getInstance() {
-        if (OpenableTransformer.instance == null) OpenableTransformer.instance = new OpenableTransformer();
-        return OpenableTransformer.instance;
-    }
-
-    private OpenableTransformer() {
+    public OpenableTransformer() {
         super(Openable.class);
     }
-
 
     @Override
     public List<String> getOptions(String mat, String argument) {
@@ -87,7 +79,7 @@ public class OpenableTransformer extends AbstractTransformer<Openable,Boolean> {
     }
 
     @Override
-    public Openable applyPropertiesToBlock(Openable base, Map<String, String> arguments) {
+    public Openable applyPropertyToBlock(Openable base, Map<String, String> arguments) {
         Boolean isOpened = this.getSingle(((Block)base).getName(), arguments);
         if (isOpened != null) base = base.setOpened(isOpened);
         return base;

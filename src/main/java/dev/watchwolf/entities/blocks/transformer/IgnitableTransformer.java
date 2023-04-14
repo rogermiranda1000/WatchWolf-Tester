@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class IgnitableTransformer extends AbstractTransformer<Ignitable,Boolean> {
     private static final int IGNITABLE_SOCKET_DATA_INDEX = 9;
 
-    private static IgnitableTransformer instance = null;
-
-    public static IgnitableTransformer getInstance() {
-        if (IgnitableTransformer.instance == null) IgnitableTransformer.instance = new IgnitableTransformer();
-        return IgnitableTransformer.instance;
-    }
-
-    private IgnitableTransformer() {
+    public IgnitableTransformer() {
         super(Ignitable.class);
     }
 
@@ -86,7 +79,7 @@ public class IgnitableTransformer extends AbstractTransformer<Ignitable,Boolean>
     }
 
     @Override
-    public Ignitable applyPropertiesToBlock(Ignitable base, Map<String, String> arguments) {
+    public Ignitable applyPropertyToBlock(Ignitable base, Map<String, String> arguments) {
         Boolean ignited = this.getSingle(((Block)base).getName(), arguments);
         if (ignited != null) base = base.setIgnited(ignited);
         return base;

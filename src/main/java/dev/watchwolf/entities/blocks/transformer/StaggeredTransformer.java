@@ -10,14 +10,7 @@ import java.util.stream.Collectors;
 public class StaggeredTransformer extends AbstractTransformer<Staggered,Integer> {
     private static final int STAGGERED_SOCKET_DATA_INDEX = 6;
 
-    private static StaggeredTransformer instance = null;
-
-    public static StaggeredTransformer getInstance() {
-        if (StaggeredTransformer.instance == null) StaggeredTransformer.instance = new StaggeredTransformer();
-        return StaggeredTransformer.instance;
-    }
-
-    private StaggeredTransformer() {
+    public StaggeredTransformer() {
         super(Staggered.class);
     }
 
@@ -126,7 +119,7 @@ public class StaggeredTransformer extends AbstractTransformer<Staggered,Integer>
     }
 
     @Override
-    public Staggered applyPropertiesToBlock(Staggered base, Map<String, String> arguments) {
+    public Staggered applyPropertyToBlock(Staggered base, Map<String, String> arguments) {
         Integer stage = this.getSingle(((Block)base).getName(), arguments);
         if (stage != null) base = base.setStage(stage);
         return base;

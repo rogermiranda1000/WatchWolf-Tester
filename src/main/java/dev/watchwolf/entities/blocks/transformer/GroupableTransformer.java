@@ -11,14 +11,7 @@ import java.util.stream.Collectors;
 public class GroupableTransformer extends AbstractTransformer<Groupable,Integer> {
     private static final int GROUPABLE_SOCKET_DATA_INDEX = 5;
 
-    private static GroupableTransformer instance = null;
-
-    public static GroupableTransformer getInstance() {
-        if (GroupableTransformer.instance == null) GroupableTransformer.instance = new GroupableTransformer();
-        return GroupableTransformer.instance;
-    }
-
-    private GroupableTransformer() {
+    public GroupableTransformer() {
         super(Groupable.class);
     }
 
@@ -99,7 +92,7 @@ public class GroupableTransformer extends AbstractTransformer<Groupable,Integer>
     }
 
     @Override
-    public Groupable applyPropertiesToBlock(Groupable base, Map<String, String> arguments) {
+    public Groupable applyPropertyToBlock(Groupable base, Map<String, String> arguments) {
         Integer group = this.getSingle(((Block)base).getName(), arguments);
         if (group != null) base = base.setGroupAmount(group);
         return base;

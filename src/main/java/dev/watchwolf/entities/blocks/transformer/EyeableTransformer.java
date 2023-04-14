@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
     private static final int EYABLE_SOCKET_DATA_INDEX = 5;
 
-    private static EyeableTransformer instance = null;
-
-    public static EyeableTransformer getInstance() {
-        if (EyeableTransformer.instance == null) EyeableTransformer.instance = new EyeableTransformer();
-        return EyeableTransformer.instance;
-    }
-
-    private EyeableTransformer() {
+    public EyeableTransformer() {
         super(Eyeable.class);
     }
 
@@ -86,7 +79,7 @@ public class EyeableTransformer extends AbstractTransformer<Eyeable,Boolean> {
     }
 
     @Override
-    public Eyeable applyPropertiesToBlock(Eyeable base, Map<String, String> arguments) {
+    public Eyeable applyPropertyToBlock(Eyeable base, Map<String, String> arguments) {
         Boolean hasEye = this.getSingle(((Block)base).getName(), arguments);
         if (hasEye != null) base = base.setEyePlaced(hasEye);
         return base;

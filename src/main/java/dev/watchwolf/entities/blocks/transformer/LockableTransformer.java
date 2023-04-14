@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class LockableTransformer extends AbstractTransformer<Lockable,Boolean> {
     private static final int LOCKABLE_SOCKET_DATA_INDEX = 9;
 
-    private static LockableTransformer instance = null;
-
-    public static LockableTransformer getInstance() {
-        if (LockableTransformer.instance == null) LockableTransformer.instance = new LockableTransformer();
-        return LockableTransformer.instance;
-    }
-
-    private LockableTransformer() {
+    public LockableTransformer() {
         super(Lockable.class);
     }
 
@@ -86,7 +79,7 @@ public class LockableTransformer extends AbstractTransformer<Lockable,Boolean> {
     }
 
     @Override
-    public Lockable applyPropertiesToBlock(Lockable base, Map<String, String> arguments) {
+    public Lockable applyPropertyToBlock(Lockable base, Map<String, String> arguments) {
         Boolean locked = this.getSingle(((Block)base).getName(), arguments);
         if (locked != null) base = base.setLocked(locked);
         return base;
