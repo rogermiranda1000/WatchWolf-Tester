@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class PowerableTransformer extends AbstractTransformer<Powerable,Boolean> {
     private static final int POWERABLE_SOCKET_DATA_INDEX = 11;
 
-    private static PowerableTransformer instance = null;
-
-    public static PowerableTransformer getInstance() {
-        if (PowerableTransformer.instance == null) PowerableTransformer.instance = new PowerableTransformer();
-        return PowerableTransformer.instance;
-    }
-
-    private PowerableTransformer() {
+    public PowerableTransformer() {
         super(Powerable.class);
     }
 
@@ -86,7 +79,7 @@ public class PowerableTransformer extends AbstractTransformer<Powerable,Boolean>
     }
 
     @Override
-    public Powerable applyPropertiesToBlock(Powerable base, Map<String, String> arguments) {
+    public Powerable applyPropertyToBlock(Powerable base, Map<String, String> arguments) {
         Boolean val = this.getSingle(((Block)base).getName(), arguments);
         if (val != null) base = base.setPowered(val);
         return base;

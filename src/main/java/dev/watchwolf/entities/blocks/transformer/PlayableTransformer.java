@@ -10,14 +10,7 @@ import java.util.stream.Collectors;
 public class PlayableTransformer extends AbstractTransformer<Playable,Integer> {
     private static final int PLAYABLE_SOCKET_DATA_INDEX = 8;
 
-    private static PlayableTransformer instance = null;
-
-    public static PlayableTransformer getInstance() {
-        if (PlayableTransformer.instance == null) PlayableTransformer.instance = new PlayableTransformer();
-        return PlayableTransformer.instance;
-    }
-
-    private PlayableTransformer() {
+    public PlayableTransformer() {
         super(Playable.class);
     }
 
@@ -86,7 +79,7 @@ public class PlayableTransformer extends AbstractTransformer<Playable,Integer> {
     }
 
     @Override
-    public Playable applyPropertiesToBlock(Playable base, Map<String, String> arguments) {
+    public Playable applyPropertyToBlock(Playable base, Map<String, String> arguments) {
         Integer note = this.getSingle(((Block)base).getName(), arguments);
         if (note != null) base = base.setNote(note);
         return base;

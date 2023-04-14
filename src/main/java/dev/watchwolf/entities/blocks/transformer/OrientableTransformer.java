@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class OrientableTransformer extends AbstractTransformer<Orientable,Orientable.Orientation> {
     private static final int ORIENTABLE_SOCKET_DATA_INDEX = 3;
 
-    private static OrientableTransformer instance = null;
-
-    public static OrientableTransformer getInstance() {
-        if (OrientableTransformer.instance == null) OrientableTransformer.instance = new OrientableTransformer();
-        return OrientableTransformer.instance;
-    }
-
-    private OrientableTransformer() {
+    public OrientableTransformer() {
         super(Orientable.class);
     }
 
@@ -230,7 +223,7 @@ public class OrientableTransformer extends AbstractTransformer<Orientable,Orient
     }
 
     @Override
-    public Orientable applyPropertiesToBlock(Orientable base, Map<String, String> arguments) {
+    public Orientable applyPropertyToBlock(Orientable base, Map<String, String> arguments) {
         Collection<Orientable.Orientation> orientations = this.get(((Block)base).getName(), arguments);
         if (this.applies(orientations)) {
             for (Orientable.Orientation orientation : Orientable.Orientation.values()) {

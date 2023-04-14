@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class DirectionableTransformer extends AbstractTransformer<Directionable,Directionable.Direction> {
     private static final int DIRECTIONABLE_SOCKET_DATA_INDEX = 3;
 
-    private static DirectionableTransformer instance = null;
-
-    public static DirectionableTransformer getInstance() {
-        if (DirectionableTransformer.instance == null) DirectionableTransformer.instance = new DirectionableTransformer();
-        return DirectionableTransformer.instance;
-    }
-
-    private DirectionableTransformer() {
+    public DirectionableTransformer() {
         super(Directionable.class);
     }
 
@@ -132,7 +125,7 @@ public class DirectionableTransformer extends AbstractTransformer<Directionable,
     }
 
     @Override
-    public Directionable applyPropertiesToBlock(Directionable base, Map<String, String> arguments) {
+    public Directionable applyPropertyToBlock(Directionable base, Map<String, String> arguments) {
         Directionable.Direction direction = this.getSingle(((Block)base).getName(), arguments);
         if (direction != null) base = base.setDirection(direction);
         return base;

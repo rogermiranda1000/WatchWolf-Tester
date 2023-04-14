@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class LeavedTransform extends AbstractTransformer<Leaved,Leaved.Leaves> {
     private static final int LEAVED_SOCKET_DATA_INDEX = 9;
 
-    private static LeavedTransform instance = null;
-
-    public static LeavedTransform getInstance() {
-        if (LeavedTransform.instance == null) LeavedTransform.instance = new LeavedTransform();
-        return LeavedTransform.instance;
-    }
-
-    private LeavedTransform() {
+    public LeavedTransform() {
         super(Leaved.class);
     }
 
@@ -99,7 +92,7 @@ public class LeavedTransform extends AbstractTransformer<Leaved,Leaved.Leaves> {
     }
 
     @Override
-    public Leaved applyPropertiesToBlock(Leaved base, Map<String, String> arguments) {
+    public Leaved applyPropertyToBlock(Leaved base, Map<String, String> arguments) {
         Leaved.Leaves leaves = this.getSingle(((Block)base).getName(), arguments);
         if (leaves != null) base = base.setLeaves(leaves);
         return base;

@@ -11,14 +11,7 @@ import java.util.stream.Collectors;
 public class DelayableTransformer extends AbstractTransformer<Delayable,Integer> {
     private static final int DELAYABLE_SOCKET_DATA_INDEX = 5;
 
-    private static DelayableTransformer instance = null;
-
-    public static DelayableTransformer getInstance() {
-        if (DelayableTransformer.instance == null) DelayableTransformer.instance = new DelayableTransformer();
-        return DelayableTransformer.instance;
-    }
-
-    private DelayableTransformer() {
+    public DelayableTransformer() {
         super(Delayable.class);
     }
     @Override
@@ -85,7 +78,7 @@ public class DelayableTransformer extends AbstractTransformer<Delayable,Integer>
     }
 
     @Override
-    public Delayable applyPropertiesToBlock(Delayable base, Map<String, String> arguments) {
+    public Delayable applyPropertyToBlock(Delayable base, Map<String, String> arguments) {
         Integer delay = this.getSingle(((Block)base).getName(), arguments);
         if (delay != null) base = base.setDelay(delay);
         return base;

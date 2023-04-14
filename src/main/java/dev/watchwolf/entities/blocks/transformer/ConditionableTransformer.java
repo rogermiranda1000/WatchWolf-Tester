@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class ConditionableTransformer extends AbstractTransformer<Conditionable,Boolean> {
     private static final int CONDITIONABLE_SOCKET_DATA_INDEX = 11;
 
-    private static ConditionableTransformer instance = null;
-
-    public static ConditionableTransformer getInstance() {
-        if (ConditionableTransformer.instance == null) ConditionableTransformer.instance = new ConditionableTransformer();
-        return ConditionableTransformer.instance;
-    }
-
-    private ConditionableTransformer() {
+    public ConditionableTransformer() {
         super(Conditionable.class);
     }
 
@@ -86,7 +79,7 @@ public class ConditionableTransformer extends AbstractTransformer<Conditionable,
     }
 
     @Override
-    public Conditionable applyPropertiesToBlock(Conditionable base, Map<String, String> arguments) {
+    public Conditionable applyPropertyToBlock(Conditionable base, Map<String, String> arguments) {
         Boolean conditional = this.getSingle(((Block)base).getName(), arguments);
         if (conditional != null) base = base.setConditional(conditional);
         return base;

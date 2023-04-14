@@ -10,14 +10,7 @@ import java.util.function.Function;
 public class HingedTransformer extends AbstractTransformer<Hinged, Hinged.Hinge> {
     private static final int HINGED_SOCKET_DATA_INDEX = 5;
 
-    private static HingedTransformer instance = null;
-
-    public static HingedTransformer getInstance() {
-        if (HingedTransformer.instance == null) HingedTransformer.instance = new HingedTransformer();
-        return HingedTransformer.instance;
-    }
-
-    private HingedTransformer() {
+    public HingedTransformer() {
         super(Hinged.class);
     }
 
@@ -87,7 +80,7 @@ public class HingedTransformer extends AbstractTransformer<Hinged, Hinged.Hinge>
     }
 
     @Override
-    public Hinged applyPropertiesToBlock(Hinged base, Map<String, String> arguments) {
+    public Hinged applyPropertyToBlock(Hinged base, Map<String, String> arguments) {
         Hinged.Hinge hinge = this.getSingle(((Block)base).getName(), arguments);
         if (hinge != null) base = base.setHinge(hinge);
         return base;

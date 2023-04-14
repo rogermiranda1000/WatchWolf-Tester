@@ -9,14 +9,7 @@ import java.util.function.Function;
 public class InvertableTransformer extends AbstractTransformer<Invertable,Boolean> {
     private static final int INVERTABLE_SOCKET_DATA_INDEX = 11;
 
-    private static InvertableTransformer instance = null;
-
-    public static InvertableTransformer getInstance() {
-        if (InvertableTransformer.instance == null) InvertableTransformer.instance = new InvertableTransformer();
-        return InvertableTransformer.instance;
-    }
-
-    private InvertableTransformer() {
+    public InvertableTransformer() {
         super(Invertable.class);
     }
 
@@ -86,7 +79,7 @@ public class InvertableTransformer extends AbstractTransformer<Invertable,Boolea
     }
 
     @Override
-    public Invertable applyPropertiesToBlock(Invertable base, Map<String, String> arguments) {
+    public Invertable applyPropertyToBlock(Invertable base, Map<String, String> arguments) {
         Boolean val = this.getSingle(((Block)base).getName(), arguments);
         if (val != null) base = base.setInvert(val);
         return base;

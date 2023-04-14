@@ -10,14 +10,7 @@ import java.util.function.Function;
 public class SectionableTransformer extends AbstractTransformer<Sectionable,Sectionable.Section> {
     private static final int SECTIONABLE_SOCKET_DATA_INDEX = 7;
 
-    private static SectionableTransformer instance = null;
-
-    public static SectionableTransformer getInstance() {
-        if (SectionableTransformer.instance == null) SectionableTransformer.instance = new SectionableTransformer();
-        return SectionableTransformer.instance;
-    }
-
-    private SectionableTransformer() {
+    public SectionableTransformer() {
         super(Sectionable.class);
     }
 
@@ -160,7 +153,7 @@ public class SectionableTransformer extends AbstractTransformer<Sectionable,Sect
     }
 
     @Override
-    public Sectionable applyPropertiesToBlock(Sectionable base, Map<String, String> arguments) {
+    public Sectionable applyPropertyToBlock(Sectionable base, Map<String, String> arguments) {
         Sectionable.Section section = this.getSingle(((Block)base).getName(), arguments);
         if (section != null) base = base.setSection(section);
         return base;

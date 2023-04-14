@@ -10,14 +10,7 @@ import java.util.stream.Collectors;
 public class RotableTransformer extends AbstractTransformer<Rotable,Rotable.Rotation> {
     private static final int ROTABLE_SOCKET_DATA_INDEX = 7;
 
-    private static RotableTransformer instance = null;
-
-    public static RotableTransformer getInstance() {
-        if (RotableTransformer.instance == null) RotableTransformer.instance = new RotableTransformer();
-        return RotableTransformer.instance;
-    }
-
-    private RotableTransformer() {
+    public RotableTransformer() {
         super(Rotable.class);
     }
 
@@ -83,7 +76,7 @@ public class RotableTransformer extends AbstractTransformer<Rotable,Rotable.Rota
     }
 
     @Override
-    public Rotable applyPropertiesToBlock(Rotable base, Map<String, String> arguments) {
+    public Rotable applyPropertyToBlock(Rotable base, Map<String, String> arguments) {
         Rotable.Rotation rotation = this.getSingle(((Block)base).getName(), arguments);
         if (rotation != null) base = base.setRotation(rotation);
         return base;

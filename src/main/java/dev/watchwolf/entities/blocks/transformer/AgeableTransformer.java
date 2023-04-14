@@ -10,14 +10,7 @@ import java.util.stream.Collectors;
 public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
     private static final int AGEABLE_SOCKET_DATA_INDEX = 2;
 
-    private static AgeableTransformer instance = null;
-
-    public static AgeableTransformer getInstance() {
-        if (AgeableTransformer.instance == null) AgeableTransformer.instance = new AgeableTransformer();
-        return AgeableTransformer.instance;
-    }
-
-    private AgeableTransformer() {
+    public AgeableTransformer() {
         super(Ageable.class);
     }
 
@@ -126,7 +119,7 @@ public class AgeableTransformer extends AbstractTransformer<Ageable,Integer> {
     }
 
     @Override
-    public Ageable applyPropertiesToBlock(Ageable base, Map<String, String> arguments) {
+    public Ageable applyPropertyToBlock(Ageable base, Map<String, String> arguments) {
         Integer age = this.getSingle(((Block)base).getName(), arguments);
         if (age != null) base = base.setAge(age);
         return base;
