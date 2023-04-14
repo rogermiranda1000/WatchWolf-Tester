@@ -195,8 +195,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      */
     public Block loadAllSocketData(Block b, int[] socketData) {
         if (this.classT.isInstance(b)) b = (Block) this.loadSocketData(this.classT.cast(b), socketData);
-        if (this.next != null) b = this.next.loadAllSocketData(b, socketData);
-        return b;
+        if (this.next == null) return b;
+        return this.next.loadAllSocketData(b, socketData);
     }
 
     /**
@@ -216,8 +216,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      */
     public Block applyPropertiesToBlock(Block base, Map<String,String> arguments) {
         if (base.getClass().isInstance(this.classT)) base = (Block) this.applyPropertyToBlock(this.classT.cast(base), arguments);
-        if (this.next != null) base = this.next.applyPropertiesToBlock(base, arguments);
-        return base;
+        if (this.next == null) return base;
+        return this.next.applyPropertiesToBlock(base, arguments);
     }
 
     /**
@@ -237,8 +237,8 @@ public abstract class AbstractTransformer<T extends BlockModifier, E> {
      */
     public String modifyAllBlockData(Block block, String blockData) {
         if (block.getClass().isInstance(this.classT)) blockData = this.modifyBlockData(this.classT.cast(block), blockData);
-        if (this.next != null) blockData = this.next.modifyAllBlockData(block, blockData);
-        return blockData;
+        if (this.next == null) return blockData;
+        return this.next.modifyAllBlockData(block, blockData);
     }
 
     /**
