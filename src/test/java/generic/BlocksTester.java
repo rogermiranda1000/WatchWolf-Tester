@@ -8,6 +8,7 @@ import dev.watchwolf.entities.blocks.Orientable;
 import dev.watchwolf.entities.blocks.special.Bell;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.TesterConnector;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -70,9 +71,8 @@ public class BlocksTester extends AbstractTest {
         assertEquals(originalData, gettedData);
     }
 
-    @ParameterizedTest
-    @ArgumentsSource(BlocksTester.class)
-    public void getRelevantDataFromFunction(TesterConnector connector) throws Exception {
+    @Test
+    public void getRelevantDataFromFunction() throws Exception {
         assertEquals(Blocks.TURTLE_EGG.toString(), "TURTLE_EGG{groupAmount=1}");
     }
 }
