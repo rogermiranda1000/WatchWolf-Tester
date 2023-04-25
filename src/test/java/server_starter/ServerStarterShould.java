@@ -16,14 +16,33 @@ import java.util.function.Supplier;
 
 @ExtendWith(ServerStarterShould.class)
 public class ServerStarterShould extends AbstractTest {
-    private static final int TIMEOUT = (3+10)*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
+    private class ServerStartedInfo {
+        public ServerType type;
+        public String version;
+        public double timestamp;
 
-    private ArrayList<String> expected, got;
+        public ServerStartedInfo(ServerType type, String version, double timestamp) {
+            this.type = type;
+            this.version = version;
+            this.timestamp = timestamp;
+        }
+
+        @Override
+        public String toString() {
+            return this.type.name() + " " + this.version;
+        }
+    }
+
+    private static final int TIMEOUT = (/*3+10*/2)*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
+
+    private ArrayList<String> expected;
+    double startTime;
+    private ArrayList<ServerStartedInfo> got;
     private ArrayList<Tester> serverTesters;
 
     @Override
     public String getConfigFile() {
-        return "src/test/java/server_starter/resources/config.yaml";
+        return "src/test/java/server_starter/resources/stress.yaml";
     }
 
     @Override
@@ -54,7 +73,7 @@ public class ServerStarterShould extends AbstractTest {
 
                 tester.setOnServerReady((connector) -> {
                     synchronized (waitForStartup) {
-                        this.got.add(connector.getServerType().name() + " " + connector.getServerVersion());
+                        this.got.add(new ServerStartedInfo(connector.getServerType(), connector.getServerVersion(), System.currentTimeMillis()));
 
                         //server.connector = connector; // TODO why is this needed?
                         waitForStartup.notify();
@@ -62,6 +81,8 @@ public class ServerStarterShould extends AbstractTest {
                 });
             }
         }
+
+        this.startTime = System.currentTimeMillis();
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> future = executor.submit(() -> {
@@ -103,12 +124,28 @@ public class ServerStarterShould extends AbstractTest {
     public void startupSucceeded() throws Exception {
         ServerStarterShould tis = (ServerStarterShould) AbstractTest.getInstance(this.getClass());
 
+        StringBuilder sb;
+        if (tis.got.size() > 0) {
+            sb = new StringBuilder();
+            sb.append("Timings:\n");
+            double avgTime = 0, maxTime = 0;
+            for (ServerStartedInfo server : tis.got) {
+                double time = (server.timestamp - tis.startTime) / 1000;
+                System.out.println(server.toString() + ": " + time + "\n");
+
+                avgTime += time;
+                if (time > maxTime) maxTime = time;
+            }
+            sb.append("Statistics: avg " + (avgTime/tis.got.size()) + ", max " + maxTime + "\n\n");
+            System.out.println(sb.toString());
+        }
+
         if (tis.expected.size() == tis.got.size()) return; // all ok!
 
-        StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
         sb.append("Expected ").append(tis.expected.size()).append(" servers, got ").append(tis.got.size()).append(".\n\nDifferences:\n");
-        for (String expected : tis.expected) {
-            boolean isUp = tis.got.contains(expected);
+        for (final String expected : tis.expected) {
+            boolean isUp = tis.got.stream().map(server -> server.toString()).anyMatch(server -> server.equals(expected));
             if (!isUp) sb.append("- ").append(expected).append("\n");
         }
         throw new RuntimeException(sb.toString());
