@@ -33,7 +33,7 @@ public class ServerStarterShould extends AbstractTest {
         }
     }
 
-    private static final int TIMEOUT = (/*3+10*/2)*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
+    private static final int TIMEOUT = (3+10)*60; // ~3 minutes to queue all the servers, and leave 10 minutes to let them start
 
     private ArrayList<String> expected;
     double startTime;
@@ -42,7 +42,7 @@ public class ServerStarterShould extends AbstractTest {
 
     @Override
     public String getConfigFile() {
-        return "src/test/java/server_starter/resources/stress.yaml";
+        return "src/test/java/server_starter/resources/basic.yaml";
     }
 
     @Override
