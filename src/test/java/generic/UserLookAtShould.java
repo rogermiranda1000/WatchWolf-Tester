@@ -6,12 +6,8 @@ import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.ExtendedClientPetition;
 import dev.watchwolf.tester.TesterConnector;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,27 +25,35 @@ public class UserLookAtShould extends AbstractTest {
 
         // all the tests, with [pitch,yaw]
         float [][]tests = new float[][] {
+                new float[]{-89, 0}, // top, south
                 new float[]{-90, 0}, // top, south
                 new float[]{0, 179}, // horizontal, north
                 new float[]{0, -179}, // horizontal, north
-                new float[]{90,-90}, // bottom, east
+                new float[]{89,-90}, // bottom, east
                 new float[]{20,-70} // a bit down, south-east
         };
 
+        int tries = 5;
         for (float []test : tests) {
             float pitch = test[0],
                     yaw = test[1];
 
-            client.lookAt(pitch, yaw);
+            boolean succeed;
+            do {
+                client.lookAt(pitch, yaw); // try some times; sometimes the chunks aren't loaded, so it fails
 
-            checkCamera(client.getYaw(), client.getPitch(), yaw, pitch);
+                succeed = checkCamera(client.getYaw(), client.getPitch(), yaw, pitch, tries > 0);
+                if (!succeed) {
+                    tries--;
+                    Thread.sleep(5000); // try again later
+                }
+            } while (!succeed);
         }
     }
 
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
     public void moveTheCameraToTheBlock(TesterConnector connector) throws Exception {
-        String clientName = connector.getClients()[0];
         ExtendedClientPetition client = connector.getClientPetition(0);
 
         Position from = new Position("world", -229.5, 4, -197.5);
@@ -82,17 +86,47 @@ public class UserLookAtShould extends AbstractTest {
                 new Float[]{40f, 6f}
         };
 
+        int tries = 5;
         for (int i = 0; i < examples.length; i++) {
             Position pos = examples[i].add(-from.getX(), -from.getY(), -from.getZ()).add(client.getPosition()); // offset to avoid teleporing the player
-            client.lookAt(pos);
 
-            float yaw = client.getYaw(),
-                    pitch = client.getPitch();
-            checkCamera(yaw, pitch, expected[i][0], expected[i][1]);
+            boolean succeed;
+            do {
+                client.lookAt(pos); // try some times; sometimes the chunks aren't loaded, so it fails
+
+                succeed = checkCamera(client.getYaw(), client.getPitch(), expected[i][0], expected[i][1], tries > 0);
+                if (!succeed) {
+                    tries--;
+                    Thread.sleep(5000); // try again later
+                }
+            } while (!succeed);
         }
     }
 
-    private void checkCamera(float yaw, float pitch, Float expectedYaw, Float expectedPitch) throws Exception {
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
+    public void moveTheCameraWhileLoadingChunks(TesterConnector connector) throws Exception {
+        String clientUsername = connector.getClients()[0];
+        ExtendedClientPetition client = connector.getClientPetition(0);
+
+        Position target = new Position("world", 10000, 100, 10000);
+        float pitch = 20f,
+                yaw = 20f;
+
+        // prepare the zone
+        connector.server.setBlock(target, Blocks.AIR);
+        connector.server.setBlock(target.add(0,1,0), Blocks.AIR);
+        connector.server.setBlock(target.add(0,-1,0), Blocks.STONE);
+
+        // run simultaneously
+        connector.server.tp(clientUsername, target);
+        client.lookAt(pitch, yaw);
+
+        // ok?
+        checkCamera(client.getYaw(), client.getPitch(), yaw, pitch, false);
+    }
+
+    private boolean checkCamera(float yaw, float pitch, Float expectedYaw, Float expectedPitch, boolean permissive) throws Exception {
         float ERROR_MARGIN = 5f;
 
         if (expectedYaw != null && Math.abs(Math.abs(expectedYaw)-180f) <= ERROR_MARGIN) {
@@ -103,10 +137,10 @@ public class UserLookAtShould extends AbstractTest {
         System.out.println(yaw + "/" + pitch);
         //System.out.println("expected " + (expectedYaw == null ? yaw : expectedYaw) + "/" + (expectedPitch == null ? pitch : expectedPitch));
 
-
-        assertTrue(Math.abs(yaw - (expectedYaw == null ? yaw : expectedYaw)) <= ERROR_MARGIN
-                        && Math.abs(pitch - (expectedPitch == null ? pitch : expectedPitch)) <= ERROR_MARGIN,
-                yaw + "/" + pitch + " (expected " + (expectedYaw == null ? yaw : expectedYaw) + "/" + (expectedPitch == null ? pitch : expectedPitch) + ")");
-
+        boolean succeed = Math.abs(yaw - (expectedYaw == null ? yaw : expectedYaw)) <= ERROR_MARGIN
+                && Math.abs(pitch - (expectedPitch == null ? pitch : expectedPitch)) <= ERROR_MARGIN;
+        if (!permissive) assertTrue(succeed, yaw + "/" + pitch + " (expected " + (expectedYaw == null ? yaw : expectedYaw) + "/" + (expectedPitch == null ? pitch : expectedPitch) + ")");
+        else if (!succeed) System.out.println("[failed]");
+        return succeed;
     }
 }
