@@ -68,6 +68,8 @@ public class AbstractTest implements TestWatcher, // send feedback
                         server.connector = connector;
                         waitForStartup.notify();
                     }
+
+                    this.beforeAll(connector);
                 });
             }
         }
@@ -81,6 +83,13 @@ public class AbstractTest implements TestWatcher, // send feedback
             } catch (InterruptedException ignore) {}
         }
     }
+
+    /**
+     * This method will run just once, at the start. Use it to setup all the tests (e.g. position one player to a specific
+     * place, or giving him items)
+     * @param server The connector to the server that is being enabled right now
+     */
+    public void beforeAll(TesterConnector server) {}
 
     @Override
     public void afterAll(ExtensionContext extensionContext) {
