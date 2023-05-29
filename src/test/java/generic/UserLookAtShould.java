@@ -58,8 +58,11 @@ public class UserLookAtShould extends AbstractTest {
         }
     }
 
-    public void moveTheCameraToTheBlock(ExtendedClientPetition client, Position target, float expectedYaw, float expectedPitch) throws Exception {
+    public void moveTheCameraToTheBlock(ExtendedClientPetition client, Position target, Float expectedYaw, Float expectedPitch) throws Exception {
         client.lookAt(target);
-        System.out.println(client.getYaw() + "/" + client.getPitch() + " (expected " + expectedYaw + "/" + expectedPitch + ")");
+
+        float yaw = client.getYaw(),
+                pitch = client.getPitch();
+        System.out.println(yaw + "/" + pitch + " (expected " + (expectedYaw == null ? yaw : expectedYaw) + "/" + (expectedPitch == null ? pitch : expectedPitch) + ")");
     }
 }
