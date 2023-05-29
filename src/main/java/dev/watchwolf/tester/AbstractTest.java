@@ -69,7 +69,11 @@ public class AbstractTest implements TestWatcher, // send feedback
                         waitForStartup.notify();
                     }
 
-                    this.beforeAll(connector);
+                    try {
+                        this.beforeAll(connector);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
             }
         }
@@ -89,7 +93,7 @@ public class AbstractTest implements TestWatcher, // send feedback
      * place, or giving him items)
      * @param server The connector to the server that is being enabled right now
      */
-    public void beforeAll(TesterConnector server) {}
+    public void beforeAll(TesterConnector server) throws IOException {}
 
     @Override
     public void afterAll(ExtensionContext extensionContext) {
