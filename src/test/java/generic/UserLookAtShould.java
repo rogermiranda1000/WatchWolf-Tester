@@ -22,20 +22,46 @@ public class UserLookAtShould extends AbstractTest {
 
     @ParameterizedTest
     @ArgumentsSource(TesterTester.class)
+    public void lookAtTheExactSameSpot(TesterConnector connector) throws Exception {
+        ExtendedClientPetition client = connector.getClientPetition(0);
+
+        // all the tests, with [pitch,yaw]
+        float [][]tests = new float[][] {
+                new float[]{-90, 0}, // top, south
+                new float[]{0, 179}, // horizontal, north
+                new float[]{0, -179}, // horizontal, north
+                new float[]{90,-90} // bottom, east
+        };
+
+        for (float []test : tests) {
+            float pitch = test[0],
+                    yaw = test[1];
+
+            client.lookAt(pitch, yaw);
+
+            Thread.sleep(500); // let the player set the new target
+
+            System.out.println(client.getYaw() + "/" + client.getPitch() + " (expected " + yaw + "/" + pitch + ")");
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TesterTester.class)
     public void moveTheCameraToTheBlock(TesterConnector connector) throws Exception {
         String clientName = connector.getClients()[0];
         ExtendedClientPetition client = connector.getClientPetition(0);
 
         Position from = new Position("world", -229.5, 4, -197.5);
         Position []examples = new Position[] {
-                new Position("world", -228, 4, -195),
-                new Position("world", -230, 4, -195),
-                new Position("world", -230, 5, -195),
-                new Position("world", -232, 4, -195),
-                new Position("world", -230, 4, -199),
-                new Position("world", -230, 3, -198),
-                new Position("world", -230, 6, -198)
+                new Position("world", -227.5, 4.5, -194.5),
+                new Position("world", -229.5, 4.5, -194.5),
+                new Position("world", -229.5, 5.5, -194.5),
+                new Position("world", -231.5, 4.5, -194.5),
+                new Position("world", -229.5, 4.5, -198.5),
+                new Position("world", -229.5, 3.5, -197.5),
+                new Position("world", -229.5, 6.5, -197.5)
         };
+        // all the results, with [yaw,pitch]
         Float [][]expected = new Float[][] {
                 new Float[]{-33f, 20f},
                 new Float[]{0f, 20f},
@@ -53,6 +79,9 @@ public class UserLookAtShould extends AbstractTest {
         connector.server.tp(clientName, from);
         // we don't need the blocks that we'll test as it's just a concept (the client will look like there's a block in there)
 
+        // let the chunks load
+        Thread.sleep(10000);
+
         for (int i = 0; i < examples.length; i++) {
             moveTheCameraToTheBlock(client, examples[i], expected[i][0], expected[i][1]);
         }
@@ -60,6 +89,7 @@ public class UserLookAtShould extends AbstractTest {
 
     public void moveTheCameraToTheBlock(ExtendedClientPetition client, Position target, Float expectedYaw, Float expectedPitch) throws Exception {
         client.lookAt(target);
+        Thread.sleep(500);
 
         float yaw = client.getYaw(),
                 pitch = client.getPitch();
