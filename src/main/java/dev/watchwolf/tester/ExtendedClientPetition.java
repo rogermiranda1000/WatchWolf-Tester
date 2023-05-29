@@ -24,35 +24,25 @@ public interface ExtendedClientPetition extends ClientPetition {
 
     /**
      * Instead of calculating the pitch and yaw, just specify the target position
-     * TODO the author said that the yaw is not correct
-     * @see <a href="https://www.spigotmc.org/threads/make-a-player-look-at-specific-block.492925/">SpigotMC - Make a player look at specific block</a>
      * @param targetPosition Place to look
      * @throws IOException Socket error
      */
     default public void lookAt(Position targetPosition) throws IOException {
-        Position currentPosition = this.getPosition();
+        final float PLAYER_HEIGHT = 1.6f;
+        Position currentPosition = this.getPosition().add(0,PLAYER_HEIGHT,0); // we need to offset the "camera" (player's eyes)
 
         double dx = targetPosition.getX() - currentPosition.getX();
         double dy = targetPosition.getY() - currentPosition.getY();
         double dz = targetPosition.getZ() - currentPosition.getZ();
-        double pitch, yaw = this.getYaw(); // TODO is getting the yaw necessary?
 
-        // Set yaw
-        if (dx != 0) {
-            if (dx < 0) {
-                yaw = (1.5f * Math.PI);
-            } else {
-                yaw = (0.5f * Math.PI);
-            }
-            yaw -= Math.atan(dz / dx);
-        } else if (dz < 0) {
-            yaw = Math.PI;
-        }
+        double distanceXZ = Math.sqrt(dx*dx + dz*dz);
+        double pitch;
+        if (distanceXZ != 0f) pitch = Math.toDegrees(Math.atan2(-dy, distanceXZ));
+        else pitch = (dy > 0) ? -90 : 90;
 
-        double dxz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
-        pitch = -Math.atan(dy / dxz);
-        yaw = -yaw * 180f / Math.PI;
-        pitch *= 180f / Math.PI;
+        double yaw;
+        if (dz != 0f) yaw = Math.toDegrees(Math.atan2(-dx, dz));
+        else yaw = (dx > 0) ? -90 : 90;
 
         this.lookAt((float)pitch, (float)yaw);
     }
