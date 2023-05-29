@@ -39,9 +39,9 @@ public interface ExtendedClientPetition extends ClientPetition {
         double pitch = 0f; // we could also use `this.getPitch()`
         if (distanceXZ > 0f) pitch = Math.toDegrees(Math.atan2(-dy, distanceXZ));
 
-        double yaw = Math.toDegrees(Math.atan2(-dx, dz));
+        double yaw = 0f;
+        if (dz > 0f) yaw = Math.toDegrees(Math.atan2(-dx, dz));
 
-        System.out.println(yaw + "/" + pitch);
         this.lookAt((float)pitch, (float)yaw);
     }
 
