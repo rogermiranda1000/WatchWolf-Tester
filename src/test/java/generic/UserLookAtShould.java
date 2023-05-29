@@ -63,7 +63,9 @@ public class UserLookAtShould extends AbstractTest {
                 new Position("world", -229.5, 3.5, -197.5),
                 new Position("world", -229.5, 6.5, -197.5),
                 new Position("world", -227.5, 5.5, -194.5),
-                new Position("world", -230.5, 4.5, -197.5)
+                new Position("world", -230.5, 4.5, -197.5),
+                new Position("world", -227.5, 5.5, -195.5),
+                new Position("world", -230.5, 5.5, -196.5)
         };
         // all the results, with [yaw,pitch]
         Float [][]expected = new Float[][] {
@@ -75,7 +77,9 @@ public class UserLookAtShould extends AbstractTest {
                 new Float[]{null, 90f},
                 new Float[]{null, -90f},
                 new Float[]{-33f, 3f},
-                new Float[]{90f, 50f}
+                new Float[]{90f, 50f},
+                new Float[]{-40f, 3f},
+                new Float[]{40f, 6f}
         };
 
         for (int i = 0; i < examples.length; i++) {
