@@ -64,15 +64,16 @@ public class AbstractTest implements TestWatcher, // send feedback
                                 .setOnServerError(Tester.DEFAULT_ERROR_PRINT); // TODO report to JUnit
 
                 server.tester.setOnServerReady((connector) -> {
-                    synchronized (waitForStartup) {
-                        server.connector = connector;
-                        waitForStartup.notify();
-                    }
-
+                    // @pre This needs to go before notifying
                     try {
                         this.beforeAll(connector);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
+                    }
+
+                    synchronized (waitForStartup) {
+                        server.connector = connector;
+                        waitForStartup.notify();
                     }
                 });
             }
