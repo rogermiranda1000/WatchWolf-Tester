@@ -36,11 +36,13 @@ public interface ExtendedClientPetition extends ClientPetition {
         double dz = targetPosition.getZ() - currentPosition.getZ();
 
         double distanceXZ = Math.sqrt(dx*dx + dz*dz);
-        double pitch = 0f; // we could also use `this.getPitch()`
-        if (distanceXZ > 0f) pitch = Math.toDegrees(Math.atan2(-dy, distanceXZ));
+        double pitch;
+        if (distanceXZ != 0f) pitch = Math.toDegrees(Math.atan2(-dy, distanceXZ));
+        else pitch = (dy > 0) ? -90 : 90;
 
-        double yaw = 0f;
-        if (dz > 0f) yaw = Math.toDegrees(Math.atan2(-dx, dz));
+        double yaw;
+        if (dz != 0f) yaw = Math.toDegrees(Math.atan2(-dx, dz));
+        else yaw = (dx > 0) ? -90 : 90;
 
         this.lookAt((float)pitch, (float)yaw);
     }
