@@ -749,7 +749,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, W
         Message message = new Message(this.serverManagerSocket);
 
         // get entity by uuid header
-        message.add((byte) 0b0001_0_011);
+        message.add((byte) 0b0011_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0001);
 
@@ -769,7 +769,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, W
         Message message = new Message(this.serverManagerSocket);
 
         // get entity by uuid header
-        message.add((byte) 0b0001_0_011);
+        message.add((byte) 0b0011_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0002);
 
@@ -802,7 +802,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, W
         Message message = new Message(this.serverManagerSocket);
 
         // get entity by uuid header
-        message.add((byte) 0b0001_0_011);
+        message.add((byte) 0b0011_0_001);
         message.add((byte) 0b00000000);
         message.add((short) 0x0003);
 
