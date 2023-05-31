@@ -1,0 +1,10 @@
+server-type:
+  - Spigot:
+      - "1.19"
+      #- "1.8.8"
+
+plugin: "WatchWolf"
+
+extra-plugins:
+  - "WorldGuard"
+  - "WorldEdit" # WG dependency
