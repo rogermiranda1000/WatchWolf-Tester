@@ -12,6 +12,7 @@ import dev.watchwolf.entities.entities.EntityType;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.items.Item;
+import dev.watchwolf.server.WorldGuardServerPetition;
 import dev.watchwolf.serversmanager.ServerErrorNotifier;
 import dev.watchwolf.serversmanager.ServerManagerPetition;
 import dev.watchwolf.serversmanager.ServerStartNotifier;
@@ -23,8 +24,9 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver, SynchronizationManager {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, WorldGuardServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver, SynchronizationManager {
     private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
@@ -735,6 +737,94 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
                 r = SocketHelper.readShort(dis);
             }
             return SocketHelper.readString(dis); // TODO if string is "" -> error
+        }
+    }
+
+    @Override
+    public void createRegion(String name, Position firstCoordinate, Position secondCoordinate) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0011_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0001);
+
+        message.add(name);
+        message.add(firstCoordinate);
+        message.add(secondCoordinate);
+
+        message.send();
+    }
+
+    @Override
+    public String []getRegions() throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0011_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0002);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000011_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0002) throw new IOException("Expected response from 0x0002 operation.");
+
+            // TODO move to helper
+            int size = SocketHelper.readShort(dis);
+            String []entities = new String[size];
+            for (int n = 0; n < size; n++) entities[n] = SocketHelper.readString(dis);
+            return entities;
+        }
+    }
+
+    @Override
+    public String []getRegions(Position pos) throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0011_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0003);
+
+        message.add(pos);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000011_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0003) throw new IOException("Expected response from 0x0003 operation.");
+
+            // TODO move to helper
+            int size = SocketHelper.readShort(dis);
+            String []entities = new String[size];
+            for (int n = 0; n < size; n++) entities[n] = SocketHelper.readString(dis);
+            return entities;
         }
     }
 
