@@ -1,0 +1,11 @@
+server-type:
+  - Spigot:
+      - "1.19"
+      - "1.8.8"
+  - Paper:
+      - "1.19"
+      - "1.8.8"
+
+timings-directory: "./src/test/java/timings/resources/reports"
+
+plugin: "WatchWolf"

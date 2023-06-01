@@ -1,4 +1,4 @@
-package generic;
+package config;
 
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.PluginBuilder;
@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-public class ConfigLoaderTester {
-    private static final String PREFIX = "src/test/java/generic/resources";
+public class ConfigLoaderShould {
+    private static final String PREFIX = "src/test/java/config/resources";
 
     @Test
     public void loadSimpleFile() throws IOException {
-        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/simple.yaml");
+        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderShould.PREFIX + "/simple.yaml");
 
         HashSet<ServerType> expectedServerTypes = new HashSet<>();
         expectedServerTypes.add(ServerType.Spigot);
@@ -42,14 +42,14 @@ public class ConfigLoaderTester {
 
     @Test
     public void loadErrorFile() throws IOException {
-        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/error.yaml");
+        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderShould.PREFIX + "/error.yaml");
 
         assertThrowsExactly(ConfigFileException.class, () -> loader.getPlugin()); // a file must contain (at least) the plugin to test
     }
 
     @Test
     public void loadComplexFile() throws IOException {
-        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderTester.PREFIX + "/complex.yaml");
+        TestConfigFileLoader loader = new TestConfigFileLoader(ConfigLoaderShould.PREFIX + "/complex.yaml");
 
         String expectedProvider = "192.168.1.80";
 
@@ -69,7 +69,7 @@ public class ConfigLoaderTester {
         expectedUsers.add("MinecraftGamer_Z");
 
         ArrayList<Plugin> expectedExtraPlugins = new ArrayList<>();
-        expectedExtraPlugins.add(PluginBuilder.build(ConfigLoaderTester.PREFIX + "/Empty.jar"));
+        expectedExtraPlugins.add(PluginBuilder.build(ConfigLoaderShould.PREFIX + "/Empty.jar"));
         expectedExtraPlugins.add(PluginBuilder.build("https://watchwolf.dev/versions/WatchWolf-0.1-1.8-1.19.jar"));
 
         String expectedWorld = "world";
