@@ -1,6 +1,5 @@
 package dev.watchwolf.tester;
 
-import dev.watchwolf.entities.*;
 import dev.watchwolf.entities.PluginBuilder;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.entities.files.ConfigFile;
@@ -8,6 +7,7 @@ import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.files.WorldFile;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * All AbstractTest's instances will have one of those objects to get the necessary data in order to run the tests.
@@ -41,6 +42,8 @@ public class TestConfigFileLoader {
     private Set<ConfigFile> configFiles;
     private Set<String> users;
 
+    private Supplier<File> timingsDirectory;
+
     public TestConfigFileLoader(String file) throws IOException {
         this.file = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
     }
@@ -54,6 +57,25 @@ public class TestConfigFileLoader {
         } catch (NullPointerException ignore) {
             return null;
         }
+    }
+
+    public boolean reportTimings() {
+        return this.getTimingsDirectory() != null;
+    }
+
+    public File getTimingsDirectory() throws IllegalArgumentException {
+        if (this.timingsDirectory == null) {
+            String dir = this.getEntry(it -> (String) it.get("timings-directory"));
+            File directory = null;
+            if (dir != null) {
+                directory = new File(dir);
+                if (!directory.isDirectory()) throw new IllegalArgumentException("The timings directory must be a directory");
+            }
+
+            final File dirCpy = directory;
+            this.timingsDirectory = ()->dirCpy;
+        }
+        return this.timingsDirectory.get();
     }
 
     public String getProvider() {

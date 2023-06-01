@@ -1,10 +1,12 @@
 package dev.watchwolf.tester;
 
 import dev.watchwolf.entities.ServerType;
+import dev.watchwolf.entities.files.ConfigFile;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ public class AbstractTest implements TestWatcher, // send feedback
                 server.tester.setOnServerReady((connector) -> {
                     // @pre This needs to go before notifying
                     try {
+                        if (this.fileLoader.reportTimings()) connector.server.startTimings();
+
                         this.beforeAll(connector);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -90,18 +94,38 @@ public class AbstractTest implements TestWatcher, // send feedback
     }
 
     /**
-     * This method will run just once, at the start. Use it to setup all the tests (e.g. position one player to a specific
-     * place, or giving him items)
+     * This method will run just once (for each server), at the start. Use it to setup all the tests (e.g. position
+     * one player to a specific place, or giving him items)
      * @param server The connector to the server that is being enabled right now
      */
     public void beforeAll(TesterConnector server) throws IOException {}
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) {
-        for (ServerInstance server : this.servers) server.tester.close();
+    public void afterAll(ExtensionContext extensionContext) throws IOException {
+        for (ServerInstance server : this.servers) {
+            TesterConnector connector = server.connector;
+            if (this.fileLoader.reportTimings()) {
+                connector.server.stopTimings()
+                        .saveToFile(
+                                new File(this.fileLoader.getTimingsDirectory(),
+                                        "timings-" + connector.getServerType().name() + "-"
+                                                + connector.getServerVersion() + ".html")
+                        );
+            }
+
+            this.afterAll(connector); // let the test close before the server actually stops
+
+            server.tester.close();
+        }
 
         // TODO send 'done' to website
     }
+
+    /**
+     * This method will run just once (for each server), at the end. Use it to close resources from all the tests
+     * @param server The connector to the server that is being enabled right now
+     */
+    public void afterAll(TesterConnector server) throws IOException {}
 
     @Override
     public void testSuccessful(ExtensionContext context) {
