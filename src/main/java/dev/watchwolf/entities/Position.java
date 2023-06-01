@@ -52,6 +52,10 @@ public class Position extends SocketData {
         return (int)this.z;
     }
 
+    public Position getBlockPosition() {
+        return new Position(this.getWorld(), this.getBlockX(), this.getBlockY(), this.getBlockZ());
+    }
+
     public Position add(Position pos) throws IllegalArgumentException {
         if (!this.world.equals(pos.world)) throw new IllegalArgumentException("You can only add positions in the same world");
         return this.add(pos.x, pos.y, pos.z);

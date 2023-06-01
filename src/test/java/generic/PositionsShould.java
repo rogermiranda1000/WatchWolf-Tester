@@ -48,7 +48,8 @@ public class PositionsShould extends AbstractTest {
     public void roundBlockPositionToBreak(TesterConnector connector) throws Exception {
         ExtendedClientPetition clientPetition = connector.getClientPetition(0);
 
-        Position blockPosition = clientPetition.getPosition().add(1,0,0), // block adjacent to the player
+        Position blockPosition = clientPetition.getPosition().getBlockPosition()
+                                        .add(1,0,0), // block adjacent to the player
                 sameBlockPosition = blockPosition.add(0.5,0.5,0.5);
 
         connector.server.setBlock(blockPosition, Blocks.DIRT);
@@ -67,18 +68,40 @@ public class PositionsShould extends AbstractTest {
         String nickname = connector.getClients()[0];
         ExtendedClientPetition clientPetition = connector.getClientPetition(0);
 
-        Position placingAt = clientPetition.getPosition().add(1,0,0), // block adjacent to the player
+        Position placingAt = clientPetition.getPosition().getBlockPosition()
+                                    .add(1,0,0), // block adjacent to the player
                 sameBlockPosition = placingAt.add(0.5,0.5,0.5);
         Block placing = Blocks.DIRT;
         Item placingItem = new Item(placing.getItemType());
 
         connector.server.setBlock(placingAt, Blocks.AIR);
-        connector.server.setBlock(placingAt.add(0,-1,0), Blocks.AIR); // make sure the player can place the block
+        connector.server.setBlock(placingAt.add(0,-1,0), Blocks.DIRT); // make sure the player can place the block
 
         connector.server.giveItem(nickname, placingItem); // give the item the player needs to place
 
         clientPetition.setBlock(placingItem, sameBlockPosition);
 
         assertEquals(placing, connector.server.getBlock(placingAt));
+    }
+
+    /**
+     * If the player is requested to break a block from another world, it should fail
+     */
+    @ParameterizedTest
+    @ArgumentsSource(PositionsShould.class)
+    public void checkTheWorld(TesterConnector connector) throws Exception {
+        ExtendedClientPetition clientPetition = connector.getClientPetition(0);
+
+        Position blockPosition = clientPetition.getPosition().getBlockPosition()
+                                        .add(1,0,0); // block adjacent to the player
+        Position counterWorldBlockPosition = new Position("none", blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+        Block placing = Blocks.DIRT;
+
+        connector.server.setBlock(blockPosition, placing);
+
+        clientPetition.breakBlock(counterWorldBlockPosition);
+
+        // the block needs to be the same (as you can't break a block from another world)
+        assertEquals(placing, connector.server.getBlock(blockPosition));
     }
 }
