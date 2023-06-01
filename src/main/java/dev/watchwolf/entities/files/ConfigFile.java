@@ -6,6 +6,7 @@ import dev.watchwolf.entities.SocketHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 public class ConfigFile extends SocketData {
@@ -68,6 +69,10 @@ public class ConfigFile extends SocketData {
         return data;
     }
 
+    public void saveToFile(File f) throws IOException {
+        Files.write(f.toPath(), this.data);
+    }
+
     @Override
     public void sendSocketData(ArrayList<Byte> out) {
         SocketHelper.addString(out, this.name + ((this.extension != null) ? ("." + this.extension): ""));
@@ -85,11 +90,21 @@ public class ConfigFile extends SocketData {
     }
     static {
         SocketData.setReaderFunction(ConfigFile.class, (dis) -> {
-            String name = SocketHelper.readString(dis),
-                    path = SocketHelper.readString(dis);
-            // TODO
+            String nameAndExtension = SocketHelper.readString(dis);
+            String offsetPath = SocketHelper.readString(dis);
+
+            // read a 4-byte integer
             int length = 0;
-            return null;
+            int multiplier = 0;
+            for (int n = 0; n < 4; n++) {
+                length |= (dis.readUnsignedByte() << multiplier);
+                multiplier += 8;
+            }
+
+            byte []file = new byte[length];
+            for (int n = 0; n < length; n++) file[n] = (byte)dis.readUnsignedByte();
+
+            return new ConfigFile(nameAndExtension, file, offsetPath);
         });
     }
 }
