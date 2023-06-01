@@ -12,7 +12,6 @@ import dev.watchwolf.entities.entities.EntityType;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.items.Item;
-import dev.watchwolf.server.WorldGuardServerPetition;
 import dev.watchwolf.serversmanager.ServerErrorNotifier;
 import dev.watchwolf.serversmanager.ServerManagerPetition;
 import dev.watchwolf.serversmanager.ServerStartNotifier;
@@ -24,9 +23,8 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-public class TesterConnector implements ServerManagerPetition, ServerPetition, WorldGuardServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver, SynchronizationManager {
+public class TesterConnector implements ServerManagerPetition, ServerPetition, ClientManagerPetition, Runnable, AsyncPetitionResolver, SynchronizationManager {
     private final Socket serversManagerSocket, clientsManagerSocket;
     private ServerStartNotifier onServerStart;
     private ServerErrorNotifier onServerError;
@@ -851,5 +849,50 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, W
     @Override
     public String toString() {
         return "TesterConnector{" + this.getServerType() + " " + this.getServerVersion() + "}";
+    }
+
+    @Override
+    public void startTimings() throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0010_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0004);
+
+        message.send();
+    }
+
+    @Override
+    public ConfigFile stopTimings() throws IOException {
+        if (this.serverManagerSocket == null) return null;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0010_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0005);
+
+        synchronized (this.serverManagerSocket) { // response with return -> reserve the socket before the thread does
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000010_1_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0x0005) throw new IOException("Expected response from 0x0005 operation.");
+
+            return (ConfigFile)SocketData.readSocketData(dis, ConfigFile.class);
+        }
     }
 }
