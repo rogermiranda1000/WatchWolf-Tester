@@ -104,7 +104,10 @@ public class AbstractTest implements TestWatcher, // send feedback
     public void afterAll(ExtensionContext extensionContext) throws IOException {
         for (ServerInstance server : this.servers) {
             TesterConnector connector = server.connector;
+            this.afterAll(connector); // let the test close before the server actually stops
+
             if (this.fileLoader.reportTimings()) {
+                System.out.println("Getting timings report... DO NOT STOP the tests.");
                 connector.server.stopTimings()
                         .saveToFile(
                                 new File(this.fileLoader.getTimingsDirectory(),
@@ -112,8 +115,6 @@ public class AbstractTest implements TestWatcher, // send feedback
                                                 + connector.getServerVersion() + ".html")
                         );
             }
-
-            this.afterAll(connector); // let the test close before the server actually stops
 
             server.tester.close();
         }
