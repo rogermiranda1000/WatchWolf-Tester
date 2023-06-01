@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(WorldGuardPetitionsShould.class) // run the tests with the AbstractTest overridden methods
+@ExtendWith(WorldGuardPetitionsShould.class)
 public class WorldGuardPetitionsShould extends AbstractTest {
     @Override
     public String getConfigFile() {
