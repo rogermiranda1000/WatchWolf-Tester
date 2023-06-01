@@ -3,8 +3,10 @@ package server_starter;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.Tester;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -15,6 +17,7 @@ import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 @ExtendWith(ServerStarterShould.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerStarterShould extends AbstractTest {
     private class ServerStartedInfo {
         public ServerType type;
