@@ -2,6 +2,7 @@ package dev.watchwolf.tester;
 
 import dev.watchwolf.entities.PluginBuilder;
 import dev.watchwolf.entities.ServerType;
+import dev.watchwolf.entities.WorldType;
 import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.files.Plugin;
 import dev.watchwolf.entities.files.WorldFile;
@@ -38,6 +39,7 @@ public class TestConfigFileLoader {
     private Boolean overrideSync;
     private Plugin plugin;
     private Set<Plugin> extraPlugins;
+    private WorldType worldType;
     private Set<WorldFile> maps;
     private Set<ConfigFile> configFiles;
     private Set<String> users;
@@ -76,6 +78,15 @@ public class TestConfigFileLoader {
             this.timingsDirectory = ()->dirCpy;
         }
         return this.timingsDirectory.get();
+    }
+
+    public WorldType getWorldType() throws IllegalArgumentException {
+        if (this.worldType == null) {
+            String type = this.getEntry(it -> (String) it.get("world-type"));
+            if (type != null) this.worldType = WorldType.valueOf(type.toUpperCase());
+            else this.worldType = WorldType.FLAT; // default value
+        }
+        return this.worldType;
     }
 
     public String getProvider() {
