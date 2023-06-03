@@ -54,6 +54,21 @@ public class WorldBuilderShould extends AbstractTest {
                 "Expected peaceful world, found that zombies can be invoked");
     }
 
+    /**
+     * Worlds should have the spawn chunk protection disabled
+     */
+    @ParameterizedTest
+    @ArgumentsSource(WorldBuilderShould.class)
+    public void allowUserInteractionInSpawnChunks(TesterConnector connector) throws Exception {
+        ExtendedClientPetition clientPetition = connector.getClientPetition(0);
+        Position breakPos = clientPetition.getPosition().add(0,-1,0); // break one block in the spawn chunks
+
+        connector.server.setBlock(breakPos, Blocks.DIRT);
+        clientPetition.breakBlock(breakPos);
+
+        assertEquals(Blocks.AIR, connector.server.getBlock(breakPos));
+    }
+
     public static int getMinBlockInFlatWorld(String mcVersion) {
         Version versionWithNegativeMinBlock = new Version("1.18"),
                 currentVersion = new Version(mcVersion);
