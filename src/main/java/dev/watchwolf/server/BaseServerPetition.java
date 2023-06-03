@@ -1,6 +1,7 @@
 package dev.watchwolf.server;
 
 import dev.watchwolf.entities.Container;
+import dev.watchwolf.entities.Difficulty;
 import dev.watchwolf.entities.Position;
 import dev.watchwolf.entities.blocks.Block;
 import dev.watchwolf.entities.entities.Entity;
@@ -26,4 +27,5 @@ public interface BaseServerPetition extends Petition {
     public Entity[]getEntities(Position center, double radius) throws IOException;
     public Entity spawnEntity(Entity e) throws IOException;
     public Entity getEntity(String UUID) throws IOException;
+    public void setDifficulty(Difficulty difficulty) throws IOException;
 }

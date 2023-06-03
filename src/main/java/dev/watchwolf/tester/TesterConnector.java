@@ -47,6 +47,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     public final ServerPetition server = this;
     // TODO client petition with variable
 
+    private boolean isPeaceful = false; // by default, a world is 'normal'
+
     public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket, boolean overrideSync) {
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
@@ -221,9 +223,32 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         return this.version;
     }
 
+    @Override
+    public String getServersManagerVersion() throws IOException {
+        Message message = new Message(this.serversManagerSocket);
+
+        // get version header
+        message.add((short) 0b111111111111_0_000);
+
+        synchronized (this.serversManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b111111111111_1_000) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
+        }
+    }
+
     /* INTERFACES */
     @Override
-    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, ConfigFile[] configFiles) throws IOException {
+    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, WorldType worldType, ConfigFile[] configFiles) throws IOException {
         this.onServerStart = onServerStart;
         this.onServerError = onError;
 
@@ -237,6 +262,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         SocketHelper.addString(message, version);
 
         SocketHelper.addArray(message, plugins);
+
+        worldType.sendSocketData(message);
 
         SocketHelper.addArray(message, configFiles);
 
@@ -629,6 +656,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     public Entity spawnEntity(Entity e) throws IOException {
         if (this.serverManagerSocket == null) return null;
 
+        // TODO warn the player if they're spawning a hostile mob
+        //if (this.isPeaceful && e.getType().)
+
         this.requestSynchronization((ServerPetition)this);
 
         Message message = new Message(this.serverManagerSocket);
@@ -688,6 +718,54 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public void setDifficulty(Difficulty difficulty) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0013);
+
+        difficulty.sendSocketData(message);
+
+        message.send();
+
+        this.isPeaceful = difficulty.equals(Difficulty.PEACEFUL);
+    }
+
+    @Override
+    public String getVersion() throws IOException {
+        // no need to sync
+
+        // from a server pov
+        Message message = new Message(this.serverManagerSocket);
+
+        // get version header
+        message.add((short) 0b000000000001_0_001);
+        message.add((short) 0xFFFF);
+
+        synchronized (this.serverManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_0_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0xFFFF) throw new IOException("Expected response from 0xFFFF operation.");
+            return SocketHelper.readString(dis);
+        }
+    }
+
+    @Override
     public void synchronize() throws IOException {
         if (this.serverManagerSocket == null) return;
 
@@ -711,6 +789,29 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
                 r = SocketHelper.readShort(dis);
             }
             if (SocketHelper.readShort(dis) != 0x000B) throw new IOException("Expected response from 0x000B operation.");
+        }
+    }
+
+    @Override
+    public String getClientsManagerVersion() throws IOException {
+        Message message = new Message(this.clientsManagerSocket);
+
+        // get version header
+        message.add((short) 0b111111111111_0_010);
+
+        synchronized (this.clientsManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.clientsManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b111111111111_1_010) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
         }
     }
 

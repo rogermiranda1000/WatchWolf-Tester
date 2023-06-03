@@ -32,27 +32,32 @@ public class Tester implements Runnable, ServerStartNotifier {
     private final String version;
     private final Plugin testedPlugin;
     private final Plugin[] extraPlugins;
+    private final WorldType worldType;
     private final WorldFile[] maps;
     private final ConfigFile[] configFiles;
     private final String[] clientNames;
 
     private final IPModifier ipModifier;
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync, IPModifier ipModifier) {
+    private final Difficulty initialDifficulty;
+
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldType worldType, Difficulty difficulty, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync, IPModifier ipModifier) {
         this.connector = new TesterConnector(serverManagerSocket, clientsManagerSocket, overrideSync);
 
         this.mcType = mcType;
         this.version = version;
         this.testedPlugin = testedPlugin;
         this.extraPlugins = extraPlugins;
+        this.worldType = worldType;
         this.maps = maps;
         this.configFiles = configFiles;
         this.clientNames = clientNames;
         this.ipModifier = ipModifier;
+        this.initialDifficulty = difficulty;
     }
 
-    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
-        this(serverManagerSocket, mcType, version, testedPlugin, extraPlugins, maps, configFiles, clientsManagerSocket, clientNames, overrideSync, Tester.IP_NO_MODIFY);
+    public Tester(Socket serverManagerSocket, ServerType mcType, String version, Plugin testedPlugin, Plugin[] extraPlugins, WorldType worldType, Difficulty difficulty, WorldFile[] maps, ConfigFile[] configFiles, Socket clientsManagerSocket, String[] clientNames, boolean overrideSync) {
+        this(serverManagerSocket, mcType, version, testedPlugin, extraPlugins, worldType, difficulty, maps, configFiles, clientsManagerSocket, clientNames, overrideSync, Tester.IP_NO_MODIFY);
     }
 
     public Tester setOnServerReady(ServerStartNotifier onServerReady) {
@@ -77,7 +82,7 @@ public class Tester implements Runnable, ServerStartNotifier {
             Collections.addAll(serverPlugins, this.extraPlugins);
             serverPlugins.add(testedPlugin);
             String ipPlusPort = this.connector.startServer(this, this.onError, this.mcType, this.version, serverPlugins.toArray(new Plugin[0]),
-                    Stream.of(this.maps, this.configFiles).flatMap(Stream::of).toArray(ConfigFile[]::new));
+                    this.worldType, Stream.of(this.maps, this.configFiles).flatMap(Stream::of).toArray(ConfigFile[]::new));
             if (ipPlusPort.equals("")) throw new IOException("Failed to start server " + this.mcType.name() + " version " + this.version);
             String []ip = ipPlusPort.split(":");
             new Thread(this.connector).start();
@@ -98,6 +103,9 @@ public class Tester implements Runnable, ServerStartNotifier {
         try {
             System.out.println("Connecting to " + this.serverIp + ":" + this.serverSocketPort + " (server)...");
             this.connector.setServerManagerSocket(new Socket(this.ipModifier.modifyIp(this.serverIp), this.serverSocketPort), this.mcType, this.version);
+
+            // set the difficulty
+            this.connector.setDifficulty(this.initialDifficulty);
 
             // whitelist the players
             for (String client : this.clientNames) this.connector.whitelistPlayer(client);

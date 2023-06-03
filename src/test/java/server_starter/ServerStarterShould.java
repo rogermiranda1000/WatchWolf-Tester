@@ -1,6 +1,8 @@
 package server_starter;
 
+import dev.watchwolf.entities.Difficulty;
 import dev.watchwolf.entities.ServerType;
+import dev.watchwolf.entities.WorldType;
 import dev.watchwolf.tester.AbstractTest;
 import dev.watchwolf.tester.Tester;
 import org.junit.jupiter.api.MethodOrderer;
@@ -67,7 +69,7 @@ public class ServerStarterShould extends AbstractTest {
 
                 System.out.println("Starting server for " + serverType.name() + " " + serverVersion);
                 Tester tester = new Tester(serversManagerSocket, serverType, serverVersion, this.fileLoader.getPlugin(),
-                        this.fileLoader.getExtraPlugins(), this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(),
+                        this.fileLoader.getExtraPlugins(), WorldType.FLAT, Difficulty.PEACEFUL, this.fileLoader.getMaps(), this.fileLoader.getConfigFiles(),
                         clientsManagerSocket, this.fileLoader.getUsers(), this.fileLoader.getOverrideSync(),
                         this.fileLoader.getProvider().equals("127.0.0.1") ? Tester.IP_WSL_MODIFY : Tester.IP_NO_MODIFY)
                         /*.setOnServerError(Tester.DEFAULT_ERROR_PRINT)*/;
