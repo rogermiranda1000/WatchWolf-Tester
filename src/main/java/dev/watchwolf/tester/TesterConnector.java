@@ -714,6 +714,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
     @Override
     public String getVersion() throws IOException {
+        // no need to sync
+
         // from a server pov
         Message message = new Message(this.serverManagerSocket);
 

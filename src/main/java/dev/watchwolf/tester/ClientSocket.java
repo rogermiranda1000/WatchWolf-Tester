@@ -183,7 +183,7 @@ public class ClientSocket implements ClientPetition {
 
     @Override
     public String getVersion() throws IOException {
-        this.syncManager.requestSynchronization(this); // not really needed for this
+        // no need to sync
 
         Message message = new Message(this.socket);
 
