@@ -221,6 +221,29 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         return this.version;
     }
 
+    @Override
+    public String getServersManagerVersion() throws IOException {
+        Message message = new Message(this.serversManagerSocket);
+
+        // get version header
+        message.add((short) 0b111111111111_0_000);
+
+        synchronized (this.serversManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serversManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b111111111111_1_000) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
+        }
+    }
+
     /* INTERFACES */
     @Override
     public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, WorldType worldType, ConfigFile[] configFiles) throws IOException {
@@ -690,6 +713,32 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public String getVersion() throws IOException {
+        // from a server pov
+        Message message = new Message(this.serverManagerSocket);
+
+        // get version header
+        message.add((short) 0b000000000001_0_001);
+        message.add((short) 0xFFFF);
+
+        synchronized (this.serverManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.serverManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000000001_0_001) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            if (SocketHelper.readShort(dis) != 0xFFFF) throw new IOException("Expected response from 0xFFFF operation.");
+            return SocketHelper.readString(dis);
+        }
+    }
+
+    @Override
     public void synchronize() throws IOException {
         if (this.serverManagerSocket == null) return;
 
@@ -713,6 +762,29 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
                 r = SocketHelper.readShort(dis);
             }
             if (SocketHelper.readShort(dis) != 0x000B) throw new IOException("Expected response from 0x000B operation.");
+        }
+    }
+
+    @Override
+    public String getClientsManagerVersion() throws IOException {
+        Message message = new Message(this.clientsManagerSocket);
+
+        // get version header
+        message.add((short) 0b111111111111_0_010);
+
+        synchronized (this.clientsManagerSocket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.clientsManagerSocket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b111111111111_1_010) {
+                this.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
         }
     }
 

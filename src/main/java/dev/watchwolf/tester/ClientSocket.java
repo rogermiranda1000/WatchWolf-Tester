@@ -182,6 +182,31 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
+    public String getVersion() throws IOException {
+        this.syncManager.requestSynchronization(this); // not really needed for this
+
+        Message message = new Message(this.socket);
+
+        // get version header
+        message.add((short) 0b111111111111_0_011);
+
+        synchronized (this.socket) {
+            message.send();
+
+            // TODO if none got, then it's <0.1.22
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b111111111111_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readString(dis);
+        }
+    }
+
+    @Override
     public void synchronize() throws IOException {
         this.syncManager.requestSynchronization(this);
 
