@@ -223,7 +223,7 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
 
     /* INTERFACES */
     @Override
-    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, ConfigFile[] configFiles) throws IOException {
+    public String startServer(ServerStartNotifier onServerStart, ServerErrorNotifier onError, ServerType mcType, String version, Plugin[] plugins, WorldType worldType, ConfigFile[] configFiles) throws IOException {
         this.onServerStart = onServerStart;
         this.onServerError = onError;
 
@@ -237,6 +237,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
         SocketHelper.addString(message, version);
 
         SocketHelper.addArray(message, plugins);
+
+        worldType.sendSocketData(message);
 
         SocketHelper.addArray(message, configFiles);
 
