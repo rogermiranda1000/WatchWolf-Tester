@@ -1,5 +1,6 @@
 package dev.watchwolf.tester;
 
+import dev.watchwolf.entities.Difficulty;
 import dev.watchwolf.entities.PluginBuilder;
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.entities.WorldType;
@@ -46,6 +47,8 @@ public class TestConfigFileLoader {
 
     private Supplier<File> timingsDirectory;
 
+    private Difficulty difficulty;
+
     public TestConfigFileLoader(String file) throws IOException {
         this.file = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
     }
@@ -87,6 +90,16 @@ public class TestConfigFileLoader {
             else this.worldType = WorldType.FLAT; // default value
         }
         return this.worldType;
+    }
+
+
+    public Difficulty getDifficulty() throws IllegalArgumentException {
+        if (this.difficulty == null) {
+            String type = this.getEntry(it -> (String) it.get("difficulty"));
+            if (type != null) this.difficulty = Difficulty.valueOf(type.toUpperCase());
+            else this.difficulty = Difficulty.PEACEFUL; // default value
+        }
+        return this.difficulty;
     }
 
     public String getProvider() {

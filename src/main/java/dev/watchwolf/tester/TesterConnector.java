@@ -47,6 +47,8 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     public final ServerPetition server = this;
     // TODO client petition with variable
 
+    private boolean isPeaceful = false; // by default, a world is 'normal'
+
     public TesterConnector(Socket serversManagerSocket, Socket clientsManagerSocket, boolean overrideSync) {
         this.serversManagerSocket = serversManagerSocket;
         this.clientsManagerSocket = clientsManagerSocket;
@@ -654,6 +656,9 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     public Entity spawnEntity(Entity e) throws IOException {
         if (this.serverManagerSocket == null) return null;
 
+        // TODO warn the player if they're spawning a hostile mob
+        //if (this.isPeaceful && e.getType().)
+
         this.requestSynchronization((ServerPetition)this);
 
         Message message = new Message(this.serverManagerSocket);
@@ -710,6 +715,26 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
             if (SocketHelper.readShort(dis) != 0x0012) throw new IOException("Expected response from 0x0012 operation.");
             return (Entity) SocketData.readSocketData(dis, Entity.class);
         }
+    }
+
+    @Override
+    public void setDifficulty(Difficulty difficulty) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0013);
+
+        difficulty.sendSocketData(message);
+
+        message.send();
+
+        this.isPeaceful = difficulty.equals(Difficulty.PEACEFUL);
     }
 
     @Override
