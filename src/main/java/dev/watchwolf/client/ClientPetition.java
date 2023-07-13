@@ -18,4 +18,6 @@ public interface ClientPetition extends Petition {
     public void hit() throws IOException;
     public void use() throws IOException;
     public void attack(String UUID) throws IOException;
+    public int start_recording() throws IOException;
+    public void stop_recording(int id, String out_path) throws IOException;
 }
