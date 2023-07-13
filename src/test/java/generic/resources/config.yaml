@@ -10,4 +10,6 @@ server-type:
 users:
   - "MinecraftGamer_Z"
 
+recordings-directory: "./src/test/java/generic/resources/recordings"
+
 plugin: "WatchWolf"

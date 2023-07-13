@@ -46,6 +46,7 @@ public class TestConfigFileLoader {
     private Set<String> users;
 
     private Supplier<File> timingsDirectory;
+    private Supplier<File> recordingsDirectory;
 
     private Difficulty difficulty;
 
@@ -81,6 +82,21 @@ public class TestConfigFileLoader {
             this.timingsDirectory = ()->dirCpy;
         }
         return this.timingsDirectory.get();
+    }
+
+    public File getRecordingsDirectory() throws IllegalArgumentException {
+        if (this.recordingsDirectory == null) {
+            String dir = this.getEntry(it -> (String) it.get("recordings-directory"));
+            File directory = null;
+            if (dir != null) {
+                directory = new File(dir);
+                if (!directory.isDirectory()) throw new IllegalArgumentException("The recordings directory must be a directory");
+            }
+
+            final File dirCpy = directory;
+            this.recordingsDirectory = ()->dirCpy;
+        }
+        return this.recordingsDirectory.get();
     }
 
     public WorldType getWorldType() throws IllegalArgumentException {

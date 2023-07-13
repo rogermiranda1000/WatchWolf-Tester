@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class ConfigFile extends SocketData {
@@ -69,7 +70,9 @@ public class ConfigFile extends SocketData {
         return data;
     }
 
-    public void saveToFile(File f) throws IOException {
+    public void saveToFile(File f) throws IOException, RuntimeException {
+        if (f.isDirectory()) throw new RuntimeException("Can't save a directory");
+        Files.createDirectories(f.getParentFile().toPath()); // create the directory (if not exists)
         Files.write(f.toPath(), this.data);
     }
 

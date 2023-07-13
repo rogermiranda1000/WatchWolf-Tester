@@ -5,6 +5,7 @@ import dev.watchwolf.entities.entities.Entity;
 import dev.watchwolf.entities.items.Item;
 import dev.watchwolf.tester.Petition;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface ClientPetition extends Petition {
@@ -19,5 +20,5 @@ public interface ClientPetition extends Petition {
     public void use() throws IOException;
     public void attack(String UUID) throws IOException;
     public int start_recording() throws IOException;
-    public void stop_recording(int id, String out_path) throws IOException;
+    public void stop_recording(int id, File out_path) throws IOException;
 }

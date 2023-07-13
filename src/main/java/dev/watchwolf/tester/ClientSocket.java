@@ -206,7 +206,7 @@ public class ClientSocket implements ClientPetition {
     }
 
     @Override
-    public void stop_recording(int id, String out_path) throws IOException {
+    public void stop_recording(int id, File out_path) throws IOException {
         Message message = new Message(this.socket);
 
         // stop recording header
@@ -226,7 +226,7 @@ public class ClientSocket implements ClientPetition {
             }
             video = (ConfigFile)SocketData.readSocketData(dis, ConfigFile.class);
         }
-        video.saveToFile(new File(out_path));
+        video.saveToFile(out_path);
     }
 
     @Override
