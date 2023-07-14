@@ -14,8 +14,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(WorldBuilderShould.class)
 public class WorldBuilderShould extends AbstractTest {
@@ -40,18 +39,38 @@ public class WorldBuilderShould extends AbstractTest {
     }
 
     /**
-     * Worlds should be peaceful by default
+     * Worlds should be medium by default
      */
     @ParameterizedTest
     @ArgumentsSource(WorldBuilderShould.class)
-    public void preventEnemiesIfNoOptionProvided(TesterConnector connector) throws Exception {
+    public void allowEnemiesIfNoOptionProvided(TesterConnector connector) throws Exception {
         ExtendedClientPetition clientPetition = connector.getClientPetition(0);
         Position spawnAt = clientPetition.getPosition();
 
         connector.spawnEntity(new Zombie(spawnAt));
 
-        assertFalse(Arrays.asList(connector.getEntities(spawnAt, 10)).stream().anyMatch(e -> e.getType().equals(EntityType.ZOMBIE)),
-                "Expected peaceful world, found that zombies can be invoked");
+        assertTrue(Arrays.asList(connector.getEntities(spawnAt, 10)).stream().anyMatch(e -> e.getType().equals(EntityType.ZOMBIE)),
+                "Expected world with mobs, but found no zombies in the region");
+    }
+
+    /**
+     * Players shouldn't take damage by default
+     */
+    @ParameterizedTest
+    @ArgumentsSource(WorldBuilderShould.class)
+    public void preventEnemyDamageIfNoOptionProvided(TesterConnector connector) throws Exception {
+        ExtendedClientPetition clientPetition = connector.getClientPetition(0);
+
+        connector.server.setBlock(clientPetition.getPosition(), Blocks.LAVA);
+
+        Thread.sleep(5000); // at this point the user should be dead
+
+        Position testBlock = clientPetition.getPosition().add(0,-1,0);
+        connector.server.setBlock(testBlock, Blocks.DIRT);
+        clientPetition.breakBlock(testBlock);
+
+        assertEquals(Blocks.AIR, connector.server.getBlock(testBlock),
+                "The player didn't break the block after swiming in lava (is it dead?)");
     }
 
     /**

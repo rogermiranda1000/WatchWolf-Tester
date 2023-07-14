@@ -76,6 +76,7 @@ public class AbstractTest implements TestWatcher, // send feedback
                     // @pre This needs to go before notifying
                     try {
                         if (this.fileLoader.reportTimings()) connector.server.startTimings();
+                        connector.server.setInvincibleMode(this.fileLoader.getInvincibleModeEnabled());
 
                         this.beforeAll(connector);
                     } catch (IOException e) {
