@@ -738,6 +738,24 @@ public class TesterConnector implements ServerManagerPetition, ServerPetition, C
     }
 
     @Override
+    public void setInvincibleMode(boolean invincible) throws IOException {
+        if (this.serverManagerSocket == null) return;
+
+        this.requestSynchronization((ServerPetition)this);
+
+        Message message = new Message(this.serverManagerSocket);
+
+        // get entity by uuid header
+        message.add((byte) 0b0001_0_001);
+        message.add((byte) 0b00000000);
+        message.add((short) 0x0014);
+
+        message.add(invincible);
+
+        message.send();
+    }
+
+    @Override
     public String getVersion() throws IOException {
         // no need to sync
 

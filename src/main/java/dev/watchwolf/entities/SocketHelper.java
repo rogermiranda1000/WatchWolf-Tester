@@ -52,6 +52,15 @@ public class SocketHelper {
         SocketHelper.addDouble(out, (double) d);
     }
 
+    public static void addBool(ArrayList<Byte> out, boolean b) {
+        if (b) out.add((byte) 0xFF);
+        else out.add((byte) 0);
+    }
+
+    public static boolean readBool(DataInputStream dis) throws IOException {
+        return dis.readUnsignedByte() != 0x00;
+    }
+
     public static void addShort(ArrayList<Byte> out, int s) {
         out.add((byte)(s & 0xFF));
         out.add((byte)((s >> 8)&0xFF));
