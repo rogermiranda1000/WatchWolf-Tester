@@ -28,4 +28,5 @@ public interface BaseServerPetition extends Petition {
     public Entity spawnEntity(Entity e) throws IOException;
     public Entity getEntity(String UUID) throws IOException;
     public void setDifficulty(Difficulty difficulty) throws IOException;
+    public void setInvincibleMode(boolean invincible) throws IOException;
 }

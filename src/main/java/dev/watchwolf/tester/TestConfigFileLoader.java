@@ -49,6 +49,7 @@ public class TestConfigFileLoader {
     private Supplier<File> recordingsDirectory;
 
     private Difficulty difficulty;
+    private Boolean invincibleModeEnabled;
 
     public TestConfigFileLoader(String file) throws IOException {
         this.file = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
@@ -113,9 +114,18 @@ public class TestConfigFileLoader {
         if (this.difficulty == null) {
             String type = this.getEntry(it -> (String) it.get("difficulty"));
             if (type != null) this.difficulty = Difficulty.valueOf(type.toUpperCase());
-            else this.difficulty = Difficulty.PEACEFUL; // default value
+            else this.difficulty = Difficulty.NORMAL; // default value
         }
         return this.difficulty;
+    }
+
+    public boolean getInvincibleModeEnabled() throws IllegalArgumentException {
+        if (this.invincibleModeEnabled == null) {
+            Boolean type = this.getEntry(it -> (boolean) it.get("invincible"));
+            if (type != null) this.invincibleModeEnabled = type;
+            else this.invincibleModeEnabled = true; // default value
+        }
+        return this.invincibleModeEnabled;
     }
 
     public String getProvider() {

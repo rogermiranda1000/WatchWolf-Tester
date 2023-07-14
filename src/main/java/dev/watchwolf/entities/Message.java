@@ -30,6 +30,11 @@ public class Message {
         this.send.add(b);
     }
 
+    public void add(boolean b) {
+        if (b) this.add((byte) 0xFF);
+        else this.add((byte) 0);
+    }
+
     public void add(double d) {
         SocketHelper.addDouble(this.send, d);
     }
@@ -49,6 +54,7 @@ public class Message {
         }
 
         if (o instanceof Byte) this.add((byte) o);
+        else if (o instanceof Boolean) this.add((boolean) o);
         else if (o instanceof Double) this.add((double) o);
         else if (o instanceof Float) this.add((float) o);
         else if (o instanceof String) SocketHelper.addString(this.send, (String)o);
