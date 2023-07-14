@@ -3,11 +3,14 @@ package dev.watchwolf.tester;
 import dev.watchwolf.client.ClientPetition;
 import dev.watchwolf.entities.Message;
 import dev.watchwolf.entities.Position;
+import dev.watchwolf.entities.SocketData;
 import dev.watchwolf.entities.SocketHelper;
 import dev.watchwolf.entities.entities.Entity;
+import dev.watchwolf.entities.files.ConfigFile;
 import dev.watchwolf.entities.items.Item;
 
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -179,6 +182,51 @@ public class ClientSocket implements ClientPetition {
         message.add(uuid);
 
         message.send();
+    }
+
+    @Override
+    public int start_recording() throws IOException {
+        Message message = new Message(this.socket);
+
+        // start recording header
+        message.add((short) 0b000000001111_0_011);
+
+        synchronized (this.socket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000001111_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            return SocketHelper.readShort(dis);
+        }
+    }
+
+    @Override
+    public void stop_recording(int id, File out_path) throws IOException {
+        Message message = new Message(this.socket);
+
+        // stop recording header
+        message.add((short) 0b000000010000_0_011);
+        message.add((short) id);
+
+        ConfigFile video;
+        synchronized (this.socket) {
+            message.send();
+
+            // read response
+            DataInputStream dis = new DataInputStream(this.socket.getInputStream());
+            int r = SocketHelper.readShort(dis);
+            while (r != 0b000000010000_1_011) {
+                this.asyncResolver.processAsyncReturn(r, dis); // expected return, found async return from another request
+                r = SocketHelper.readShort(dis);
+            }
+            video = (ConfigFile)SocketData.readSocketData(dis, ConfigFile.class);
+        }
+        video.saveToFile(out_path);
     }
 
     @Override

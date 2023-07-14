@@ -2,6 +2,9 @@ package dev.watchwolf.tester;
 
 import dev.watchwolf.entities.ServerType;
 import dev.watchwolf.entities.files.ConfigFile;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -26,6 +30,8 @@ public class AbstractTest implements TestWatcher, // send feedback
     private static HashMap<Class<? extends AbstractTest>, AbstractTest> instances = new HashMap<>();
 
     private ArrayList<ServerInstance> servers;
+    private HashMap<ServerInstance,HashMap<String,Integer>> cameras;
+
     private UUID testID;
 
     protected TestConfigFileLoader fileLoader;
@@ -139,6 +145,42 @@ public class AbstractTest implements TestWatcher, // send feedback
     public void testFailed(ExtensionContext context, Throwable cause) {
         // TODO send 'fail' to website
         System.err.println("Test " + context.getDisplayName() + " failed: " + cause.getMessage());
+    }
+
+    @BeforeEach
+    public void startRecording() throws IOException {
+        AbstractTest tis = AbstractTest.getInstance(this.getClass());
+        if (tis.fileLoader.getRecordingsDirectory() == null) return; // don't record
+
+        tis.cameras = new HashMap<>();
+        for (ServerInstance si : tis.servers) {
+            HashMap<String,Integer> serverCameras = new HashMap<>();
+
+            for (String player : si.connector.server.getPlayers()) {
+                int playerCameraId = si.connector.getClientPetition(player)
+                                .start_recording();
+                serverCameras.put(player, playerCameraId);
+            }
+
+            tis.cameras.put(si, serverCameras);
+        }
+    }
+
+    @AfterEach
+    public void doneRecording(TestInfo testInfo) throws IOException {
+        AbstractTest tis = AbstractTest.getInstance(this.getClass());
+        if (tis.cameras == null) return;
+
+        for (Map.Entry<ServerInstance,HashMap<String,Integer>> server : tis.cameras.entrySet()) {
+            TesterConnector connector = server.getKey().connector;
+            File recordingsFolder = new File(new File(tis.fileLoader.getRecordingsDirectory(), testInfo.getTestMethod().get().getName()),
+                    connector.getServerType().name() + "-" + connector.getServerVersion());
+
+            for (Map.Entry<String,Integer> user : server.getValue().entrySet()) {
+                String username = user.getKey();
+                connector.getClientPetition(username).stop_recording(user.getValue(), new File(recordingsFolder, username + ".mp4"));
+            }
+        }
     }
 
     protected static AbstractTest getInstance(Class<?> cls) throws IllegalArgumentException {
