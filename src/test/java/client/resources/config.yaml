@@ -1,0 +1,11 @@
+server-type:
+  - Spigot:
+      - "1.18"
+      - "1.8.8"
+
+difficulty: "PEACEFUL"
+
+users:
+  - "MinecraftGamer_Z"
+
+plugin: "WatchWolf"
